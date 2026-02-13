@@ -1,0 +1,36 @@
+﻿Meeting 1
+Meeting minutes: 30.
+The design change and thought process of the website has changed. 
+Before we had the idea to plan for the whole 4 years but it has been changed to per semester.
+The website got an overhaul update thanks to Jostin with him also adding a log in page and sign up page. The ability to add courses also being added.
+
+
+That have been done are :
+creating the website
+Adding the courses UI
+Weekly schedule
+What needs to be done:
+Memory logic
+
+
+development tasks per user story
+Build term schedule
+*  Create Test Folder and Folder folder for Dummy Data
+* Define repository interfaces 
+* Create domain model classes 
+* View weekly timetable for a term
+* Add courses to a term (with validation)
+* Term schedule UI (create/view schedule)
+
+
+Plan full degree time line
+* Release checklist 
+
+
+Eligibility and rule feedback about said plans
+* Release checklist 
+* Implement Eligibility + Plan services (rules/logic) 
+* Time conflict checker
+
+
+Save and compare plans
