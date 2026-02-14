@@ -1,3 +1,8 @@
+/**
+ * Optional performance reporting (from CRA template).
+ * Not required for this project.
+ */
+
 const reportWebVitals = onPerfEntry => {
   if (onPerfEntry && onPerfEntry instanceof Function) {
     import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {

@@ -1,3 +1,9 @@
+/**
+ * Legacy file (likely unused in Vite build).
+ * The app entrypoint imports App.jsx from main.jsx.
+ * Keep this only if your team still uses it for reference.
+ */
+
 import React, { useEffect, useMemo, useState } from "react";
 import "./App.css";
 

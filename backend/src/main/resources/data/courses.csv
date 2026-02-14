@@ -1,0 +1,11 @@
+﻿courseCode,title,credits,department,prerequisites
+EECS 2001,Computer Organization,3,EECS,EECS 1022
+EECS 2030,Advanced Object Oriented Programming,3,EECS,EECS 1022
+EECS 2031,Software Tools,3,EECS,EECS 1022
+EECS 2311,Software Engineering Testing,3,EECS,EECS 2030
+EECS 2021,Computer Organization & Programming,3,EECS,EECS 1021
+EECS 2101,Fundamentals of Data Structures,3,EECS,EECS 1022
+EECS 2200,Electric Circuits,3,EECS,PHYS 1800
+EECS 2011,Data Structures and Algorithms,3,EECS,EECS 1022
+MATH 1013,Applied Calculus I,3,MATH,
+MATH 1014,Applied Calculus II,3,MATH,MATH 1013

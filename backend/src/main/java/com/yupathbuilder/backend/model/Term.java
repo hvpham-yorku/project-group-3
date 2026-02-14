@@ -2,12 +2,21 @@ package com.yupathbuilder.backend.model;
 
 import java.util.Objects;
 
-public final class Term implements Comparable<Term> {
+
+/**
+ * Domain model: Term.
+ *
+ * <p>Simple immutable data structures used throughout the backend.
+ */
+
+public class Term implements Comparable<Term> {
 
     public enum Season { WINTER, SUMMER, FALL }
 
-    private final Season season;
-    private final int year;
+    private Season season;
+    private int year;
+
+    public Term() {}
 
     public Term(Season season, int year) {
         if (season == null) throw new IllegalArgumentException("season cannot be null");
@@ -16,28 +25,30 @@ public final class Term implements Comparable<Term> {
         this.year = year;
     }
 
-    public Season getSeason() {
-        return season;
-    }
+    public Season getSeason() { return season; }
+    public void setSeason(Season season) { this.season = season; }
 
-    public int getYear() {
-        return year;
-    }
+    public int getYear() { return year; }
+    public void setYear(int year) { this.year = year; }
 
     @Override
     public int compareTo(Term other) {
-        if (other == null) throw new NullPointerException("other term is null");
-        int yearCmp = Integer.compare(this.year, other.year);
-        if (yearCmp != 0) return yearCmp;
+        if (other == null) return 1;
+
+        // Compare by year first
+        int byYear = Integer.compare(this.year, other.year);
+        if (byYear != 0) return byYear;
+
+        // Same year: compare by season order
         return Integer.compare(seasonOrder(this.season), seasonOrder(other.season));
     }
 
-    private static int seasonOrder(Season s) {
-        // York usually goes Winter -> Summer -> Fall
+    private int seasonOrder(Season s) {
+        // Chronological within a year (typical): WINTER -> SUMMER -> FALL
         return switch (s) {
-            case WINTER -> 0;
-            case SUMMER -> 1;
-            case FALL -> 2;
+            case WINTER -> 1;
+            case SUMMER -> 2;
+            case FALL -> 3;
         };
     }
 
@@ -51,10 +62,5 @@ public final class Term implements Comparable<Term> {
     @Override
     public int hashCode() {
         return Objects.hash(season, year);
-    }
-
-    @Override
-    public String toString() {
-        return season + " " + year;
     }
 }

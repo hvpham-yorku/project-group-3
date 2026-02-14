@@ -1,0 +1,12 @@
+{
+  "jostin" : {
+    "username" : "Jostin",
+    "passwordHash" : "$2a$10$9lQHI138BUjPBr9w8KsFROE7MFHdVp99YCoFFfdop5z9fzg5t8iMe",
+    "roles" : [ "ROLE_STUDENT" ]
+  },
+  "student" : {
+    "username" : "student",
+    "passwordHash" : "$2a$10$qgGlQc2isHKXajTZ5hD.mujCI1swcZ1rBsihaDnt5eCvgKm5pn8tu",
+    "roles" : [ "ROLE_STUDENT" ]
+  }
+}
