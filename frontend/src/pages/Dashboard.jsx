@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { buildSchedule, listCourses, searchCourses } from "./api.js";
-import ScheduleGrid from "./ScheduleGrid.jsx";
+import ScheduleGrid from "../components/ScheduleGrid.jsx";
 
 /**
  * Dashboard.jsx
