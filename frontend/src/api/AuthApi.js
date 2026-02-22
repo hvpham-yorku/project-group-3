@@ -1,74 +1,30 @@
-/**
- * AuthApi.js
- * Handles:
- * - JWT storage
- * - Login / Register API calls
- * - Logout (clear localStorage)
- */
+import { http, setAuth, clearAuth } from "./Http.js";
 
-const TOKEN_KEY = "ypb_token";
-const USER_KEY = "ypb_user";
-
-// Vite proxy handles forwarding to Spring Boot
-const API_BASE = "";
-
-/* ------------------------------ Auth storage ------------------------------ */
-
-export function getToken() {
-  return localStorage.getItem(TOKEN_KEY) || "";
-}
-
-export function getUsername() {
-  return localStorage.getItem(USER_KEY) || "";
-}
-
-export function setAuth(token, username) {
-  localStorage.setItem(TOKEN_KEY, token || "");
-  localStorage.setItem(USER_KEY, username || "");
-}
-
-export function clearAuth() {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
-}
-
-/* ------------------------------ HTTP helper ------------------------------ */
-
-async function http(method, path, body) {
-  const token = getToken();
-
-  const res = await fetch(`${API_BASE}${path}`, {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-
-  const contentType = res.headers.get("content-type") || "";
-  const isJson = contentType.includes("application/json");
-  const payload = isJson
-    ? await res.json().catch(() => null)
-    : await res.text().catch(() => "");
-
-  if (!res.ok) {
-    const msg =
-      (payload && (payload.message || payload.error)) ||
-      (typeof payload === "string" && payload) ||
-      `HTTP ${res.status}`;
-    throw new Error(msg);
-  }
-
-  return payload;
-}
-
-/* ------------------------------ Auth routes ------------------------------ */
+/* ---------------- Auth Routes ---------------- */
 
 export async function login(username, password) {
-  return http("POST", "/api/auth/login", { username, password });
+  const data = await http("POST", "/api/auth/login", {
+    username,
+    password,
+  });
+
+  // Save token automatically
+  setAuth(data.token, data.username);
+
+  return data;
 }
 
 export async function register(username, password) {
-  return http("POST", "/api/auth/register", { username, password });
+  const data = await http("POST", "/api/auth/register", {
+    username,
+    password,
+  });
+
+  setAuth(data.token, data.username);
+
+  return data;
+}
+
+export function logout() {
+  clearAuth();
 }

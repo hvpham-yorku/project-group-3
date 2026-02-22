@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Topbar from "../components/layout/Topbar.jsx";
+import TopBar from "../components/layout/TopBar.jsx";
 import LoginCard from "../components/auth/LoginCard.jsx";
 import Register from "../components/auth/RegisterCard.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
@@ -10,7 +10,7 @@ export default function AuthPage() {
 
   return (
     <>
-      <Topbar isAuthed={false} />
+      <TopBar/>
 
       <main className="container">
         {mode === "login" ? (

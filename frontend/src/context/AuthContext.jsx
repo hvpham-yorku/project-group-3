@@ -1,12 +1,16 @@
 import React, { createContext, useContext, useMemo, useState } from "react";
 import {
-  clearAuth,
-  getToken,
-  getUsername,
-  setAuth,
   login as apiLogin,
   register as apiRegister,
 } from "../api/AuthApi.js";
+import { 
+  clearAuth, 
+  getToken,
+  getUsername,
+  setAuth, 
+} from "../api/Http.js";
+
+
 
 /**
  * AuthContext

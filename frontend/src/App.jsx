@@ -1,5 +1,5 @@
 import React from "react";
-//import Dashboard from "./Dashboard.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
 import { useAuth } from "./context/AuthContext.jsx";
 
