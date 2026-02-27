@@ -99,9 +99,9 @@ export async function listCourses() {
 
 export async function buildSchedule(term, courseCodes) {
   // Protected endpoint: POST /api/schedule/build
-  // body: { term: string, courses: string[] }
+  // body: { term: string, courseCodes: string[] }
   return http("POST", "/api/schedule/build", {
     term,
-    courses: Array.isArray(courseCodes) ? courseCodes : [],
+    courseCodes: Array.isArray(courseCodes) ? courseCodes : [],
   });
 }
