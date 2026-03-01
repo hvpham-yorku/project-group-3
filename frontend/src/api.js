@@ -64,7 +64,12 @@ async function http(method, path, body) {
       (payload && (payload.message || payload.error)) ||
       (typeof payload === "string" && payload) ||
       `HTTP ${res.status}`;
-    throw new Error(msg);
+    const err = new Error(msg);
+    // Attach full payload so callers can access extra fields like `conflicts`
+    if (payload && typeof payload === "object") {
+      Object.assign(err, payload);
+    }
+    throw err;
   }
 
   return payload;
@@ -99,9 +104,9 @@ export async function listCourses() {
 
 export async function buildSchedule(term, courseCodes) {
   // Protected endpoint: POST /api/schedule/build
-  // body: { term: string, courses: string[] }
+  // body: { term: string, courseCodes: string[] }
   return http("POST", "/api/schedule/build", {
     term,
-    courses: Array.isArray(courseCodes) ? courseCodes : [],
+    courseCodes: Array.isArray(courseCodes) ? courseCodes : [],
   });
 }

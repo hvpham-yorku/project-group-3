@@ -29,7 +29,11 @@ public class ScheduleController {
     public ResponseEntity<?> build(@Valid @RequestBody BuildScheduleRequest req) {
         var result = schedule.build(req.term(), req.courseCodes());
         if (result.isEmpty()) {
-            return ResponseEntity.status(409).body("No non-conflicting schedule found for the selected courses/term.");
+            var conflicts = schedule.findConflicts(req.term(), req.courseCodes());
+            var body = new java.util.LinkedHashMap<String, Object>();
+            body.put("error", "No non-conflicting schedule found for the selected courses/term.");
+            body.put("conflicts", conflicts);
+            return ResponseEntity.status(409).body(body);
         }
         return ResponseEntity.ok(new BuildScheduleResponse(req.term(), result.get()));
     }

@@ -5,6 +5,7 @@ import com.yupathbuilder.backend.repo.SectionRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
@@ -118,6 +119,91 @@ public class ScheduleService {
             if ("MTWRFSU".indexOf(c) >= 0) out.add(c);
         }
         return out;
+    }
+
+    /**
+     * Detects conflicts among sections for the given courses/term.
+     * Reports all pairs of courses where at least some sections overlap,
+     * showing the specific time clashes.
+     */
+    public List<String> findConflicts(String term, List<String> courseCodes) {
+        List<String> normalized = courseCodes.stream()
+                .filter(Objects::nonNull)
+                .map(s -> s.replaceAll("\\s+", "").toUpperCase())
+                .distinct()
+                .toList();
+
+        // collect ALL candidate sections per course
+        Map<String, List<Section>> candidateMap = new LinkedHashMap<>();
+        for (String code : normalized) {
+            List<Section> list = sections.findByNormalizedCourseCodeAndTerm(code, term);
+            if (!list.isEmpty()) {
+                candidateMap.put(code, list);
+            }
+        }
+
+        List<String> conflicts = new ArrayList<>();
+        List<String> codes = new ArrayList<>(candidateMap.keySet());
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("h:mm a");
+
+        // Check every pair of courses and report overlapping section combos
+        for (int i = 0; i < codes.size(); i++) {
+            for (int j = i + 1; j < codes.size(); j++) {
+                String codeA = codes.get(i);
+                String codeB = codes.get(j);
+                List<Section> sectionsA = candidateMap.get(codeA);
+                List<Section> sectionsB = candidateMap.get(codeB);
+
+                // Collect all conflicting pairs between these two courses
+                Set<String> reported = new HashSet<>();
+                for (Section a : sectionsA) {
+                    for (Section b : sectionsB) {
+                        if (sectionsConflict(a, b)) {
+                            String key = a.sectionId() + "|" + b.sectionId();
+                            if (reported.add(key)) {
+                                String timeA = formatSectionTime(a, fmt);
+                                String timeB = formatSectionTime(b, fmt);
+                                conflicts.add(String.format(
+                                        "%s (%s, %s) conflicts with %s (%s, %s)",
+                                        a.courseCode(), a.sectionId(), timeA,
+                                        b.courseCode(), b.sectionId(), timeB));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Also report courses with no sections in this term
+        for (String code : normalized) {
+            if (!candidateMap.containsKey(code)) {
+                conflicts.add(String.format("%s has no available sections for term %s", code, term));
+            }
+        }
+
+        return conflicts;
+    }
+
+    private boolean sectionsConflict(Section a, Section b) {
+        if (a.startTime() == null || a.endTime() == null || b.startTime() == null || b.endTime() == null)
+            return false;
+        List<Character> daysA = parseDays(a.days());
+        List<Character> daysB = parseDays(b.days());
+        for (char da : daysA) {
+            for (char db : daysB) {
+                if (da == db && a.startTime().isBefore(b.endTime()) && b.startTime().isBefore(a.endTime())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private String formatSectionTime(Section s, DateTimeFormatter fmt) {
+        String days = s.days() != null ? s.days() : "?";
+        String start = s.startTime() != null ? s.startTime().format(fmt) : "?";
+        String end = s.endTime() != null ? s.endTime().format(fmt) : "?";
+        return days + " " + start + "-" + end;
     }
 
     private static class TimeRange {

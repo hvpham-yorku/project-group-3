@@ -25,10 +25,13 @@ export default function Dashboard() {
   const [selected, setSelected] = useState([]);
 
   // Term is typed by the user (backend expects a term string)
-  const [term, setTerm] = useState("FALL 2026");
+  const [term, setTerm] = useState("W2026");
 
   // Message area for errors/info
   const [msg, setMsg] = useState("");
+
+  // Conflict details when schedule build fails
+  const [conflicts, setConflicts] = useState([]);
 
   // Schedule build result: { term, chosenSections: [...] }
   const [schedule, setSchedule] = useState(null);
@@ -86,12 +89,17 @@ export default function Dashboard() {
   async function onBuild() {
     setMsg("");
     setSchedule(null);
+    setConflicts([]);
 
     try {
       const res = await buildSchedule(term, selected);
       setSchedule(res);
     } catch (e) {
-      setMsg(e.message);
+      // Check if the error response contains conflict details
+      if (e.conflicts && Array.isArray(e.conflicts)) {
+        setConflicts(e.conflicts);
+      }
+      setMsg(e.message || e.error || "Schedule build failed");
     }
   }
 
@@ -155,6 +163,18 @@ export default function Dashboard() {
         </button>
 
         {msg ? <div className="error">{msg}</div> : null}
+
+        {/* Conflict details */}
+        {conflicts.length > 0 ? (
+          <div className="card inner" style={{borderLeft: '4px solid #e74c3c', marginTop: '0.5rem'}}>
+            <h4 style={{color: '#e74c3c', margin: '0 0 0.5rem 0'}}>⚠ Time Conflicts Detected</h4>
+            <ul style={{margin: 0, paddingLeft: '1.2rem'}}>
+              {conflicts.map((c, i) => (
+                <li key={i} style={{marginBottom: '0.3rem'}}>{c}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
 
         {/* Schedule result table */}
         {schedule ? (

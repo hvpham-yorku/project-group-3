@@ -8,5 +8,20 @@
     "username" : "student",
     "passwordHash" : "$2a$10$qgGlQc2isHKXajTZ5hD.mujCI1swcZ1rBsihaDnt5eCvgKm5pn8tu",
     "roles" : [ "ROLE_STUDENT" ]
+  },
+  "test2" : {
+    "username" : "test2",
+    "passwordHash" : "$2a$10$Qc0WLF42.l.pFyFdT3ChYeGn/Mh..L.cb9WXP.PV1xJa3OsgK7R0y",
+    "roles" : [ "ROLE_STUDENT" ]
+  },
+  "test3" : {
+    "username" : "test3",
+    "passwordHash" : "$2a$10$sqFDz1/E7M0QH0fDHl6vTuTK92lfJ6yyivCpSdFa/DGZJBp6Dvmt6",
+    "roles" : [ "ROLE_STUDENT" ]
+  },
+  "testuser" : {
+    "username" : "testuser",
+    "passwordHash" : "$2a$10$mUz1umqhXTA5EJtATMD2..1znbmdMesMJNzSLfL65rUzh2uIM5hkK",
+    "roles" : [ "ROLE_STUDENT" ]
   }
 }
