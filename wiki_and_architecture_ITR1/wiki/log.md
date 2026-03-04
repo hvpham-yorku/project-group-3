@@ -92,6 +92,18 @@ This log documents progress, meeting minutes, design decisions, work allocation,
   - **Wamiq:** finalize backend packaging instructions and verify endpoints (due 2026-02-13)
   - **Taha:** add/verify unit tests for conflict detection and schedule building (due 2026-02-13)
 
+### 2026-04-03 (Itr2 progress report)
+- **Attendees:** Jostin Martinez Castillo, Fejuku Oyinkansola Barbara, Jaicks Reuben
+**Agenda:**
+- Polish schedule view upgrade
+- admin user - Wamiq
+- user story "save and compare plans" maybe forgotten
+- Wamiq to organise the admin user
+- joston to implement the database
+- barbara to create the new gui
+- Reuben to improve conflict logic
+- Reuben reorganing the backend
+- lasted 33 mins
 ---
 
 ## Design decisions (rationale)
