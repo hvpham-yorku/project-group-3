@@ -34,15 +34,26 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
-        try {
-            var user = users.register(req.username(), req.password());
-            String token = jwt.generateToken(user.username(), user.roles().stream().toList());
-            return ResponseEntity.ok(new AuthResponse(token, user.username()));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(400).body(e.getMessage());
+public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
+    try {
+        if (!req.password().equals(req.confirmPassword())) {
+            return ResponseEntity.status(400).body("Passwords do not match");
         }
+
+        var user = users.register(
+                req.email(),
+                req.password(),
+                req.firstName(),
+                req.lastName(),
+                req.programId()
+        );
+
+        String token = jwt.generateToken(user.username(), user.roles().stream().toList());
+        return ResponseEntity.ok(new AuthResponse(token, user.username())); // username = email
+    } catch (IllegalArgumentException e) {
+        return ResponseEntity.status(400).body(e.getMessage());
     }
+}
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {

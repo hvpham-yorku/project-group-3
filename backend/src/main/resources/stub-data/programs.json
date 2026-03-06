@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "facultyId": 1,
+    "name": "Software Engineering (Security Stream)",
+    "degree": "BEng"
+  },
+  {
+    "id": 2,
+    "facultyId": 2,
+    "name": "Kinesiology",
+    "degree": "BSc"
+  }
+]

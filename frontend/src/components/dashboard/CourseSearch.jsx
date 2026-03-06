@@ -1,26 +1,93 @@
-import React, { useEffect, useState } from "react";
-import { searchCourses } from "../../api/CourseApi.js";
+import React, { useEffect, useMemo, useState } from "react";
+import { searchCourses, getCourseDetails } from "../../api/CourseApi.js";
 
-export default function CourseSearch({ selectedSet, onToggle }) {
+export default function CourseSearch({
+  selectedSet,
+  onToggle,
+  selectedTerm,
+  setSelectedTerm,
+  termLocked,
+}) {
   const [q, setQ] = useState("");
   const [results, setResults] = useState([]);
+
+  const [expanded, setExpanded] = useState({});
+  const [detailsByCode, setDetailsByCode] = useState({});
+  const [loadingByCode, setLoadingByCode] = useState({});
+
+  // parse season/year from selectedTerm
+  const { season, year } = useMemo(() => {
+    const parts = selectedTerm.trim().split(/\s+/);
+    return {
+      season: (parts[0] || "FALL").toUpperCase(),
+      year: parseInt(parts[1] || "2026", 10),
+    };
+  }, [selectedTerm]);
+
+  // ✅ IMPORTANT FIX: when term changes, reset cached details + open states
+  // so "More Info" fetches again with the new season/year.
+  useEffect(() => {
+    setExpanded({});
+    setDetailsByCode({});
+    setLoadingByCode({});
+  }, [season, year]);
 
   useEffect(() => {
     const t = setTimeout(async () => {
       try {
-        const data = await searchCourses(q);
+        const data = await searchCourses(q, season, year);
         setResults(Array.isArray(data) ? data : []);
-      } catch {
-        // ignore rapid typing errors
+      } catch (e) {
+        console.error("searchCourses failed:", e);
+        setResults([]);
       }
     }, 250);
 
     return () => clearTimeout(t);
-  }, [q]);
+  }, [q, season, year]);
+
+  async function toggleInfo(courseCode) {
+    const next = !expanded[courseCode];
+    setExpanded((prev) => ({ ...prev, [courseCode]: next }));
+
+    if (next && !detailsByCode[courseCode]) {
+      setLoadingByCode((prev) => ({ ...prev, [courseCode]: true }));
+      try {
+        const d = await getCourseDetails(courseCode, season, year);
+        setDetailsByCode((prev) => ({ ...prev, [courseCode]: d }));
+      } catch (e) {
+        setDetailsByCode((prev) => ({
+          ...prev,
+          [courseCode]: { error: e.message || "Failed to load details" },
+        }));
+      } finally {
+        setLoadingByCode((prev) => ({ ...prev, [courseCode]: false }));
+      }
+    }
+  }
 
   return (
     <div className="card">
       <h2>Course Search</h2>
+
+      {/* ✅ single dropdown term + lock */}
+      <label style={{ marginBottom: 10, display: "block" }}>
+        Term
+        <select
+          value={selectedTerm}
+          onChange={(e) => setSelectedTerm(e.target.value)}
+          disabled={termLocked}
+        >
+          <option value="FALL 2026">FALL 2026</option>
+          <option value="WINTER 2027">WINTER 2027</option>
+        </select>
+
+        {termLocked && (
+          <div className="muted" style={{ marginTop: 6 }}>
+            Term locked because you already added a course. Remove all selected courses to change term.
+          </div>
+        )}
+      </label>
 
       <input
         value={q}
@@ -29,20 +96,88 @@ export default function CourseSearch({ selectedSet, onToggle }) {
       />
 
       <div className="list">
-        {results.slice(0, 15).map((c) => (
-          <div key={c.courseCode} className="row">
-            <div>
-              <b>{c.courseCode}</b> {c.title}
-            </div>
+        {results.slice(0, 15).map((c) => {
+          const code = c.courseCode;
+          const selectionKey = `${season}-${year}-${code}`;
+          const isOpen = !!expanded[code];
+          const details = detailsByCode[code];
+          const loading = !!loadingByCode[code];
 
-            <button
-              className={`btn ${selectedSet.has(c.courseCode) ? "danger" : ""}`}
-              onClick={() => onToggle(c.courseCode)}
-            >
-              {selectedSet.has(c.courseCode) ? "Remove" : "Add"}
-            </button>
-          </div>
-        ))}
+          return (
+            <div key={code} className="row" style={{ display: "block" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+                <div>
+                  <b>{code}</b> {c.title}
+                </div>
+
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button className="btn" onClick={() => toggleInfo(code)}>
+                    {isOpen ? "Hide Info" : "More Info"}
+                  </button>
+
+                  <button
+                    className={`btn ${selectedSet.has(selectionKey) ? "danger" : ""}`}
+                    onClick={() => onToggle(code)}
+                  >
+                    {selectedSet.has(selectionKey) ? "Remove" : "Add"}
+                  </button>
+                </div>
+              </div>
+
+              {isOpen && (
+                <div className="card inner" style={{ marginTop: 10 }}>
+                  <div className="muted" style={{ marginBottom: 8 }}>
+                    Term: <b>{season} {year}</b>
+                  </div>
+
+                  {loading && <div className="muted">Loading...</div>}
+                  {!loading && details?.error && <div className="error">{details.error}</div>}
+
+                  {!loading && details && !details.error && (
+                    <>
+                      <div style={{ marginBottom: 10 }}>
+                        <b>Description:</b>
+                        <div className="muted">{details.description || "No description."}</div>
+                      </div>
+
+                      <div>
+                        <b>Sections:</b>
+                        {Array.isArray(details.sections) && details.sections.length > 0 ? (
+                          <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
+                            {details.sections.map((s) => (
+                              <div key={s.sectionCode} className="card inner">
+                                <b>Section {s.sectionCode}</b>
+
+                                {Array.isArray(s.meetings) && s.meetings.length > 0 ? (
+                                  <ul style={{ marginTop: 6 }}>
+                                    {s.meetings.map((m, idx) => (
+                                      <li key={`${m.day}-${m.startTime}-${idx}`}>
+                                        <b>{m.day}</b> {m.startTime}–{m.endTime}{" "}
+                                        <span className="muted">{m.location || ""}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                ) : (
+                                  <div className="muted">No meeting times for this section.</div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="muted" style={{ marginTop: 6 }}>
+                            No sections found for this term.
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        {q.trim() !== "" && results.length === 0 && <div className="muted">No results.</div>}
       </div>
     </div>
   );

@@ -1,22 +1,38 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { buildSchedule } from "../../api/ScheduleApi.js";
 import ScheduleGrid from "../ScheduleGrid.jsx";
 
 export default function SelectedCourses({
   selected,
-  onToggle,
+  removeKey,
   schedule,
   setSchedule,
+  selectedTerm,
 }) {
-  const [term, setTerm] = useState("FALL 2026");
   const [msg, setMsg] = useState("");
+
+  const prefix = useMemo(() => {
+    const [seasonRaw, yearRaw] = selectedTerm.trim().split(/\s+/);
+    const season = (seasonRaw || "FALL").toUpperCase();
+    const year = yearRaw || "2026";
+    return `${season}-${year}-`;
+  }, [selectedTerm]);
+
+  const selectedForTerm = useMemo(
+    () => selected.filter((k) => k.startsWith(prefix)),
+    [selected, prefix]
+  );
+
+  const courseCodesForTerm = useMemo(
+    () => selectedForTerm.map((k) => k.slice(prefix.length)),
+    [selectedForTerm, prefix]
+  );
 
   async function onBuild() {
     setMsg("");
     setSchedule(null);
-
     try {
-      const res = await buildSchedule(term, selected);
+      const res = await buildSchedule(selectedTerm, courseCodesForTerm);
       setSchedule(res);
     } catch (e) {
       setMsg(e.message);
@@ -27,35 +43,24 @@ export default function SelectedCourses({
     <div className="card">
       <h2>Selected Courses</h2>
 
-      <label>
-        Term
-        <input
-          value={term}
-          onChange={(e) => setTerm(e.target.value)}
-        />
-      </label>
-
-      <div className="pillRow">
-        {selected.length === 0 && (
-          <span className="muted">No courses selected</span>
-        )}
-
-        {selected.map((code) => (
-          <button
-            key={code}
-            className="pill"
-            onClick={() => onToggle(code)}
-          >
-            {code} ✕
-          </button>
-        ))}
+      <div className="muted">
+        Term: <b>{selectedTerm}</b>
       </div>
 
-      <button
-        className="btn primary"
-        disabled={selected.length === 0}
-        onClick={onBuild}
-      >
+      <div className="pillRow">
+        {selectedForTerm.length === 0 && <span className="muted">No courses selected</span>}
+
+        {selectedForTerm.map((key) => {
+          const courseCode = key.slice(prefix.length);
+          return (
+            <button key={key} className="pill" onClick={() => removeKey(key)}>
+              {courseCode} ✕
+            </button>
+          );
+        })}
+      </div>
+
+      <button className="btn primary" disabled={selectedForTerm.length === 0} onClick={onBuild}>
         Build Schedule
       </button>
 

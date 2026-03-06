@@ -1,37 +1,40 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import TopBar from "../components/layout/TopBar.jsx";
+
 import CourseSearch from "../components/dashboard/CourseSearch.jsx";
 import SelectedCourses from "../components/dashboard/SelectedCourse.jsx";
-import AllCourses from "../components/dashboard/AllCourses.jsx";
-import { searchCourses, listCourses } from "../api/CourseApi";
-import { buildSchedule } from "../api/ScheduleApi";
+import ProgramChecklist from "../components/dashboard/ProgramChecklist.jsx";
 
 export default function Dashboard() {
-  const [allCourses, setAllCourses] = useState([]);
+  const [selectedTerm, setSelectedTerm] = useState("FALL 2026");
   const [selected, setSelected] = useState([]);
   const [schedule, setSchedule] = useState(null);
 
   const selectedSet = useMemo(() => new Set(selected), [selected]);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await listCourses();
-        setAllCourses(Array.isArray(data) ? data : []);
-      } catch (e) {
-        console.error("Course load failed:", e.message);
-      }
-    })();
-  }, []);
+  const prefixOf = (term) => {
+    const [seasonRaw, yearRaw] = term.trim().split(/\s+/);
+    const season = (seasonRaw || "FALL").toUpperCase();
+    const year = yearRaw || "2026";
+    return `${season}-${year}-`;
+  };
 
-  function toggle(code) {
+  const keyOf = (term, courseCode) => `${prefixOf(term)}${courseCode}`;
+
+  function toggleCourse(courseCode) {
     setSchedule(null);
+    const key = keyOf(selectedTerm, courseCode);
     setSelected((prev) =>
-      prev.includes(code)
-        ? prev.filter((c) => c !== code)
-        : [...prev, code]
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     );
   }
+
+  function removeKey(key) {
+    setSchedule(null);
+    setSelected((prev) => prev.filter((k) => k !== key));
+  }
+
+  const termLocked = selected.length > 0;
 
   return (
     <>
@@ -40,21 +43,22 @@ export default function Dashboard() {
       <div className="grid">
         <CourseSearch
           selectedSet={selectedSet}
-          onToggle={toggle}
+          onToggle={toggleCourse}
+          selectedTerm={selectedTerm}
+          setSelectedTerm={setSelectedTerm}
+          termLocked={termLocked}
         />
 
         <SelectedCourses
           selected={selected}
-          onToggle={toggle}
+          removeKey={removeKey}
           schedule={schedule}
           setSchedule={setSchedule}
+          selectedTerm={selectedTerm}
         />
 
-        <AllCourses
-          allCourses={allCourses}
-          selectedSet={selectedSet}
-          onToggle={toggle}
-        />
+        {/* ✅ Replaces "All Courses" */}
+        <ProgramChecklist />
       </div>
     </>
   );
