@@ -4,28 +4,25 @@ import ScheduleGrid from "../ScheduleGrid.jsx";
 
 export default function SelectedCourses({
   selected,
-  onToggle,
+  removeKey,
   schedule,
   setSchedule,
+  selectedTerm,
 }) {
-  const [term, setTerm] = useState("FALL 2026");
   const [msg, setMsg] = useState("");
 
-  // term -> prefix "FALL-2026-"
   const prefix = useMemo(() => {
-    const parts = term.trim().split(/\s+/); // ["FALL","2026"]
-    const season = (parts[0] || "FALL").toUpperCase();
-    const year = parts[1] || "2026";
+    const [seasonRaw, yearRaw] = selectedTerm.trim().split(/\s+/);
+    const season = (seasonRaw || "FALL").toUpperCase();
+    const year = yearRaw || "2026";
     return `${season}-${year}-`;
-  }, [term]);
+  }, [selectedTerm]);
 
-  // selected keys for this term only
   const selectedForTerm = useMemo(
     () => selected.filter((k) => k.startsWith(prefix)),
     [selected, prefix]
   );
 
-  // course codes extracted from keys
   const courseCodesForTerm = useMemo(
     () => selectedForTerm.map((k) => k.slice(prefix.length)),
     [selectedForTerm, prefix]
@@ -34,9 +31,8 @@ export default function SelectedCourses({
   async function onBuild() {
     setMsg("");
     setSchedule(null);
-
     try {
-      const res = await buildSchedule(term, courseCodesForTerm);
+      const res = await buildSchedule(selectedTerm, courseCodesForTerm);
       setSchedule(res);
     } catch (e) {
       setMsg(e.message);
@@ -47,31 +43,24 @@ export default function SelectedCourses({
     <div className="card">
       <h2>Selected Courses</h2>
 
-      <label>
-        Term
-        <input value={term} onChange={(e) => setTerm(e.target.value)} />
-      </label>
+      <div className="muted">
+        Term: <b>{selectedTerm}</b>
+      </div>
 
       <div className="pillRow">
-        {selectedForTerm.length === 0 && (
-          <span className="muted">No courses selected for {term}</span>
-        )}
+        {selectedForTerm.length === 0 && <span className="muted">No courses selected</span>}
 
         {selectedForTerm.map((key) => {
           const courseCode = key.slice(prefix.length);
           return (
-            <button key={key} className="pill" onClick={() => onToggle(key)}>
+            <button key={key} className="pill" onClick={() => removeKey(key)}>
               {courseCode} ✕
             </button>
           );
         })}
       </div>
 
-      <button
-        className="btn primary"
-        disabled={selectedForTerm.length === 0}
-        onClick={onBuild}
-      >
+      <button className="btn primary" disabled={selectedForTerm.length === 0} onClick={onBuild}>
         Build Schedule
       </button>
 

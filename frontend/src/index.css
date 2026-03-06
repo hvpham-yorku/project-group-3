@@ -289,3 +289,50 @@ body.hasSchedule .schedHeaderRow, body.hasSchedule .schedBodyRow { grid-template
   text-align: center;
   margin-top: 6px;
 }
+
+select {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.25);
+  color: white;
+  outline: none;
+}
+select:focus { border-color: rgba(120,170,255,0.8); }
+
+.combo { position: relative; }
+.comboRow { display: flex; gap: 8px; align-items: center; }
+.comboBtn { width: 44px; display: grid; place-items: center; }
+
+.comboList {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  max-height: 260px;
+  overflow: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(10, 15, 30, 0.98);
+  backdrop-filter: blur(8px);
+  padding: 6px;
+}
+
+.comboItem {
+  width: 100%;
+  text-align: left;
+  padding: 10px 10px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: white;
+  cursor: pointer;
+}
+.comboItem:hover {
+  border-color: rgba(120,170,255,0.35);
+  background: rgba(120,170,255,0.12);
+}
+
+.comboMain { font-weight: 700; }
+.comboSub { font-size: 12px; margin-top: 2px; }

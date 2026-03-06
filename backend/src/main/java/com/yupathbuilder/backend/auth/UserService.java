@@ -29,7 +29,8 @@ public class UserService {
         load();
         // Ensure at least one default user for demos
         usersByName.computeIfAbsent("student", u ->
-                new AppUser("student", encoder.encode("password"), Set.of("ROLE_STUDENT")));
+        new AppUser("student", encoder.encode("password"), Set.of("ROLE_STUDENT"),
+                "Demo", "Student", 1L));
         save();
     }
 
@@ -38,14 +39,23 @@ public class UserService {
         return Optional.ofNullable(usersByName.get(username.toLowerCase()));
     }
 
-    public AppUser register(String username, String rawPassword) {
-        String key = username.toLowerCase();
-        if (usersByName.containsKey(key)) throw new IllegalArgumentException("Username already exists");
-        AppUser user = new AppUser(username, encoder.encode(rawPassword), Set.of("ROLE_STUDENT"));
-        usersByName.put(key, user);
-        save();
-        return user;
-    }
+    public AppUser register(String email, String rawPassword, String firstName, String lastName, Long programId) {
+    String key = email.toLowerCase();
+    if (usersByName.containsKey(key)) throw new IllegalArgumentException("Email already exists");
+
+    AppUser user = new AppUser(
+            key, // username = email en minúsculas
+            encoder.encode(rawPassword),
+            Set.of("ROLE_STUDENT"),
+            firstName,
+            lastName,
+            programId
+    );
+
+    usersByName.put(key, user);
+    save();
+    return user;
+}
 
     private synchronized void load() {
         try {
