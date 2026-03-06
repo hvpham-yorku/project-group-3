@@ -3,11 +3,13 @@ package com.yupathbuilder.backend.store;
 import com.yupathbuilder.backend.entity.CourseEntity;
 import com.yupathbuilder.backend.repo.CourseRepo;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@Profile("!stub")
 @ConditionalOnProperty(name = "app.store", havingValue = "sql", matchIfMissing = true)
 public class SqlCourseStore implements CourseStore {
 
@@ -28,8 +30,6 @@ public class SqlCourseStore implements CourseStore {
 
         String query = q.trim().toLowerCase();
 
-        // ✅ If your repo already has search methods, use them instead.
-        // Otherwise, do a simple in-memory filter (fine for small datasets).
         return courseRepo.findAll().stream()
                 .filter(c ->
                         (c.getCourseCode() != null && c.getCourseCode().toLowerCase().contains(query)) ||

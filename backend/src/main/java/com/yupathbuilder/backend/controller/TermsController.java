@@ -1,7 +1,7 @@
 package com.yupathbuilder.backend.controller;
 
 import com.yupathbuilder.backend.dto.TermDto;
-import com.yupathbuilder.backend.repo.TermRepo;
+import com.yupathbuilder.backend.store.TermStore;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,16 +10,14 @@ import java.util.List;
 @RequestMapping("/api")
 public class TermsController {
 
-  private final TermRepo termRepo;
+  private final TermStore termStore;
 
-  public TermsController(TermRepo termRepo) {
-    this.termRepo = termRepo;
+  public TermsController(TermStore termStore) {
+    this.termStore = termStore;
   }
 
   @GetMapping("/terms")
   public List<TermDto> listTerms() {
-    return termRepo.findAll().stream()
-        .map(t -> new TermDto(t.getId(), t.getSeason().name(), t.getYear()))
-        .toList();
+    return termStore.listTerms();
   }
 }

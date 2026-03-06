@@ -5,8 +5,10 @@ import org.flywaydb.core.Flyway;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
+@Profile("!stub")
 public class FlywayForceMigrateConfig {
 
   @Bean
@@ -14,18 +16,18 @@ public class FlywayForceMigrateConfig {
     return args -> {
       System.out.println(">>> Flyway forced migrate: starting...");
       long start = System.nanoTime();
-var result = Flyway.configure()
-    .dataSource(dataSource)
-    .locations("classpath:db/migration")
-    .baselineOnMigrate(true)
-    .load()
-    .migrate();
-long end = System.nanoTime();
 
-System.out.println(">>> Flyway forced migrate: executed=" + result.migrationsExecuted
-    + " timeMs=" + ((end - start) / 1_000_000));
+      var result = Flyway.configure()
+          .dataSource(dataSource)
+          .locations("classpath:db/migration")
+          .baselineOnMigrate(true)
+          .load()
+          .migrate();
 
-      
+      long end = System.nanoTime();
+
+      System.out.println(">>> Flyway forced migrate: executed=" + result.migrationsExecuted
+          + " timeMs=" + ((end - start) / 1_000_000));
     };
   }
 }
