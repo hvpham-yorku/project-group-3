@@ -1,67 +1,40 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import TopBar from "../components/layout/TopBar.jsx";
+
 import CourseSearch from "../components/dashboard/CourseSearch.jsx";
 import SelectedCourses from "../components/dashboard/SelectedCourse.jsx";
-import AllCourses from "../components/dashboard/AllCourses.jsx";
-import { listCourses } from "../api/CourseApi";
-import { listTerms } from "../api/TermsApi";
+import ProgramChecklist from "../components/dashboard/ProgramChecklist.jsx";
 
 export default function Dashboard() {
-  const [allCourses, setAllCourses] = useState([]);
-  const [selected, setSelected] = useState([]); // ["FALL-2026-EECS 2311", ...]
+  const [selectedTerm, setSelectedTerm] = useState("FALL 2026");
+  const [selected, setSelected] = useState([]);
   const [schedule, setSchedule] = useState(null);
-
-  const keyOf = (season, year, courseCode) => `${season}-${year}-${courseCode}`;
-  const courseFromKey = (key) => key.split("-").slice(2).join("-");
-
-  function toggleCourseForCurrentTerm(courseCode) {
-    const key = keyOf(termSeason, termYear, courseCode);
-    setSchedule(null);
-    setSelected((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
-  }
-
-  // term state (shared)
-  const [terms, setTerms] = useState([]);
-  const [termSeason, setTermSeason] = useState("FALL");
-  const [termYear, setTermYear] = useState(2026);
 
   const selectedSet = useMemo(() => new Set(selected), [selected]);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await listCourses();
-        setAllCourses(Array.isArray(data) ? data : []);
-      } catch (e) {
-        console.error("Course load failed:", e.message);
-      }
-    })();
-  }, []);
+  const prefixOf = (term) => {
+    const [seasonRaw, yearRaw] = term.trim().split(/\s+/);
+    const season = (seasonRaw || "FALL").toUpperCase();
+    const year = yearRaw || "2026";
+    return `${season}-${year}-`;
+  };
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await listTerms();
-        const arr = Array.isArray(data) ? data : [];
-        setTerms(arr);
+  const keyOf = (term, courseCode) => `${prefixOf(term)}${courseCode}`;
 
-        // pick first term as default if available
-        if (arr.length > 0) {
-          setTermSeason(arr[0].season);
-          setTermYear(arr[0].year);
-        }
-      } catch (e) {
-        console.warn("Term load failed (using defaults):", e.message);
-      }
-    })();
-  }, []);
-
-  function toggle(code) {
+  function toggleCourse(courseCode) {
     setSchedule(null);
+    const key = keyOf(selectedTerm, courseCode);
     setSelected((prev) =>
-      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     );
   }
+
+  function removeKey(key) {
+    setSchedule(null);
+    setSelected((prev) => prev.filter((k) => k !== key));
+  }
+
+  const termLocked = selected.length > 0;
 
   return (
     <>
@@ -69,26 +42,23 @@ export default function Dashboard() {
 
       <div className="grid">
         <CourseSearch
-          selectedSet={new Set(selected)}   // selected now contains keys
-          onToggle={toggleCourseForCurrentTerm}
-          termSeason={termSeason}
-          termYear={termYear}
-          setTermSeason={setTermSeason}
-          setTermYear={setTermYear}
+          selectedSet={selectedSet}
+          onToggle={toggleCourse}
+          selectedTerm={selectedTerm}
+          setSelectedTerm={setSelectedTerm}
+          termLocked={termLocked}
         />
 
         <SelectedCourses
           selected={selected}
-          onToggle={toggle}
+          removeKey={removeKey}
           schedule={schedule}
           setSchedule={setSchedule}
-          termSeason={termSeason}
-          termYear={termYear}
-          setTermSeason={setTermSeason}
-          setTermYear={setTermYear}
+          selectedTerm={selectedTerm}
         />
 
-        <AllCourses allCourses={allCourses} selectedSet={selectedSet} onToggle={toggle} />
+        {/* ✅ Replaces "All Courses" */}
+        <ProgramChecklist />
       </div>
     </>
   );

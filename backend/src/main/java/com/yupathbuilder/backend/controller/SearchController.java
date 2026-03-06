@@ -1,8 +1,7 @@
 package com.yupathbuilder.backend.controller;
 
 import com.yupathbuilder.backend.dto.CourseDto;
-import com.yupathbuilder.backend.model.Season;
-import com.yupathbuilder.backend.repo.CourseRepo;
+import com.yupathbuilder.backend.store.CourseStore;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,28 +10,24 @@ import java.util.List;
 @RequestMapping("/api/search")
 public class SearchController {
 
-  private final CourseRepo courseRepo;
+  private final CourseStore courseStore;
 
-  public SearchController(CourseRepo courseRepo) {
-    this.courseRepo = courseRepo;
+  public SearchController(CourseStore courseStore) {
+    this.courseStore = courseStore;
   }
 
   @GetMapping("/courses")
   public List<CourseDto> search(
-      @RequestParam(name="q", defaultValue="") String q,
-      @RequestParam(name="season", required=false) String season,
-      @RequestParam(name="year", required=false) Integer year
+      @RequestParam(name = "q", defaultValue = "") String q,
+      @RequestParam(name = "season", required = false) String season,
+      @RequestParam(name = "year", required = false) Integer year
   ) {
     if (q == null || q.trim().isEmpty()) return List.of();
 
-    List<com.yupathbuilder.backend.entity.CourseEntity> list;
+    var list = courseStore.searchCourses(q);
 
-    if (season != null && year != null) {
-      list = courseRepo.searchByTerm(q, Season.parse(season), year);
-    } else {
-      list = courseRepo.findTop20ByCourseCodeContainingIgnoreCaseOrTitleContainingIgnoreCase(q, q);
-    }
-
-    return list.stream().map(c -> new CourseDto(c.getCourseCode(), c.getTitle())).toList();
+    return list.stream()
+        .map(c -> new CourseDto(c.getCourseCode(), c.getTitle()))
+        .toList();
   }
 }

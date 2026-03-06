@@ -2,26 +2,36 @@ import { http, setAuth, clearAuth } from "./Http.js";
 
 /* ---------------- Auth Routes ---------------- */
 
-export async function login(username, password) {
+// UI calls this with email, but backend still expects { username, password }
+export async function login(email, password) {
   const data = await http("POST", "/api/auth/login", {
-    username,
+    username: email,
     password,
   });
 
-  // Save token automatically
   setAuth(data.token, data.username);
-
   return data;
 }
 
-export async function register(username, password) {
+// New register payload expected by backend
+export async function register({
+  firstName,
+  lastName,
+  email,
+  programId,
+  password,
+  confirmPassword,
+}) {
   const data = await http("POST", "/api/auth/register", {
-    username,
+    firstName,
+    lastName,
+    email,
+    programId,
     password,
+    confirmPassword,
   });
 
   setAuth(data.token, data.username);
-
   return data;
 }
 
