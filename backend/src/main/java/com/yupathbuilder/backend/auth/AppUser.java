@@ -2,13 +2,11 @@ package com.yupathbuilder.backend.auth;
 
 import java.util.Set;
 
-
-/**
- * Authentication / user domain component: AppUser.
- */
-
 public record AppUser(
-        String username,
+        String username,        // aquí guardaremos el email (login)
         String passwordHash,
-        Set<String> roles
+        Set<String> roles,
+        String firstName,
+        String lastName,
+        Long programId
 ) {}

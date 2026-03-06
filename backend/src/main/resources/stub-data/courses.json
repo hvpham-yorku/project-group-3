@@ -1,0 +1,98 @@
+[
+  {
+    "id": 1011,
+    "courseCode": "EECS 1011",
+    "title": "Computational Thinking Through Mechatronics",
+    "description": "Intro computational thinking (selected for Year 1 demo)."
+  },
+  {
+    "id": 1013,
+    "courseCode": "MATH 1013",
+    "title": "Applied Calculus I",
+    "description": "Limits, derivatives, and applications in engineering (selected for Year 1 demo)."
+  },
+  {
+    "id": 2030,
+    "courseCode": "EECS 2030",
+    "title": "Advanced Object Oriented Programming",
+    "description": "Object-oriented design and programming (selected for Year 2 demo)."
+  },
+  {
+    "id": 2311,
+    "courseCode": "EECS 2311",
+    "title": "Software Development Project",
+    "description": "Project-based software engineering course (selected for Year 2 demo)."
+  },
+  {
+    "id": 3311,
+    "courseCode": "EECS 3311",
+    "title": "Software Design",
+    "description": "Design patterns, architecture, and maintainability (selected for Year 3 demo)."
+  },
+  {
+    "id": 3482,
+    "courseCode": "EECS 3482",
+    "title": "Introduction to Computer Security",
+    "description": "Security foundations and threats (selected for Year 3 demo)."
+  },
+  {
+    "id": 4481,
+    "courseCode": "EECS 4481",
+    "title": "Computer Security Laboratory",
+    "description": "Hands-on security lab work (selected for Year 4 demo)."
+  },
+  {
+    "id": 4482,
+    "courseCode": "EECS 4482",
+    "title": "Computer Security Management: Assessment and Forensics",
+    "description": "Security assessment and forensics (selected for Year 4 demo)."
+  },
+  {
+    "id": 1000,
+    "courseCode": "KINE 1000",
+    "title": "Kinesiology: Sociocultural Perspectives",
+    "description": "Foundations of kinesiology (Year 1 demo)."
+  },
+  {
+    "id": 1020,
+    "courseCode": "KINE 1020",
+    "title": "Fitness and Health",
+    "description": "Fitness, health and training basics (Year 1 demo)."
+  },
+  {
+    "id": 2011,
+    "courseCode": "KINE 2011",
+    "title": "Human Physiology I",
+    "description": "Intro human physiology (Year 2 demo)."
+  },
+  {
+    "id": 2031,
+    "courseCode": "KINE 2031",
+    "title": "Human Anatomy",
+    "description": "Intro human anatomy (Year 2 demo)."
+  },
+  {
+    "id": 3012,
+    "courseCode": "KINE 3012",
+    "title": "Human Physiology II",
+    "description": "Advanced physiology (Year 3 demo)."
+  },
+  {
+    "id": 3030,
+    "courseCode": "KINE 3030",
+    "title": "Biomechanics of Human Movement",
+    "description": "Biomechanics fundamentals (Year 3 demo)."
+  },
+  {
+    "id": 4010,
+    "courseCode": "KINE 4010",
+    "title": "Exercise Physiology",
+    "description": "Exercise physiology (Year 4 demo)."
+  },
+  {
+    "id": 4020,
+    "courseCode": "KINE 4020",
+    "title": "Human Nutrition",
+    "description": "Human nutrition (Year 4 demo)."
+  }
+]
