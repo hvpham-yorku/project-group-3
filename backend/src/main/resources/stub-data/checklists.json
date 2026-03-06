@@ -1,0 +1,164 @@
+[
+  {
+    "programId": 1,
+    "years": [
+      {
+        "year": 1,
+        "groups": [
+          {
+            "groupName": "Core",
+            "reqType": "REQUIRED",
+            "courses": [
+              {
+                "courseCode": "EECS 1011",
+                "title": "Computational Thinking Through Mechatronics"
+              },
+              {
+                "courseCode": "MATH 1013",
+                "title": "Applied Calculus I"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "groups": [
+          {
+            "groupName": "Core",
+            "reqType": "REQUIRED",
+            "courses": [
+              {
+                "courseCode": "EECS 2030",
+                "title": "Advanced Object Oriented Programming"
+              },
+              {
+                "courseCode": "EECS 2311",
+                "title": "Software Development Project"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "groups": [
+          {
+            "groupName": "Core",
+            "reqType": "REQUIRED",
+            "courses": [
+              {
+                "courseCode": "EECS 3311",
+                "title": "Software Design"
+              },
+              {
+                "courseCode": "EECS 3482",
+                "title": "Introduction to Computer Security"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "groups": [
+          {
+            "groupName": "Core",
+            "reqType": "REQUIRED",
+            "courses": [
+              {
+                "courseCode": "EECS 4481",
+                "title": "Computer Security Laboratory"
+              },
+              {
+                "courseCode": "EECS 4482",
+                "title": "Computer Security Management: Assessment and Forensics"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "programId": 2,
+    "years": [
+      {
+        "year": 1,
+        "groups": [
+          {
+            "groupName": "Core",
+            "reqType": "REQUIRED",
+            "courses": [
+              {
+                "courseCode": "KINE 1000",
+                "title": "Kinesiology: Sociocultural Perspectives"
+              },
+              {
+                "courseCode": "KINE 1020",
+                "title": "Fitness and Health"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "year": 2,
+        "groups": [
+          {
+            "groupName": "Core",
+            "reqType": "REQUIRED",
+            "courses": [
+              {
+                "courseCode": "KINE 2011",
+                "title": "Human Physiology I"
+              },
+              {
+                "courseCode": "KINE 2031",
+                "title": "Human Anatomy"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "year": 3,
+        "groups": [
+          {
+            "groupName": "Core",
+            "reqType": "REQUIRED",
+            "courses": [
+              {
+                "courseCode": "KINE 3012",
+                "title": "Human Physiology II"
+              },
+              {
+                "courseCode": "KINE 3030",
+                "title": "Biomechanics of Human Movement"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "year": 4,
+        "groups": [
+          {
+            "groupName": "Core",
+            "reqType": "REQUIRED",
+            "courses": [
+              {
+                "courseCode": "KINE 4010",
+                "title": "Exercise Physiology"
+              },
+              {
+                "courseCode": "KINE 4020",
+                "title": "Human Nutrition"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

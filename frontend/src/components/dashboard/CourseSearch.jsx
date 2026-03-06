@@ -24,6 +24,14 @@ export default function CourseSearch({
     };
   }, [selectedTerm]);
 
+  // ✅ IMPORTANT FIX: when term changes, reset cached details + open states
+  // so "More Info" fetches again with the new season/year.
+  useEffect(() => {
+    setExpanded({});
+    setDetailsByCode({});
+    setLoadingByCode({});
+  }, [season, year]);
+
   useEffect(() => {
     const t = setTimeout(async () => {
       try {

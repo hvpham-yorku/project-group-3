@@ -2,8 +2,7 @@ package com.yupathbuilder.backend.controller;
 
 import com.yupathbuilder.backend.entity.FacultyEntity;
 import com.yupathbuilder.backend.entity.ProgramEntity;
-import com.yupathbuilder.backend.repo.FacultyRepo;
-import com.yupathbuilder.backend.repo.ProgramRepo;
+import com.yupathbuilder.backend.store.CatalogStore;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,22 +11,19 @@ import java.util.List;
 @RequestMapping("/api")
 public class ProgramController {
 
-    private final FacultyRepo facultyRepo;
-    private final ProgramRepo programRepo;
+    private final CatalogStore store;
 
-    public ProgramController(FacultyRepo facultyRepo, ProgramRepo programRepo) {
-        this.facultyRepo = facultyRepo;
-        this.programRepo = programRepo;
+    public ProgramController(CatalogStore store) {
+        this.store = store;
     }
 
     @GetMapping("/faculties")
     public List<FacultyEntity> faculties() {
-        return facultyRepo.findAll();
+        return store.listFaculties();
     }
 
     @GetMapping("/programs")
     public List<ProgramEntity> programs(@RequestParam(required = false) Long facultyId) {
-        if (facultyId == null) return programRepo.findAll();
-        return programRepo.findByFaculty_IdOrderByNameAsc(facultyId);
+        return store.listPrograms(facultyId);
     }
 }

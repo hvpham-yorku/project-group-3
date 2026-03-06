@@ -1,6 +1,6 @@
-# log.md — ITR1
+# log.md — ITR1 + ITR2
 
-This log documents progress, meeting minutes, design decisions, work allocation, and risks for ITR1.
+This log documents progress, meeting minutes, design decisions, work allocation, and risks.
 
 ---
 
@@ -92,18 +92,74 @@ This log documents progress, meeting minutes, design decisions, work allocation,
   - **Wamiq:** finalize backend packaging instructions and verify endpoints (due 2026-02-13)
   - **Taha:** add/verify unit tests for conflict detection and schedule building (due 2026-02-13)
 
-### 2026-04-03 (Itr2 progress report)
+---
+
+## ITR2 meetings
+
+### 2026-03-03 (ITR2 kickoff: DB plan + DI requirement)
+- **Attendees:** Jostin Martinez Castillo, Fejuku Oyinkansola Barbara, Wamiq Lakha, Jaicks Reuben, Taha Usama
+- **Duration:** 60 minutes
+- **Agenda:**
+  - Re-check ITR2 requirements: real DB + stub DB switch via dependency injection
+  - Decide MySQL + Flyway approach + repo packaging requirements
+- **Decisions:**
+  - Use **MySQL + Flyway** for persistent DB mode (`app.store=sql`)
+  - Keep a **stub mode** (`app.store=stub`) so features can run without MySQL
+  - Stub data should be **minimal but feature-complete** (enough for TA testing)
+- **Action items:**
+  - **Jostin:** integrate MySQL + Flyway migrations + seed (due 2026-03-04)
+  - **Jaicks/Reuben:** confirm ITR2 DI + folder requirements and update Jira tasks (due 2026-03-04)
+  - **Wamiq/Taha:** review what endpoints/features must work in both modes (due 2026-03-04)
+
+---
+
+### 2026-03-04 (ITR2 implementation: backend + frontend integration)
 - **Attendees:** Jostin Martinez Castillo, Fejuku Oyinkansola Barbara, Jaicks Reuben
-**Agenda:**
-- Polish schedule view upgrade
-- admin user - Wamiq
-- user story "save and compare plans" maybe forgotten
-- Wamiq to organise the admin user
-- joston to implement the database
-- barbara to create the new gui
-- Reuben to improve conflict logic
-- Reuben reorganing the backend
-- lasted 33 mins
+- **Duration:** 75 minutes
+- **Agenda:**
+  - Implement DB schema + seed + JPA validation fixes
+  - Implement store layer (SQL vs STUB) for catalog + courses
+  - Update frontend register/login + checklist + course search
+- **Key progress:**
+  - Fixed Hibernate schema validation mismatch (`year_level` tinyint vs integer)
+  - Added store interfaces and SQL/STUB implementations:
+    - `CatalogStore` (faculties/programs/checklist)
+    - `CourseStore` (course search/list)
+  - Moved STUB data to JSON files under `backend/src/main/resources/stub-data`
+  - Updated Register UI to: first/last/email/password/confirm + faculty/program selection
+  - Updated Login UI to use **email** (backend stores email as username)
+- **Issue discovered:**
+  - Course “More Info” did not refresh when switching term (cached by courseCode)
+- **Fix applied:**
+  - Clear cached details/expanded state when term changes in `CourseSearch.jsx`
+- **Action items:**
+  - **Jostin:** make schedule build + course details work in both modes (due 2026-03-05)
+  - **Barbara/Reuben:** check UI flow and edge cases for term switching (due 2026-03-05)
+
+---
+
+### 2026-03-05 (ITR2 hardening: schedule stub + docs + wiki)
+- **Attendees:** Jostin Martinez Castillo, Fejuku Oyinkansola Barbara, Jaicks Reuben
+- **Duration:** 60 minutes
+- **Agenda:**
+  - Make schedule build and course details consistent in stub mode
+  - Add TA/team database instructions + docker-compose
+  - Update wiki for ITR2 changes
+- **Key progress:**
+  - Implemented `ScheduleStore` (SQL and STUB) so `/api/schedule/build` works without DB
+  - Implemented consistent STUB time rules so “More Info” matches schedule output
+  - Added `database/` folder at repo root with:
+    - `docker-compose.yml`
+    - `README-TA.md` (Docker instructions)
+    - `README-TEAM.md` (local MySQL instructions)
+  - Updated GitHub Wiki to document:
+    - SQL vs STUB modes
+    - new store layer
+    - updated endpoints and run commands
+- **Action items:**
+  - **Jostin:** finalize log updates + ensure README includes demo login and “what to test” (due 2026-03-05)
+  - **Team:** start integration/unit tests (JUnit) (parallel)
+
 ---
 
 ## Design decisions (rationale)
@@ -123,12 +179,17 @@ This log documents progress, meeting minutes, design decisions, work allocation,
 - **Why we chose it:** fewer moving parts; deterministic local runs; matches ITR1 requirement for a stub DB.
 - **Impact:** schedule building depends on correct term/course fields in CSV.
 
-### 4) Backtracking schedule algorithm
+### 4) ITR2: Dual data sources (SQL + STUB) via dependency injection
+- **Alternatives considered:** DB-only; stub-only
+- **Why we chose it:** matches ITR2 requirement to support both real DB and stub data with DI switching.
+- **Impact:** project can run in SQL mode (persistent) or STUB mode (no DB) for easier testing/demo.
+
+### 5) Backtracking schedule algorithm
 - **Alternatives considered:** greedy pick-first; brute-force without pruning
 - **Why we chose it:** backtracking naturally handles “choose 1 section per course” and prunes conflicts early.
 - **Impact:** works well for small-to-medium sets of selected courses; needs tests for edge cases.
 
-### 5) UI expands horizontally after “Build Schedule”
+### 6) UI expands horizontally after “Build Schedule”
 - **Alternatives considered:** keep fixed max-width; force full-width always
 - **Why we chose it:** keeps the UI compact during browsing, but improves readability when schedule is displayed.
 - **Impact:** better user experience on wide screens.
@@ -148,14 +209,23 @@ This log documents progress, meeting minutes, design decisions, work allocation,
 | 2026-02-12 | Jostin Martinez Castillo | Login/register + schedule UI polish | 3.0 | 3.0 | Removed debug raw JSON, improved layout |
 | 2026-02-13 | Wamiq Lakha | Verify endpoints + run instructions | 1.0 | 1.0 | Confirmed backend run steps |
 | 2026-02-13 | Taha Usama | Unit tests for schedule/conflicts | 3.0 | 2.5 | Add more edge cases if time |
+| 2026-03-03 | Jostin Martinez Castillo | MySQL + Flyway integration plan | 2.0 | 2.0 | Defined schema/seed workflow |
+| 2026-03-04 | Jostin Martinez Castillo | Implement DB + migrations + fix schema mismatch | 6.0 | 12.0 | DB setup took longer than expected |
+| 2026-03-04 | Jostin Martinez Castillo | Implement DI stores + stub JSON data | 4.0 | 5.0 | CatalogStore + CourseStore |
+| 2026-03-04 | Fejuku Oyinkansola Barbara | UI updates + register/login improvements | 3.0 | 3.0 | Faculty/program selection added |
+| 2026-03-05 | Jostin Martinez Castillo | Schedule + course details stub consistency | 3.0 | 3.0 | More Info matches schedule output |
+| 2026-03-05 | Jaicks Reuben | Jira updates + story tracking | 1.5 | 1.5 | ITR2 tasks updated |
+| 2026-03-05 | Jostin Martinez Castillo | Database folder + TA/team readmes + docker-compose | 2.0 | 2.0 | TA-proof setup created |
+| 2026-03-05 | Jostin Martinez Castillo | Wiki updates for ITR2 | 2.0 | 2.0 | Documented SQL vs stub + endpoints |
 
 ---
 
 ## Concerns / risks
 
-- **Term mismatch:** if UI term does not match CSV term values, schedule build returns no sections.
-- **Data format:** CSV parsing depends on consistent column order and time format (`HH:mm` / `HH:mm:ss`).
-- **Schedule edge cases:** overlapping boundaries (e.g., one ends exactly when another starts), multi-day sections, missing days.
+- **Term mismatch:** if UI term does not match available term values, schedule build may return no sections (SQL mode).
+- **Data format:** time parsing depends on consistent format (`HH:mm` / `HH:mm:ss`) across data sources.
+- **Schedule edge cases:** overlapping boundaries, multi-day sections, missing days.
 - **Auth handling:** token storage and protected routes; needs consistent error messages for expired/invalid token.
-- **Testing coverage:** risk of few tests for overlap logic and schedule search branching.
-- **Usability:** schedule readability on smaller screens (needs horizontal scroll or responsive layout).
+- **Testing coverage:** risk of limited edge case tests (team to address via JUnit).
+- **Usability:** schedule readability on smaller screens (responsive layout / scrolling).
+- **Setup risk (TA):** mitigated by Docker setup + documented STUB mode fallback.
