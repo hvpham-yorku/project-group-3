@@ -7,11 +7,13 @@ import com.yupathbuilder.backend.entity.ProgramEntity;
 import com.yupathbuilder.backend.repo.FacultyRepo;
 import com.yupathbuilder.backend.repo.ProgramRepo;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@Profile("!stub")
 @ConditionalOnProperty(name = "app.store", havingValue = "sql", matchIfMissing = true)
 public class SqlCatalogStore implements CatalogStore {
 

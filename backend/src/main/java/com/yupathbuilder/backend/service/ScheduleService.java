@@ -5,12 +5,14 @@ import com.yupathbuilder.backend.schedule.dto.ScheduleBuildResponse;
 import com.yupathbuilder.backend.repo.SectionRepo;
 import com.yupathbuilder.backend.repo.TermRepo;
 import com.yupathbuilder.backend.util.TermParser;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
 import java.util.*;
 
 @Service
+@Profile("!stub")
 public class ScheduleService {
 
   private final TermRepo termRepo;
@@ -37,7 +39,6 @@ public class ScheduleService {
         throw new IllegalArgumentException("No sections for " + code + " in " + termString);
       }
 
-      // pick first non-conflicting section
       var picked = sections.stream()
           .filter(s -> s.getMeetings() != null && !s.getMeetings().isEmpty())
           .filter(s -> !conflicts(toBlocks(s), used))
@@ -67,7 +68,6 @@ public class ScheduleService {
   }
 
   private ChosenSectionDto toChosenDto(String courseCode, String sectionCode, List<Block> blocks) {
-    // Group meetings by same time slot + location; build "MON,WED"
     var first = blocks.get(0);
     var days = new ArrayList<String>();
     for (var b : blocks) {

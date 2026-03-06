@@ -56,3 +56,25 @@ cd backend
 # If you want to run without MySQL:
 cd backend
 .\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=stub
+
+## What to do in case of a Docker error (Posible solution)
+
+That Docker error means port 3306 is already being used on your PC (usually a local MySQL service), so Docker can’t bind it.
+
+1) Check what’s using 3306:
+netstat -aon | findstr :3306
+Then see the process name:
+tasklist /FI "PID eq <PID>"
+
+2) If it’s MySQL (mysqld / MySQL80), stop it:
+Open Services (Win+R -> services.msc) -> find “MySQL80” (or “MySQL”) -> Stop
+Then run again:
+docker compose -f database/docker-compose.yml up -d
+
+Alternative (if you want to keep local MySQL running):
+Change docker-compose ports from "3306:3306" to "3307:3306"
+And update backend DB URL to use localhost:3307
+
+If docker ps shows nothing, try:
+docker ps -a
+docker compose -f database/docker-compose.yml ps

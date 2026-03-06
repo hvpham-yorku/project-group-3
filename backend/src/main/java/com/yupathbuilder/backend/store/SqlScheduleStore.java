@@ -3,11 +3,13 @@ package com.yupathbuilder.backend.store;
 import com.yupathbuilder.backend.schedule.dto.ScheduleBuildResponse;
 import com.yupathbuilder.backend.service.ScheduleService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@Profile("!stub")
 @ConditionalOnProperty(name = "app.store", havingValue = "sql", matchIfMissing = true)
 public class SqlScheduleStore implements ScheduleStore {
 

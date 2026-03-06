@@ -43,14 +43,14 @@ cd backend
 # ./mvnw spring-boot:run
 
 ## 5) Run backend (STUB mode — no DB required)
-# Windows (PowerShell):
+# Windows (command prompt):
 cd backend
 .\mvnw.cmd clean package
 .\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=stub
 
 # macOS/Linux:
 # cd backend
-# ./mvnw spring-boot:run -Dspring-boot.run.profiles=stub
+# ./mvnw spring-boot:run "-Dspring-boot.run.profiles=stub"
 
 ## 6) Stop the database
 # From the repo root:
@@ -93,3 +93,25 @@ In SQL mode, the program/course data comes from the MySQL database and Flyway mi
 
 4) Program Checklist
 - Verify checklist loads and shows courses grouped by year (STUB: minimal; SQL: seeded)
+
+## What to do in case of a Docker error (Posible solution)
+
+That Docker error means port 3306 is already being used on your PC (usually a local MySQL service), so Docker can’t bind it.
+
+1) Check what’s using 3306:
+netstat -aon | findstr :3306
+Then see the process name:
+tasklist /FI "PID eq <PID>"
+
+2) If it’s MySQL (mysqld / MySQL80), stop it:
+Open Services (Win+R -> services.msc) -> find “MySQL80” (or “MySQL”) -> Stop
+Then run again:
+docker compose -f database/docker-compose.yml up -d
+
+Alternative (if you want to keep local MySQL running):
+Change docker-compose ports from "3306:3306" to "3307:3306"
+And update backend DB URL to use localhost:3307
+
+If docker ps shows nothing, try:
+docker ps -a
+docker compose -f database/docker-compose.yml ps

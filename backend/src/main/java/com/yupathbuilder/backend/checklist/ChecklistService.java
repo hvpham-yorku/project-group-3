@@ -2,11 +2,13 @@ package com.yupathbuilder.backend.checklist;
 
 import com.yupathbuilder.backend.checklist.dto.ChecklistResponseDto;
 import com.yupathbuilder.backend.repo.ProgramRequirementRepo;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
+@Profile("!stub")
 public class ChecklistService {
 
     private final ProgramRequirementRepo repo;
@@ -21,7 +23,7 @@ public class ChecklistService {
         Map<Integer, Map<String, List<ChecklistResponseDto.CourseDto>>> yearsMap = new LinkedHashMap<>();
 
         for (var pr : rows) {
-            int year = pr.getYearLevel().intValue();            
+            int year = pr.getYearLevel().intValue();
             String groupName = (pr.getGroupName() == null || pr.getGroupName().isBlank()) ? "Core" : pr.getGroupName().trim();
             String reqType = pr.getReqType().name();
             String groupKey = groupName + "||" + reqType;
