@@ -7,11 +7,13 @@ import com.yupathbuilder.backend.model.Season;
 import com.yupathbuilder.backend.repo.CourseRepo;
 import com.yupathbuilder.backend.repo.SectionRepo;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@Profile("!stub")
 @ConditionalOnProperty(name = "app.store", havingValue = "sql", matchIfMissing = true)
 public class SqlCourseDetailsStore implements CourseDetailsStore {
 
