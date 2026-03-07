@@ -2,13 +2,11 @@ import React, { useState } from "react";
 
 /**
  * LoginCard.jsx
- * Handles login only.
- *
  * Parent must pass:
- *   onLogin(username, password)
+ *   onLogin(email, password)
  */
 export default function LoginCard({ onLogin }) {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [msg, setMsg] = useState("");
@@ -17,12 +15,12 @@ export default function LoginCard({ onLogin }) {
     e.preventDefault();
     setMsg("");
 
-    const u = username.trim();
-    if (!u) return setMsg("Please enter a username.");
+    const e2 = email.trim();
+    if (!e2) return setMsg("Please enter an email.");
     if (!password) return setMsg("Please enter a password.");
 
     try {
-      await onLogin(u, password);
+      await onLogin(e2, password);
     } catch (err) {
       setMsg(err.message || "Login failed");
     }
@@ -46,12 +44,12 @@ export default function LoginCard({ onLogin }) {
 
         <form onSubmit={submit} className="form authForm">
           <label>
-            Username
+            Email
             <input
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               autoComplete="username"
-              placeholder="Enter your username"
+              placeholder="Enter your email"
             />
           </label>
 

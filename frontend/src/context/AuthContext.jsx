@@ -38,8 +38,8 @@ export function AuthProvider({ children }) {
     setUsername(res.username);
   }
 
-  async function register(username, password, firstName, lastName) {
-    const res = await apiRegister(username, password);
+  async function register(payload) {
+    const res = await apiRegister(payload);
     setAuth(res.token, res.username);
     setToken(res.token);
     setUsername(res.username);

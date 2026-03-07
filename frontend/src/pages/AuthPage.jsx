@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import TopBar from "../components/layout/TopBar.jsx";
 import LoginCard from "../components/auth/LoginCard.jsx";
-import Register from "../components/auth/RegisterCard.jsx";
+import RegisterCard from "../components/auth/RegisterCard.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import "../index.css";
 import "../styles/AuthPage.css";
