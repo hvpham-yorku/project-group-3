@@ -21,7 +21,7 @@ export default function AuthPage() {
             {toggle ? (
               <LoginCard onLogin={login} />
             ) : (
-              <Register onRegister={register} />
+              <RegisterCard onRegister={register} />
             )}
 
             <div className="authSwitch">
