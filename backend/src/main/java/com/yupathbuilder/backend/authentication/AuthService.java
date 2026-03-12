@@ -1,7 +1,9 @@
 package com.yupathbuilder.backend.authentication;
 
 import com.yupathbuilder.backend.authentication.dto.*;
+import com.yupathbuilder.backend.authentication.entity.UserEntity;
 import com.yupathbuilder.backend.authentication.jwt.JwtUtil;
+import com.yupathbuilder.backend.authentication.entity_mapper.UserMapper;
 import com.yupathbuilder.backend.authentication.model.User;
 import com.yupathbuilder.backend.authentication.repo.UserRepo;
 
@@ -26,31 +28,25 @@ public class AuthService {
      */
     public AuthResponse register(RegisterRequest req) {
 
-        if (!req.password().equals(req.confirmPassword()))
-            throw new IllegalArgumentException("Passwords do not match");
+    if (!req.password().equals(req.confirmPassword()))
+        throw new IllegalArgumentException("Passwords do not match");
 
-        String email = req.email().toLowerCase();
+    String email = req.email().toLowerCase();
 
-        if (repo.exists(email))
-            throw new IllegalArgumentException("User already exists");
+    if (repo.existsByEmail(email))
+        throw new IllegalArgumentException("User already exists");
 
-        User user = new User(
-                email,
-                encoder.encode(req.password()),
-                req.firstName(),
-                req.lastName(),
-                req.programId(),
-                UserRole.STUDENT
-        );
+    UserEntity user = new UserEntity(
+            email,
+            encoder.encode(req.password()),
+            req.programId()
+    );
 
-        repo.save(user);
+    repo.save(user);
 
-        String token = jwt.generateToken(
-                user.getUsername(),
-                user.getType().name()
-        );
+    String token = jwt.generateToken(email, "USER");
 
-        return new AuthResponse(token, user.getUsername());
+    return new AuthResponse(token, email);
     }
 
     /*
@@ -58,17 +54,14 @@ public class AuthService {
      */
     public AuthResponse login(LoginRequest req) {
 
-        User user = repo.find(req.username())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+    UserEntity user = repo.findByEmail(req.email())
+            .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
 
-        if (!encoder.matches(req.password(), user.getPasswordHash()))
-            throw new IllegalArgumentException("Invalid credentials");
+    if (!encoder.matches(req.password(), user.getPasswordHash()))
+        throw new IllegalArgumentException("Invalid credentials");
 
-        String token = jwt.generateToken(
-                user.getUsername(),
-                user.getType().name()
-        );
+    String token = jwt.generateToken(user.getEmail(), "USER");
 
-        return new AuthResponse(token, user.getUsername());
-    }
+    return new AuthResponse(token, user.getEmail());
+}
 }

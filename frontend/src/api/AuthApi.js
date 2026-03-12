@@ -4,8 +4,8 @@ import { http, setAuth, clearAuth } from "./Http.js";
 
 // UI calls this with email, but backend still expects { username, password }
 export async function login(email, password) {
-  const data = await http("POST", "/api/auth/login", {
-    username: email,
+  const data = await http("POST", "/api/authentication/login", {
+    email: email.toLowerCase(),
     password,
   });
 
@@ -22,10 +22,10 @@ export async function register({
   password,
   confirmPassword,
 }) {
-  const data = await http("POST", "/api/auth/register", {
+  const data = await http("POST", "/api/authentication/register", {
     firstName,
     lastName,
-    email,
+    email: email.toLowerCase(),
     programId,
     password,
     confirmPassword,

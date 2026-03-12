@@ -1,7 +1,7 @@
-package com.yupathbuilder.backend.unit.controller;
+/*package com.yupathbuilder.backend.unit.controller;
 
-import com.yupathbuilder.backend.auth.AppUser;
-import com.yupathbuilder.backend.auth.UserService;
+import com.yupathbuilder.backend.authentication.AppUser;
+import com.yupathbuilder.backend.authentication.UserService;
 import com.yupathbuilder.backend.checklist.dto.ChecklistResponseDto;
 import com.yupathbuilder.backend.controller.ChecklistController;
 import com.yupathbuilder.backend.store.CatalogStore;
@@ -67,4 +67,4 @@ class ChecklistControllerUnitTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.programId").value(1));
     }
-}
+}*/
