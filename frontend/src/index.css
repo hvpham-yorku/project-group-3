@@ -333,6 +333,125 @@ select:focus { border-color: rgba(120,170,255,0.8); }
   border-color: rgba(120,170,255,0.35);
   background: rgba(120,170,255,0.12);
 }
+/* --- Theme Toggle Button --- */
+.themeToggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.14);
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 9999;
+  transition: background 0.3s, color 0.3s, transform 0.2s;
+}
 
+.themeToggle:hover { transform: scale(1.05); }
+
+.themeToggle.red { background: #E31837; color:
+                       #ffffff; border-color: #161112; }
+.themeToggle.black { background: #0e0d0d; color: 
+              #ffffff; border-color: #0e0d0d; }
+
+/* --- Site Themes --- */
+body.theme-red {
+  background-color: #e9e6e6;
+  color: #000000;
+}
+body.theme-black {
+  background-color: #0e0d0d;
+  color: #f1f1f1;
+}
+
+/* Optional: Cards adapt to theme */
+body.theme-red .card { background: rgba(255,255,255,0.08); color: #000000; }
+body.theme-black .card { background: rgba(0,0,0,0.25); color: #ffffff; }
+
+/* Topbar adapts too */
+body.theme-red .topbar { background: #E31837; }
+body.theme-black .topbar { background: rgba(0,0,0,0.3); }
+
+/* Red theme */
+body.theme-red .row {
+  background: #E31837;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #0d0707;
+}
+
+/* Black theme */
+body.theme-black .row {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #ffffff;
+}
+/* --- Schedule Grid Theme Overrides --- */
+
+/* Red theme */
+body.theme-red .schedTable,
+body.theme-red .schedHeaderRow,
+body.theme-red .schedBodyRow,
+body.theme-red .schedTimeCol,
+body.theme-red .schedDayCol,
+body.theme-red .timeCell,
+body.theme-red .gridRow {
+  border-color: #000000; /* grid lines black */
+}
+
+body.theme-red .schedDayCol {
+  background: #E31837; /* course background red */
+  color: #ffffff;       /* course text white */
+}
+
+body.theme-red .schedTimeHead,
+body.theme-red .schedDayHead,
+body.theme-red .timeCell span {
+  color: #ffffff;       /* headers white */
+}
+
+/* Optional: make individual schedule events stand out in red theme */
+body.theme-red .schedEvent {
+  background: rgba(255,255,255,0.15); /* slightly transparent white overlay */
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+/* Black theme (keep default) */
+body.theme-black .schedDayCol {
+  background: rgba(255,255,255,0.03); /* original black-ish background */
+  color: #000000;
+}
+
+body.theme-black .schedEvent {
+  background: rgba(86,156,214,0.22); /* default course blue overlay */
+  border-color: rgba(86,156,214,0.35);
+  color: #ffffff;
+}
+
+/* Red theme weekday header */
+body.theme-red .schedDayHead {
+  background: #ffffff;   /* red background */
+  color: #ffffff;        /* white text */
+  border-bottom: 1px solid #000000; /* black line under header */
+}
+
+
+body.theme-red .timeCell span {
+  color: #000000; /* ensure the hour text is white */
+}
+
+/* Black theme (original styling) */
+body.theme-black .schedTimeCol {
+  background: rgba(0,0,0,0.18); /* dark background as original */
+}
+
+body.theme-black .timeCell {
+  border-bottom: 1px solid rgba(255,255,255,0.06); /* original lines */
+  color: #000000; /* text black or original */
+}
+
+body.theme-black .timeCell span {
+  color: rgba(255,255,255,0.55); /* original text */
+}
 .comboMain { font-weight: 700; }
 .comboSub { font-size: 12px; margin-top: 2px; }
