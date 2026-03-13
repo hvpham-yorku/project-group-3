@@ -108,10 +108,6 @@ Open Services (Win+R -> services.msc) -> find “MySQL80” (or “MySQL”) -> 
 Then run again:
 docker compose -f database/docker-compose.yml up -d
 
-Alternative (if you want to keep local MySQL running):
-Change docker-compose ports from "3306:3306" to "3307:3306"
-And update backend DB URL to use localhost:3307
-
 If docker ps shows nothing, try:
 docker ps -a
 docker compose -f database/docker-compose.yml ps
