@@ -3,8 +3,6 @@ package com.yupathbuilder.backend.authentication;
 import com.yupathbuilder.backend.authentication.dto.*;
 import com.yupathbuilder.backend.authentication.entity.UserEntity;
 import com.yupathbuilder.backend.authentication.jwt.JwtUtil;
-import com.yupathbuilder.backend.authentication.entity_mapper.UserMapper;
-import com.yupathbuilder.backend.authentication.model.User;
 import com.yupathbuilder.backend.authentication.repo.UserRepo;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
