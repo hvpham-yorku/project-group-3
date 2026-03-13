@@ -1,4 +1,4 @@
-package com.yupathbuilder.backend.auth.dto;
+package com.yupathbuilder.backend.authentication.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

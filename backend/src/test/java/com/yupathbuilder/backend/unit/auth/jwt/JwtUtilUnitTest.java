@@ -1,10 +1,10 @@
 package com.yupathbuilder.backend.unit.auth.jwt;
 
-import com.yupathbuilder.backend.auth.jwt.JwtUtil;
-import io.jsonwebtoken.Claims;
-import org.junit.jupiter.api.Test;
+import com.yupathbuilder.backend.authentication.jwt.JwtUtil;
 
-import java.util.List;
+import io.jsonwebtoken.Claims;
+
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,21 +14,32 @@ class JwtUtilUnitTest {
 
     @Test
     void generateTokenAndParseRoundTrip() {
+
         JwtUtil jwtUtil = new JwtUtil(SECRET, 60);
 
-        String token = jwtUtil.generateToken("wamiq@example.com", List.of("ROLE_STUDENT"));
+        String token = jwtUtil.generateToken(
+                "wamiq@example.com",
+                "ROLE_STUDENT"
+        );
+
         Claims claims = jwtUtil.parse(token);
 
         assertEquals("wamiq@example.com", claims.getSubject());
-        assertEquals(List.of("ROLE_STUDENT"), claims.get("roles", List.class));
+        assertEquals("ROLE_STUDENT", claims.get("role", String.class));
         assertNotNull(claims.getIssuedAt());
         assertNotNull(claims.getExpiration());
     }
 
     @Test
     void parseRejectsTamperedToken() {
+
         JwtUtil jwtUtil = new JwtUtil(SECRET, 60);
-        String token = jwtUtil.generateToken("wamiq@example.com", List.of("ROLE_STUDENT"));
+
+        String token = jwtUtil.generateToken(
+                "wamiq@example.com",
+                "ROLE_STUDENT"
+        );
+
         String tampered = token.substring(0, token.length() - 2) + "aa";
 
         assertThrows(Exception.class, () -> jwtUtil.parse(tampered));

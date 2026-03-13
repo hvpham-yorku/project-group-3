@@ -1,7 +1,7 @@
 package com.yupathbuilder.backend.config;
 
-import com.yupathbuilder.backend.auth.jwt.JwtAuthFilter;
-import com.yupathbuilder.backend.auth.jwt.JwtUtil;
+import com.yupathbuilder.backend.authentication.jwt.JwtAuthFilter;
+import com.yupathbuilder.backend.authentication.jwt.JwtUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
