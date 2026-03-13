@@ -1,4 +1,4 @@
-package com.yupathbuilder.backend.auth.dto;
+package com.yupathbuilder.backend.authentication.dto;
 
 
 /**

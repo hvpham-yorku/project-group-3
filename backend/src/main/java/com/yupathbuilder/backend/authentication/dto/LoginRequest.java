@@ -1,4 +1,4 @@
-package com.yupathbuilder.backend.auth.dto;
+package com.yupathbuilder.backend.authentication.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
@@ -8,6 +8,6 @@ import jakarta.validation.constraints.NotBlank;
  */
 
 public record LoginRequest(
-        @NotBlank String username,
+        @NotBlank String email,
         @NotBlank String password
 ) {}

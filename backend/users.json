@@ -23,6 +23,14 @@
     "lastName" : null,
     "programId" : null
   },
+  "reubenj@my.yorku.ca" : {
+    "username" : "reubenj@my.yorku.ca",
+    "passwordHash" : "$2a$10$PnteIhId3kgKq6BPH1BuEeHWe4/Im26Bhnbo2KtUARIhvj2PU/csO",
+    "roles" : [ "ROLE_STUDENT" ],
+    "firstName" : "Reuben",
+    "lastName" : "Jaicks",
+    "programId" : 1
+  },
   "student" : {
     "username" : "student",
     "passwordHash" : "$2a$10$qgGlQc2isHKXajTZ5hD.mujCI1swcZ1rBsihaDnt5eCvgKm5pn8tu",

@@ -1,8 +1,7 @@
-package com.yupathbuilder.backend.auth.jwt;
+package com.yupathbuilder.backend.authentication.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 import java.nio.charset.StandardCharsets;
@@ -10,12 +9,6 @@ import java.security.Key;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.List;
-
-
-/**
- * JWT (JSON Web Token) utilities / filter for securing protected endpoints.
- */
 
 public class JwtUtil {
 
@@ -27,20 +20,22 @@ public class JwtUtil {
         this.expirationMinutes = expirationMinutes;
     }
 
-    public String generateToken(String username, List<String> roles) {
+    public String generateToken(String username, String role) {
+
         Instant now = Instant.now();
         Instant exp = now.plus(expirationMinutes, ChronoUnit.MINUTES);
 
         return Jwts.builder()
                 .setSubject(username)
-                .claim("roles", roles)
+                .claim("role", role)
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(exp))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(key)
                 .compact();
     }
 
     public Claims parse(String token) {
+
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
