@@ -29,9 +29,12 @@ export default function SelectedCourses({
     () => (schedule ? detectScheduleConflicts(schedule.chosenSections) : { hasConflicts: false, segments: [] }),
     [schedule]
   );
+  const cardClassName = schedule
+    ? "card selectedCoursesCard"
+    : "card selectedCoursesCard selectedCoursesCardTall";
 
   return (
-    <div className="card selectedCoursesCard">
+    <div className={cardClassName}>
       <h2>Selected Courses</h2>
 
       <div className="muted">

@@ -2,7 +2,9 @@ package com.yupathbuilder.backend.unit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yupathbuilder.backend.authentication.AuthController;
+import com.yupathbuilder.backend.authentication.InvalidCredentialsException;
 import com.yupathbuilder.backend.authentication.AuthService;
+import com.yupathbuilder.backend.authentication.UserProfileService;
 import com.yupathbuilder.backend.authentication.dto.AuthResponse;
 import com.yupathbuilder.backend.authentication.dto.LoginRequest;
 import com.yupathbuilder.backend.authentication.dto.RegisterRequest;
@@ -27,14 +29,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 class AuthControllerUnitTest {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @MockitoBean
     private AuthService authService;
+
+    @MockitoBean
+    private UserProfileService userProfileService;
 
     @Test
     void registerReturnsTokenOnSuccess() throws Exception {
@@ -53,7 +57,7 @@ class AuthControllerUnitTest {
 
         mockMvc.perform(post("/api/authentication/register")
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(OBJECT_MAPPER.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value("token123"))
                 .andExpect(jsonPath("$.username").value("wamiq@example.com"));
@@ -72,7 +76,7 @@ class AuthControllerUnitTest {
 
         mockMvc.perform(post("/api/authentication/login")
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(OBJECT_MAPPER.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value("token123"))
                 .andExpect(jsonPath("$.username").value("wamiq@example.com"));
@@ -92,6 +96,24 @@ class AuthControllerUnitTest {
                         .contentType(APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void loginReturnsUnauthorizedForInvalidCredentials() throws Exception {
+
+        var request = new LoginRequest(
+                "wamiq@example.com",
+                "wrong-password"
+        );
+
+        given(authService.login(request))
+                .willThrow(new InvalidCredentialsException("Invalid credentials"));
+
+        mockMvc.perform(post("/api/authentication/login")
+                        .contentType(APPLICATION_JSON)
+                        .content(OBJECT_MAPPER.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("Invalid credentials"));
     }
 
     @Test

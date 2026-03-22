@@ -19,9 +19,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
-/**
- * Spring Security / application configuration.
- */
 @Configuration
 public class SecurityConfig {
 
@@ -45,8 +42,9 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/me/**").authenticated() // ✅ NEW: protect "me" endpoints (checklist, etc.)
+                        .requestMatchers("/api/authentication/login", "/api/authentication/register").permitAll()
+                        .requestMatchers("/api/authentication/profile", "/api/authentication/profile/**").authenticated()
+                        .requestMatchers("/api/me/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/courses/**").authenticated()
                         .requestMatchers("/api/schedule/**").authenticated()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
