@@ -1,164 +1,284 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import {
+  detectScheduleConflicts,
+  expandChosenSections,
+  formatRange,
+  getScheduleDays,
+} from "../utils/scheduleConflicts.js";
 
-/**
- * York-style weekly schedule table:
- * - Time column on the left (30-min rows)
- * - Day columns (Mon..Fri)
- * - Events are positioned inside each day column using absolute top/height
- */
-export default function ScheduleGrid({ chosenSections }) {
-  const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
-  const DAY_KEY = { Mon: "MON", Tue: "TUE", Wed: "WED", Thu: "THU", Fri: "FRI" };
+function sameState(a, b) {
+  if (!a || !b || a.type !== b.type) return false;
+  if (a.type === "empty") return false;
+  if (a.type === "event") return a.eventId === b.eventId;
+  return a.signature === b.signature;
+}
 
-  // Table range (8:00 - 19:00)
+export default function ScheduleGrid({ chosenSections, termLabel }) {
+  const DAYS = getScheduleDays();
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [sizeIndex, setSizeIndex] = useState(() => {
+    const saved = window.localStorage.getItem("schedule-size-index");
+    const parsed = Number(saved);
+    return Number.isInteger(parsed) ? Math.min(2, Math.max(0, parsed)) : 1;
+  });
+  const wrapRef = useRef(null);
+  const sizeOptions = ["compact", "default", "expanded"];
+
   const START_DAY_MIN = 8 * 60;
   const END_DAY_MIN = 19 * 60;
-
-  // Must match CSS: .timeCell / .gridRow height (px)
   const SLOT_MINUTES = 30;
-  const SLOT_PX = 30;
 
-  function toMin(t) {
-    if (!t) return null;
-    // accepts "HH:MM" or "HH:MM:SS"
-    const parts = String(t).split(":");
-    const hh = Number(parts[0] ?? 0);
-    const mm = Number(parts[1] ?? 0);
-    return hh * 60 + mm;
-  }
-
-  function parseDays(str) {
-    if (!str) return [];
-    const s = String(str).trim();
-
-    // support "Mon,Wed" or "Mon Wed"
-    if (s.includes(",") || s.toLowerCase().includes("mon")) {
-      return s
-        .split(/[,\s]+/)
-        .map((x) => x.trim().toLowerCase())
-        .filter(Boolean)
-        .map((x) => {
-          if (x.startsWith("mon")) return "MON";
-          if (x.startsWith("tue")) return "TUE";
-          if (x.startsWith("wed")) return "WED";
-          if (x.startsWith("thu")) return "THU";
-          if (x.startsWith("fri")) return "FRI";
-          return null;
-        })
-        .filter(Boolean);
+  const slots = useMemo(() => {
+    const list = [];
+    for (let start = START_DAY_MIN; start < END_DAY_MIN; start += SLOT_MINUTES) {
+      const end = start + SLOT_MINUTES;
+      list.push({
+        start,
+        end,
+        label: formatRange(start, end),
+      });
     }
-
-    // support compact "MWTRF" style (M T W R F)
-    const out = [];
-    for (const ch of s.toUpperCase()) {
-      if (ch === "M") out.push("MON");
-      if (ch === "T") out.push("TUE");
-      if (ch === "W") out.push("WED");
-      if (ch === "R") out.push("THU"); // York uses R for Thursday
-      if (ch === "F") out.push("FRI");
-    }
-    return out;
-  }
-
-  const events = useMemo(() => {
-    const list = Array.isArray(chosenSections) ? chosenSections : [];
-    const out = [];
-
-    for (const sec of list) {
-      const start = toMin(sec.startTime);
-      const end = toMin(sec.endTime);
-      const ds = parseDays(sec.days);
-
-      if (start == null || end == null || ds.length === 0) continue;
-
-      // clamp to visible range
-      const s = Math.max(start, START_DAY_MIN);
-      const e = Math.min(end, END_DAY_MIN);
-      if (e <= s) continue;
-
-      for (const d of ds) out.push({ ...sec, day: d, start: s, end: e });
-    }
-
-    return out;
-  }, [chosenSections]);
-
-  const timeLabels = useMemo(() => {
-    const labels = [];
-    for (let m = START_DAY_MIN; m <= END_DAY_MIN; m += SLOT_MINUTES) {
-      const hh = String(Math.floor(m / 60)).padStart(2, "0");
-      const mm = String(m % 60).padStart(2, "0");
-      labels.push(`${Number(hh)}:${mm}`); // "8:00" instead of "08:00"
-    }
-    return labels;
+    return list;
   }, []);
 
-  function minutesToPx(min) {
-    return ((min - START_DAY_MIN) / SLOT_MINUTES) * SLOT_PX;
+  const events = useMemo(
+    () =>
+      expandChosenSections(chosenSections, {
+        start: START_DAY_MIN,
+        end: END_DAY_MIN,
+      }),
+    [chosenSections]
+  );
+
+  const conflicts = useMemo(
+    () =>
+      detectScheduleConflicts(chosenSections, {
+        start: START_DAY_MIN,
+        end: END_DAY_MIN,
+      }),
+    [chosenSections]
+  );
+
+  const activeDays = useMemo(() => {
+    const used = new Set(events.map((event) => event.day));
+    return DAYS.map((day) => used.has(day.key));
+  }, [events]);
+
+  const dayWidths = useMemo(() => {
+    const weights = activeDays.map((isActive) => (isActive ? 1.15 : 0.72));
+    const total = weights.reduce((sum, weight) => sum + weight, 0);
+    return weights.map((weight) => `${(weight / total) * 100}%`);
+  }, [activeDays]);
+
+  const dayBlocks = useMemo(() => {
+    const byDay = {};
+
+    for (const day of DAYS) {
+      const dayEvents = events.filter((event) => event.day === day.key);
+      const dayConflicts = conflicts.segments.filter((segment) => segment.day === day.key);
+
+      const slotStates = slots.map((slot) => {
+        const overlapEvents = dayEvents.filter(
+          (event) => event.start < slot.end && event.end > slot.start
+        );
+        const overlapConflicts = dayConflicts.filter(
+          (segment) => segment.start < slot.end && segment.end > slot.start
+        );
+
+        if (overlapConflicts.length > 0 || overlapEvents.length > 1) {
+          const signature =
+            overlapConflicts[0]?.signature ??
+            overlapEvents.map((event) => event.eventId).sort().join("||");
+          return {
+            type: "conflict",
+            signature,
+            occurrences: overlapConflicts[0]?.occurrences ?? overlapEvents,
+          };
+        }
+
+        if (overlapEvents.length === 1) {
+          return {
+            type: "event",
+            eventId: overlapEvents[0].eventId,
+            event: overlapEvents[0],
+          };
+        }
+
+        return { type: "empty" };
+      });
+
+      const starts = new Map();
+      const covered = new Set();
+
+      let index = 0;
+      while (index < slotStates.length) {
+        const state = slotStates[index];
+        let endIndex = index + 1;
+        while (endIndex < slotStates.length && sameState(state, slotStates[endIndex])) {
+          endIndex += 1;
+        }
+
+        const block = {
+          ...state,
+          startIndex: index,
+          rowSpan: endIndex - index,
+        };
+        starts.set(index, block);
+
+        for (let coveredIndex = index + 1; coveredIndex < endIndex; coveredIndex += 1) {
+          covered.add(coveredIndex);
+        }
+
+        index = endIndex;
+      }
+
+      byDay[day.key] = { starts, covered };
+    }
+
+    return byDay;
+  }, [DAYS, events, conflicts, slots]);
+
+  useEffect(() => {
+    function syncFullscreen() {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    }
+
+    document.addEventListener("fullscreenchange", syncFullscreen);
+    return () => document.removeEventListener("fullscreenchange", syncFullscreen);
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("schedule-size-index", String(sizeIndex));
+  }, [sizeIndex]);
+
+  async function toggleFullscreen() {
+    try {
+      if (!document.fullscreenElement && wrapRef.current?.requestFullscreen) {
+        await wrapRef.current.requestFullscreen();
+        return;
+      }
+
+      if (document.fullscreenElement && document.exitFullscreen) {
+        await document.exitFullscreen();
+      }
+    } catch (error) {
+      console.error("Fullscreen toggle failed", error);
+    }
   }
 
-  function eventStyle(e) {
-    const top = minutesToPx(e.start);
-    const height = Math.max(18, minutesToPx(e.end) - minutesToPx(e.start));
-    return { top: `${top}px`, height: `${height}px` };
+  function printSchedule() {
+    window.print();
   }
 
-  function renderEventsForDay(dayLabel) {
-    const key = DAY_KEY[dayLabel];
-    return events
-      .filter((e) => e.day === key)
-      .map((e) => (
-        <div
-          key={`${e.sectionId}-${e.day}`}
-          className="schedEvent"
-          style={eventStyle(e)}
-          title={`${e.courseCode} ${e.sectionId} @ ${e.location || ""}`}
-        >
-          <div className="schedCode">{e.courseCode}</div>
-          <div className="schedMeta">
-            {String(e.startTime).slice(0, 5)}–{String(e.endTime).slice(0, 5)}
-          </div>
-          {e.location ? <div className="schedMeta">{e.location}</div> : null}
+  function renderBlock(dayKey, slotIndex) {
+    const dayInfo = dayBlocks[dayKey];
+    if (dayInfo.covered.has(slotIndex)) return null;
+
+    const block = dayInfo.starts.get(slotIndex);
+    if (!block || block.type === "empty") {
+      return <td className="schedMatrixCell" />;
+    }
+
+    if (block.type === "conflict") {
+      return (
+        <td className="schedMatrixCell schedConflictCell" rowSpan={block.rowSpan}>
+          CONFLICT
+        </td>
+      );
+    }
+
+    return (
+      <td className="schedMatrixCell schedCourseCell" rowSpan={block.rowSpan}>
+        <div className="schedCode">{block.event.courseCode}</div>
+        <div className="schedMeta">
+          {String(block.event.startTime).slice(0, 5)}-{String(block.event.endTime).slice(0, 5)}
         </div>
-      ));
+        {block.event.location ? <div className="schedMeta">{block.event.location}</div> : null}
+      </td>
+    );
   }
-
-  // number of 30-min rows (END is inclusive in labels, so rows are labels-1)
-  const rows = timeLabels.length - 1;
 
   return (
-    <div className="schedWrap">
-      <div className="schedTable">
-        {/* Header */}
-        <div className="schedHeaderRow">
-          <div className="schedTimeHead">Time</div>
-          {DAYS.map((d) => (
-            <div key={d} className="schedDayHead">
-              {d}
-            </div>
-          ))}
+    <div
+      ref={wrapRef}
+      className={`schedWrap schedScale${sizeOptions[sizeIndex][0].toUpperCase()}${sizeOptions[sizeIndex].slice(1)} ${isFullscreen ? "schedWrapFullscreen" : ""}`}
+    >
+      <div className="schedToolbar">
+        <div className="schedToolbarMeta muted">
+          {termLabel ? (
+            <>
+              Term: <b>{termLabel}</b>
+            </>
+          ) : null}
         </div>
 
-        {/* Body */}
-        <div className="schedBodyRow">
-          {/* Time Column */}
-          <div className="schedTimeCol">
-            {timeLabels.slice(0, -1).map((t) => (
-              <div key={t} className="timeCell">
-                <span>{t}</span>
-              </div>
-            ))}
+        <div className="schedActions">
+          <div className="schedZoomControls" aria-label="Schedule size controls">
+            <button
+              className="btn schedZoomBtn"
+              onClick={() => setSizeIndex((value) => Math.max(0, value - 1))}
+              disabled={sizeIndex === 0}
+              aria-label="Make schedule smaller"
+            >
+              -
+            </button>
+            <button
+              className="btn schedZoomBtn"
+              onClick={() => setSizeIndex((value) => Math.min(sizeOptions.length - 1, value + 1))}
+              disabled={sizeIndex === sizeOptions.length - 1}
+              aria-label="Make schedule larger"
+            >
+              +
+            </button>
           </div>
-
-          {/* Day Columns */}
-          {DAYS.map((d) => (
-            <div key={d} className="schedDayCol">
-              {Array.from({ length: rows }).map((_, i) => (
-                <div key={i} className="gridRow" />
-              ))}
-              {renderEventsForDay(d)}
-            </div>
-          ))}
+          <button className="btn" onClick={toggleFullscreen}>
+            {isFullscreen ? "Exit Full Screen" : "Full Screen"}
+          </button>
+          <button className="btn" onClick={printSchedule}>
+            Printable Version
+          </button>
         </div>
+      </div>
+
+      <div className="schedTable">
+        <table className="schedMatrix">
+          <colgroup>
+            <col className="schedTimeColumn" />
+            {DAYS.map((day, index) => (
+              <col key={day.key} style={{ width: dayWidths[index] }} />
+            ))}
+          </colgroup>
+
+          <thead>
+            <tr>
+              <th className="schedTimeHead">Time</th>
+              {DAYS.map((day, index) => (
+                <th
+                  key={day.key}
+                  className={`schedDayHead ${activeDays[index] ? "schedDayHeadActive" : "schedDayHeadEmpty"}`}
+                >
+                  {day.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+
+          <tbody>
+            {slots.map((slot, slotIndex) => (
+              <tr key={slot.label}>
+                <th className="timeCell">
+                  <span>{slot.label}</span>
+                </th>
+
+                {DAYS.map((day) => (
+                  <React.Fragment key={`${day.key}-${slot.label}`}>
+                    {renderBlock(day.key, slotIndex)}
+                  </React.Fragment>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <div className="muted tiny" style={{ marginTop: 10 }}>
