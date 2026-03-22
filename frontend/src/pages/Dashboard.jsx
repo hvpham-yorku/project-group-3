@@ -6,7 +6,7 @@ import CourseSearch from "../components/dashboard/CourseSearch.jsx";
 import SelectedCourses from "../components/dashboard/SelectedCourse.jsx";
 import ProgramChecklist from "../components/dashboard/ProgramChecklist.jsx";
 
-export default function Dashboard({ theme, onToggleTheme }) {
+export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
   const [selectedTerm, setSelectedTerm] = useState("FALL 2026");
   const [selected, setSelected] = useState([]);
   const [schedule, setSchedule] = useState(null);
@@ -68,7 +68,7 @@ export default function Dashboard({ theme, onToggleTheme }) {
 
   return (
     <>
-      <TopBar theme={theme} onToggleTheme={onToggleTheme} />
+      <TopBar theme={theme} onToggleTheme={onToggleTheme} activeNav="schedule" onNavigate={onNavigate} />
 
       <div className="grid">
         <div className="searchPanel">

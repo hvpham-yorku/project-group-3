@@ -29,13 +29,15 @@ public class AuthService {
     if (!req.password().equals(req.confirmPassword()))
         throw new IllegalArgumentException("Passwords do not match");
 
-    String email = req.email().toLowerCase();
+    String email = req.email().trim().toLowerCase();
 
     if (repo.existsByEmail(email))
         throw new IllegalArgumentException("User already exists");
 
     UserEntity user = new UserEntity(
             email,
+            req.firstName().trim(),
+            req.lastName().trim(),
             encoder.encode(req.password()),
             req.programId()
     );
@@ -52,11 +54,13 @@ public class AuthService {
      */
     public AuthResponse login(LoginRequest req) {
 
-    UserEntity user = repo.findByEmail(req.email())
-            .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+    String email = req.email().trim().toLowerCase();
+
+    UserEntity user = repo.findByEmail(email)
+            .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
 
     if (!encoder.matches(req.password(), user.getPasswordHash()))
-        throw new IllegalArgumentException("Invalid credentials");
+        throw new InvalidCredentialsException("Invalid credentials");
 
     String token = jwt.generateToken(user.getEmail(), "USER");
 
