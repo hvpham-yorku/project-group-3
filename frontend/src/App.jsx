@@ -10,18 +10,6 @@ export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "dark");
   const [path, setPath] = useState(() => window.location.pathname || "/");
 
-<<<<<<< HEAD
-  return (
-    <div>
-      {/* Render the main page */}
-      {isAuthed ? <Dashboard /> : <AuthPage />}
-      
-      {/* Always show the theme toggle button */}
-      <UIButton />
-    </div>
-  );
-}
-=======
   useEffect(() => {
     document.body.dataset.theme = theme;
     localStorage.setItem("theme", theme);
@@ -62,4 +50,3 @@ export default function App() {
 
   return <Dashboard theme={theme} onToggleTheme={toggleTheme} onNavigate={navigate} />;
 }
->>>>>>> c17896eb33ec34ddfca737e1d2586d9ec864f502
