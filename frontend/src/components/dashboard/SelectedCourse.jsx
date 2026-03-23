@@ -1,16 +1,18 @@
-import React, { useMemo, useState } from "react";
-import { buildSchedule } from "../../api/ScheduleApi.js";
+import React, { useMemo } from "react";
 import ScheduleGrid from "../ScheduleGrid.jsx";
+import {
+  detectScheduleConflicts,
+  formatDayLabel,
+  formatRange,
+} from "../../utils/scheduleConflicts.js";
 
 export default function SelectedCourses({
   selected,
   removeKey,
   schedule,
-  setSchedule,
   selectedTerm,
+  msg,
 }) {
-  const [msg, setMsg] = useState("");
-
   const prefix = useMemo(() => {
     const [seasonRaw, yearRaw] = selectedTerm.trim().split(/\s+/);
     const season = (seasonRaw || "FALL").toUpperCase();
@@ -23,24 +25,16 @@ export default function SelectedCourses({
     [selected, prefix]
   );
 
-  const courseCodesForTerm = useMemo(
-    () => selectedForTerm.map((k) => k.slice(prefix.length)),
-    [selectedForTerm, prefix]
+  const conflicts = useMemo(
+    () => (schedule ? detectScheduleConflicts(schedule.chosenSections) : { hasConflicts: false, segments: [] }),
+    [schedule]
   );
-
-  async function onBuild() {
-    setMsg("");
-    setSchedule(null);
-    try {
-      const res = await buildSchedule(selectedTerm, courseCodesForTerm);
-      setSchedule(res);
-    } catch (e) {
-      setMsg(e.message);
-    }
-  }
+  const cardClassName = schedule
+    ? "card selectedCoursesCard"
+    : "card selectedCoursesCard selectedCoursesCardTall";
 
   return (
-    <div className="card">
+    <div className={cardClassName}>
       <h2>Selected Courses</h2>
 
       <div className="muted">
@@ -60,17 +54,44 @@ export default function SelectedCourses({
         })}
       </div>
 
-      <button className="btn primary" disabled={selectedForTerm.length === 0} onClick={onBuild}>
-        Build Schedule
-      </button>
-
       {msg && <div className="error">{msg}</div>}
 
       {schedule && (
         <div className="card inner">
           <h3>Schedule Result</h3>
-          <div className="muted">Term: {schedule.term}</div>
-          <ScheduleGrid chosenSections={schedule.chosenSections} />
+          <ScheduleGrid chosenSections={schedule.chosenSections} termLabel={schedule.term} />
+
+          {conflicts.hasConflicts && (
+            <div className="conflictPanel">
+              <h4>Schedule Conflicts</h4>
+              <p className="conflictIntro">
+                There is at least one block of time where more than one course is scheduled
+                to meet simultaneously. Each overlap is listed below.
+              </p>
+
+              <ul className="conflictList">
+                {conflicts.segments.map((segment) => (
+                  <li key={`${segment.day}-${segment.start}-${segment.end}-${segment.signature}`}>
+                    <div className="conflictRange">
+                      {formatDayLabel(segment.day, true)}, {formatRange(segment.start, segment.end)}
+                    </div>
+
+                    <ul className="conflictCourses">
+                      {segment.occurrences.map((item) => (
+                        <li key={item.eventId}>
+                          {item.courseCode} | Section {item.sectionId}
+                          {item.location ? ` | ${item.location}` : ""}
+                          {item.startTime && item.endTime
+                            ? ` | ${String(item.startTime).slice(0, 5)}-${String(item.endTime).slice(0, 5)}`
+                            : ""}
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -7,6 +7,8 @@ export default function CourseSearch({
   selectedTerm,
   setSelectedTerm,
   termLocked,
+  selectedCount,
+  onBuildSchedule,
 }) {
   const [q, setQ] = useState("");
   const [results, setResults] = useState([]);
@@ -67,7 +69,7 @@ export default function CourseSearch({
   }
 
   return (
-    <div className="card">
+    <div className="card dashboardPanel courseSearchCard">
       <h2>Course Search</h2>
 
       {/* ✅ single dropdown term + lock */}
@@ -95,7 +97,17 @@ export default function CourseSearch({
         placeholder="Search e.g. EECS, MATH..."
       />
 
-      <div className="list">
+      <div style={{ marginTop: 12 }}>
+        <button
+          className="btn primary"
+          disabled={selectedCount === 0}
+          onClick={onBuildSchedule}
+        >
+          Build Schedule
+        </button>
+      </div>
+
+      <div className="list courseSearchList">
         {results.slice(0, 15).map((c) => {
           const code = c.courseCode;
           const selectionKey = `${season}-${year}-${code}`;
@@ -125,7 +137,7 @@ export default function CourseSearch({
               </div>
 
               {isOpen && (
-                <div className="card inner" style={{ marginTop: 10 }}>
+                <div className="card inner courseDetailsPanel" style={{ marginTop: 10 }}>
                   <div className="muted" style={{ marginBottom: 8 }}>
                     Term: <b>{season} {year}</b>
                   </div>
@@ -143,7 +155,7 @@ export default function CourseSearch({
                       <div>
                         <b>Sections:</b>
                         {Array.isArray(details.sections) && details.sections.length > 0 ? (
-                          <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
+                          <div className="courseSectionsList" style={{ marginTop: 8 }}>
                             {details.sections.map((s) => (
                               <div key={s.sectionCode} className="card inner">
                                 <b>Section {s.sectionCode}</b>

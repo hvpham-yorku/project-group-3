@@ -41,7 +41,7 @@ export default function ProgramChecklist() {
   }
 
   return (
-    <div className="card">
+    <div className="card dashboardPanel checklistCard">
       <h3>Program Checklist</h3>
       <div className="muted">
         Courses are grouped by year. (Checkbox state is local for now.)
@@ -52,7 +52,7 @@ export default function ProgramChecklist() {
       {!msg && !data && <div className="muted" style={{ marginTop: 10 }}>Loading…</div>}
 
       {data && (
-        <div className="list">
+        <div className="list checklistList">
           {years.map((y) => {
             const isOpen = openYears.has(y.year);
             return (
@@ -71,7 +71,7 @@ export default function ProgramChecklist() {
                 </div>
 
                 {isOpen && (
-                  <div className="list">
+                  <div className="list checklistExpanded">
                     {y.groups?.map((g, idx) => (
                       <div key={`${g.groupName}-${g.reqType}-${idx}`} className="card inner">
                         <div style={{ display: "flex", gap: 10, alignItems: "baseline" }}>

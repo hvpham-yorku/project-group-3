@@ -27,60 +27,58 @@ export default function LoginCard({ onLogin }) {
   }
 
   return (
-    <div className="authShell">
-      <div className="card authCard">
-        <div className="authHeader">
-          <div className="authLogo" aria-hidden="true">
-            YU
-          </div>
-
-          <div>
-            <h2 className="authTitle">Welcome back</h2>
-            <div className="muted authSubtitle">
-              Sign in to build schedules and plan your term.
-            </div>
-          </div>
+    <div className="card authCard">
+      <div className="authHeader">
+        <div className="authLogo" aria-hidden="true">
+          YU
         </div>
 
-        <form onSubmit={submit} className="form authForm">
-          <label>
-            Email
-            <input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="username"
-              placeholder="Enter your email"
-            />
-          </label>
-
-          <label>
-            Password
-            <div className="authPassWrap">
-              <input
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                type={showPass ? "text" : "password"}
-                autoComplete="current-password"
-                placeholder="Enter your password"
-              />
-
-              <button
-                type="button"
-                className="btn authPassBtn"
-                onClick={() => setShowPass((v) => !v)}
-              >
-                {showPass ? "Hide" : "Show"}
-              </button>
-            </div>
-          </label>
-
-          {msg && <div className="error">{msg}</div>}
-
-          <button className="btn primary authSubmit" type="submit">
-            Login
-          </button>
-        </form>
+        <div>
+          <h2 className="authTitle">Welcome back</h2>
+          <div className="muted authSubtitle">
+            Sign in to build schedules and plan your term.
+          </div>
+        </div>
       </div>
+
+      <form onSubmit={submit} className="form authForm">
+        <label>
+          Email
+          <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="username"
+            placeholder="Enter your email"
+          />
+        </label>
+
+        <label>
+          Password
+          <div className="authPassWrap">
+            <input
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type={showPass ? "text" : "password"}
+              autoComplete="current-password"
+              placeholder="Enter your password"
+            />
+
+            <button
+              type="button"
+              className="btn authPassBtn"
+              onClick={() => setShowPass((v) => !v)}
+            >
+              {showPass ? "Hide" : "Show"}
+            </button>
+          </div>
+        </label>
+
+        {msg && <div className="error">{msg}</div>}
+
+        <button className="btn primary authSubmit" type="submit">
+          Login
+        </button>
+      </form>
     </div>
   );
 }

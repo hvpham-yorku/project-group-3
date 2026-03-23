@@ -10,7 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -34,6 +35,14 @@ class ChecklistControllerUnitTest {
     @MockitoBean
     private CatalogStore store;
 
+    private static UsernamePasswordAuthenticationToken studentAuth() {
+        return new UsernamePasswordAuthenticationToken(
+                "wamiq@example.com",
+                "n/a",
+                List.of(new SimpleGrantedAuthority("ROLE_STUDENT"))
+        );
+    }
+
     @Test
     void myChecklistReturnsUnauthorizedWhenAuthenticationMissing() throws Exception {
 
@@ -42,7 +51,6 @@ class ChecklistControllerUnitTest {
     }
 
     @Test
-    @WithMockUser(username = "wamiq@example.com", roles = "STUDENT")
     void myChecklistReturnsBadRequestWhenUserHasNoProgram() throws Exception {
 
         UserEntity user = new UserEntity(
@@ -54,12 +62,12 @@ class ChecklistControllerUnitTest {
         given(repo.findByEmail("wamiq@example.com"))
                 .willReturn(Optional.of(user));
 
-        mockMvc.perform(get("/api/me/checklist"))
+        mockMvc.perform(get("/api/me/checklist")
+                        .principal(studentAuth()))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    @WithMockUser(username = "wamiq@example.com", roles = "STUDENT")
     void myChecklistReturnsChecklistForAuthenticatedUser() throws Exception {
 
         UserEntity user = new UserEntity(
@@ -74,7 +82,8 @@ class ChecklistControllerUnitTest {
         given(store.checklistByProgramId(1L))
                 .willReturn(new ChecklistResponseDto(1L, List.of()));
 
-        mockMvc.perform(get("/api/me/checklist"))
+        mockMvc.perform(get("/api/me/checklist")
+                        .principal(studentAuth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.programId").value(1));
     }
