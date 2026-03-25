@@ -1,6 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import TopBar from "../components/layout/TopBar.jsx";
 import { buildSchedule } from "../api/ScheduleApi.js";
+import {
+  addSelectedCourse,
+  listSelectedCourses,
+  removeSelectedCourse,
+} from "../api/SelectedCoursesApi.js";
 
 import CourseSearch from "../components/dashboard/CourseSearch.jsx";
 import SelectedCourses from "../components/dashboard/SelectedCourse.jsx";
@@ -11,6 +16,8 @@ export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
   const [selected, setSelected] = useState([]);
   const [schedule, setSchedule] = useState(null);
   const [scheduleMsg, setScheduleMsg] = useState("");
+  const [saveError, setSaveError] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const selectedSet = useMemo(() => new Set(selected), [selected]);
 
@@ -23,17 +30,87 @@ export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
 
   const keyOf = (term, courseCode) => `${prefixOf(term)}${courseCode}`;
 
-  function toggleCourse(courseCode) {
-    setSchedule(null);
-    const key = keyOf(selectedTerm, courseCode);
-    setSelected((prev) =>
-      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+  const parseKey = (key) => {
+    const firstDash = key.indexOf("-");
+    const secondDash = key.indexOf("-", firstDash + 1);
+    return {
+      term: `${key.slice(0, firstDash)} ${key.slice(firstDash + 1, secondDash)}`,
+      courseCode: key.slice(secondDash + 1),
+    };
+  };
+
+  const savedCourseTermByCode = useMemo(() => {
+    return Object.fromEntries(
+      selected.map((key) => {
+        const { term, courseCode } = parseKey(key);
+        return [courseCode, term];
+      })
     );
+  }, [selected]);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadSelectedCourses() {
+      try {
+        const saved = await listSelectedCourses();
+        if (ignore) {
+          return;
+        }
+        setSelected(
+          (Array.isArray(saved) ? saved : []).map((item) => keyOf(item.term, item.courseCode))
+        );
+      } catch (e) {
+        if (!ignore) {
+          setSaveError(e.message || "Failed to load saved courses");
+        }
+      }
+    }
+
+    loadSelectedCourses();
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  async function toggleCourse(courseCode) {
+    setSchedule(null);
+    setScheduleMsg("");
+    setSaveError("");
+    const key = keyOf(selectedTerm, courseCode);
+    const alreadySelected = selected.includes(key);
+
+    setSaving(true);
+    try {
+      if (alreadySelected) {
+        await removeSelectedCourse(selectedTerm, courseCode);
+        setSelected((prev) => prev.filter((k) => k !== key));
+      } else {
+        await addSelectedCourse(selectedTerm, courseCode);
+        setSelected((prev) => (prev.includes(key) ? prev : [...prev, key]));
+      }
+    } catch (e) {
+      setSaveError(e.message || "Failed to update saved courses");
+    } finally {
+      setSaving(false);
+    }
   }
 
-  function removeKey(key) {
+  async function removeKey(key) {
     setSchedule(null);
-    setSelected((prev) => prev.filter((k) => k !== key));
+    setScheduleMsg("");
+    setSaveError("");
+    const { term, courseCode } = parseKey(key);
+
+    setSaving(true);
+    try {
+      await removeSelectedCourse(term, courseCode);
+      setSelected((prev) => prev.filter((current) => current !== key));
+    } catch (e) {
+      setSaveError(e.message || "Failed to update saved courses");
+    } finally {
+      setSaving(false);
+    }
   }
 
   const prefix = useMemo(() => prefixOf(selectedTerm), [selectedTerm]);
@@ -59,12 +136,15 @@ export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
     }
   }
 
-  const termLocked = selected.length > 0;
-
   useEffect(() => {
     document.body.classList.toggle("hasSchedule", Boolean(schedule));
     return () => document.body.classList.remove("hasSchedule");
   }, [schedule]);
+
+  useEffect(() => {
+    setSchedule(null);
+    setScheduleMsg("");
+  }, [selectedTerm]);
 
   return (
     <>
@@ -74,12 +154,14 @@ export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
         <div className="searchPanel">
           <CourseSearch
             selectedSet={selectedSet}
+            savedCourseTermByCode={savedCourseTermByCode}
             onToggle={toggleCourse}
             selectedTerm={selectedTerm}
             setSelectedTerm={setSelectedTerm}
-            termLocked={termLocked}
             selectedCount={selectedForTerm.length}
             onBuildSchedule={onBuildSchedule}
+            saving={saving}
+            saveError={saveError}
           />
         </div>
 

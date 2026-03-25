@@ -3,12 +3,14 @@ import { searchCourses, getCourseDetails } from "../../api/CourseApi.js";
 
 export default function CourseSearch({
   selectedSet,
+  savedCourseTermByCode,
   onToggle,
   selectedTerm,
   setSelectedTerm,
-  termLocked,
   selectedCount,
   onBuildSchedule,
+  saving,
+  saveError,
 }) {
   const [q, setQ] = useState("");
   const [results, setResults] = useState([]);
@@ -72,23 +74,15 @@ export default function CourseSearch({
     <div className="card dashboardPanel courseSearchCard">
       <h2>Course Search</h2>
 
-      {/* ✅ single dropdown term + lock */}
       <label style={{ marginBottom: 10, display: "block" }}>
         Term
         <select
           value={selectedTerm}
           onChange={(e) => setSelectedTerm(e.target.value)}
-          disabled={termLocked}
         >
           <option value="FALL 2026">FALL 2026</option>
           <option value="WINTER 2027">WINTER 2027</option>
         </select>
-
-        {termLocked && (
-          <div className="muted" style={{ marginTop: 6 }}>
-            Term locked because you already added a course. Remove all selected courses to change term.
-          </div>
-        )}
       </label>
 
       <input
@@ -100,17 +94,25 @@ export default function CourseSearch({
       <div style={{ marginTop: 12 }}>
         <button
           className="btn primary"
-          disabled={selectedCount === 0}
+          disabled={selectedCount === 0 || saving}
           onClick={onBuildSchedule}
         >
           Build Schedule
         </button>
       </div>
 
+      {saveError && (
+        <div className="error" style={{ marginTop: 10 }}>
+          {saveError}
+        </div>
+      )}
+
       <div className="list courseSearchList">
         {results.slice(0, 15).map((c) => {
           const code = c.courseCode;
           const selectionKey = `${season}-${year}-${code}`;
+          const savedInTerm = savedCourseTermByCode[code] || "";
+          const savedElsewhere = Boolean(savedInTerm) && savedInTerm !== selectedTerm;
           const isOpen = !!expanded[code];
           const details = detailsByCode[code];
           const loading = !!loadingByCode[code];
@@ -129,9 +131,14 @@ export default function CourseSearch({
 
                   <button
                     className={`btn ${selectedSet.has(selectionKey) ? "danger" : ""}`}
+                    disabled={saving || savedElsewhere}
                     onClick={() => onToggle(code)}
                   >
-                    {selectedSet.has(selectionKey) ? "Remove" : "Add"}
+                    {selectedSet.has(selectionKey)
+                      ? "Remove"
+                      : savedElsewhere
+                        ? `Saved in ${savedInTerm}`
+                        : "Add"}
                   </button>
                 </div>
               </div>
