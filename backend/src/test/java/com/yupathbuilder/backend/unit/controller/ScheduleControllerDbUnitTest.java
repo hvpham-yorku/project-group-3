@@ -65,4 +65,23 @@ class ScheduleControllerDbUnitTest {
                 .andExpect(jsonPath("$.chosenSections[0].courseCode").value("EECS 1011"))
                 .andExpect(jsonPath("$.chosenSections[0].sectionId").value("A"));
     }
+
+    @Test
+    void buildReturnsBadRequestWithMessageWhenStoreRejectsRequest() throws Exception {
+        given(scheduleStore.build(eq("SUMMER 2027"), eq(List.of("EECS 1011"))))
+                .willThrow(new IllegalArgumentException("No sections for EECS 1011 in SUMMER 2027"));
+
+        String body = """
+                {
+                  "term": "SUMMER 2027",
+                  "courseCodes": ["EECS 1011"]
+                }
+                """;
+
+        mockMvc.perform(post("/api/schedule/build")
+                        .contentType(APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("No sections for EECS 1011 in SUMMER 2027"));
+    }
 }

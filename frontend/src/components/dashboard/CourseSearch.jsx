@@ -82,6 +82,7 @@ export default function CourseSearch({
         >
           <option value="FALL 2026">FALL 2026</option>
           <option value="WINTER 2027">WINTER 2027</option>
+          <option value="SUMMER 2027">SUMMER 2027</option>
         </select>
       </label>
 
