@@ -722,160 +722,44 @@ AND NOT EXISTS (
 -- (We do explicit inserts for each course + day.)
 
 -- ========== FALL inserts (MW courses) ==========
--- EECS 1011
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'MON','09:30:00','10:30:00','LAS 1004'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 1011' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='MON' AND m.start_time='09:30:00');
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'WED','09:30:00','10:30:00','LAS 1004'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 1011' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='WED' AND m.start_time='09:30:00');
+-- Realistic rooms list
+SET @rooms = 'LAS 1004,ACW 109,CLH 201,LAS 1004,HNE 100,HNE 200,HNE 300,HNE 400';
 
--- MATH 1013
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'MON','10:30:00','11:30:00','LAS 1004'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='MATH 1013' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='MON' AND m.start_time='10:30:00');
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'WED','10:30:00','11:30:00','LAS 1004'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='MATH 1013' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='WED' AND m.start_time='10:30:00');
+-- Split the rooms into a temporary table
+DROP TEMPORARY TABLE IF EXISTS temp_rooms;
+CREATE TEMPORARY TABLE temp_rooms (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    room_name VARCHAR(20)
+);
 
--- EECS 2030
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'MON','12:30:00','13:30:00','ACW 109'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 2030' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='MON' AND m.start_time='12:30:00');
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'WED','12:30:00','13:30:00','ACW 109'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 2030' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='WED' AND m.start_time='12:30:00');
+-- Populate temp_rooms
+INSERT INTO temp_rooms(room_name)
+SELECT TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(@rooms, ',', n.n), ',', -1))
+FROM (
+    SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+    UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8
+) n;
 
--- EECS 2311
+-- Insert section meetings for FALL 2026 with realistic rooms
 INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'MON','14:30:00','15:30:00','ACW 109'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 2311' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='MON' AND m.start_time='14:30:00');
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'WED','14:30:00','15:30:00','ACW 109'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 2311' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='WED' AND m.start_time='14:30:00');
-
--- ========== FALL inserts (TTh courses) ==========
--- EECS 3311
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'TUE','09:30:00','10:30:00','CLH 201'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 3311' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='TUE' AND m.start_time='09:30:00');
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'THU','09:30:00','10:30:00','CLH 201'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 3311' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='THU' AND m.start_time='09:30:00');
-
--- EECS 3482
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'TUE','10:30:00','11:30:00','CLH 201'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 3482' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='TUE' AND m.start_time='10:30:00');
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'THU','10:30:00','11:30:00','CLH 201'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 3482' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='THU' AND m.start_time='10:30:00');
-
--- EECS 4481
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'TUE','12:30:00','13:30:00','LAS 1004'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 4481' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='TUE' AND m.start_time='12:30:00');
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'THU','12:30:00','13:30:00','LAS 1004'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 4481' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='THU' AND m.start_time='12:30:00');
-
--- EECS 4482
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'TUE','14:30:00','15:30:00','LAS 1004'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 4482' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='TUE' AND m.start_time='14:30:00');
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'THU','14:30:00','15:30:00','LAS 1004'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 4482' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='THU' AND m.start_time='14:30:00');
-
--- ========== FALL inserts (single-day courses for KINE to avoid conflicts) ==========
--- KINE 1000 (FRI)
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'FRI','09:30:00','10:30:00','HNE 100'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='KINE 1000' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='FRI' AND m.start_time='09:30:00');
-
--- KINE 1020 (FRI)
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'FRI','10:30:00','11:30:00','HNE 100'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='KINE 1020' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='FRI' AND m.start_time='10:30:00');
-
--- KINE 2011 (FRI)
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'FRI','12:30:00','13:30:00','HNE 200'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='KINE 2011' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='FRI' AND m.start_time='12:30:00');
-
--- KINE 2031 (FRI)
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'FRI','14:30:00','15:30:00','HNE 200'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='KINE 2031' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='FRI' AND m.start_time='14:30:00');
-
--- KINE 3012 (MON late)
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'MON','16:00:00','17:00:00','HNE 300'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='KINE 3012' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='MON' AND m.start_time='16:00:00');
-
--- KINE 3030 (WED late)
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'WED','16:00:00','17:00:00','HNE 300'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='KINE 3030' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='WED' AND m.start_time='16:00:00');
-
--- KINE 4010 (TUE late)
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'TUE','16:00:00','17:00:00','HNE 400'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='KINE 4010' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='TUE' AND m.start_time='16:00:00');
-
--- KINE 4020 (THU late)
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'THU','16:00:00','17:00:00','HNE 400'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='KINE 4020' AND t.season='FALL' AND t.year=2026 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='THU' AND m.start_time='16:00:00');
-
+SELECT s.id,
+       CASE 
+           WHEN ROW_NUMBER() OVER (ORDER BY s.id) % 5 = 1 THEN 'MON'
+           WHEN ROW_NUMBER() OVER (ORDER BY s.id) % 5 = 2 THEN 'TUE'
+           WHEN ROW_NUMBER() OVER (ORDER BY s.id) % 5 = 3 THEN 'WED'
+           WHEN ROW_NUMBER() OVER (ORDER BY s.id) % 5 = 4 THEN 'THU'
+           ELSE 'FRI'
+       END AS day_of_week,
+       TIME(CONCAT(8 + (ROW_NUMBER() OVER (ORDER BY s.id) % 8), ':00:00')) AS start_time,
+       TIME(CONCAT(9 + (ROW_NUMBER() OVER (ORDER BY s.id) % 8), ':30:00')) AS end_time,
+       tr.room_name
+FROM sections s
+JOIN terms t ON t.id = s.term_id
+JOIN temp_rooms tr ON ((ROW_NUMBER() OVER (ORDER BY s.id) - 1) % (SELECT COUNT(*) FROM temp_rooms) + 1) = tr.id
+WHERE t.season='FALL' AND t.year=2026
+  AND NOT EXISTS (
+      SELECT 1 FROM section_meetings m WHERE m.section_id = s.id
+  );
 -- ---------------------------------------------------------
 -- WINTER 2027 meetings: shift everything to different slots (still no conflicts)
 -- (We keep same pairing pattern but different days/rooms so term change is visible.)
@@ -901,149 +785,45 @@ AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.d
 -- KINE 4020  THU 16:00-17:00  HNE 400
 
 -- (For WINTER, same pattern as FALL but swapped MW <-> TTh for SWE.)
+-- ---------------------------------------------------------
+-- Meeting assignment (WINTER 2027) — unique slots per course
+-- ---------------------------------------------------------
 
--- EECS 1011 (WINTER TTh 09:30)
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'TUE','09:30:00','10:30:00','LAS 1004'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 1011' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='TUE' AND m.start_time='09:30:00');
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'THU','09:30:00','10:30:00','LAS 1004'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 1011' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='THU' AND m.start_time='09:30:00');
+-- Realistic rooms list (reuse same as FALL)
+SET @rooms = 'LAS 1004,ACW 109,CLH 201,LAS 1004,HNE 100,HNE 200,HNE 300,HNE 400';
 
--- MATH 1013 (WINTER TTh 10:30)
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'TUE','10:30:00','11:30:00','LAS 1004'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='MATH 1013' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='TUE' AND m.start_time='10:30:00');
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'THU','10:30:00','11:30:00','LAS 1004'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='MATH 1013' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='THU' AND m.start_time='10:30:00');
+-- Drop temp table if exists
+DROP TEMPORARY TABLE IF EXISTS temp_rooms;
+CREATE TEMPORARY TABLE temp_rooms (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    room_name VARCHAR(20)
+);
 
--- EECS 2030 (WINTER TTh 12:30)
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'TUE','12:30:00','13:30:00','ACW 109'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 2030' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='TUE' AND m.start_time='12:30:00');
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'THU','12:30:00','13:30:00','ACW 109'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 2030' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='THU' AND m.start_time='12:30:00');
+-- Populate temp_rooms
+INSERT INTO temp_rooms(room_name)
+SELECT TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(@rooms, ',', n.n), ',', -1))
+FROM (
+    SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+    UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8
+) n;
 
--- EECS 2311 (WINTER TTh 14:30)
+-- Insert section meetings for WINTER 2027 with realistic rooms
 INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'TUE','14:30:00','15:30:00','ACW 109'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 2311' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='TUE' AND m.start_time='14:30:00');
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'THU','14:30:00','15:30:00','ACW 109'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 2311' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='THU' AND m.start_time='14:30:00');
-
--- EECS 3311 (WINTER MW 09:30)
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'MON','09:30:00','10:30:00','CLH 201'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 3311' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='MON' AND m.start_time='09:30:00');
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'WED','09:30:00','10:30:00','CLH 201'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 3311' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='WED' AND m.start_time='09:30:00');
-
--- EECS 3482 (WINTER MW 10:30)
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'MON','10:30:00','11:30:00','CLH 201'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 3482' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='MON' AND m.start_time='10:30:00');
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'WED','10:30:00','11:30:00','CLH 201'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 3482' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='WED' AND m.start_time='10:30:00');
-
--- EECS 4481 (WINTER MW 12:30)
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'MON','12:30:00','13:30:00','LAS 1004'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 4481' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='MON' AND m.start_time='12:30:00');
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'WED','12:30:00','13:30:00','LAS 1004'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 4481' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='WED' AND m.start_time='12:30:00');
-
--- EECS 4482 (WINTER MW 14:30)
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'MON','14:30:00','15:30:00','LAS 1004'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 4482' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='MON' AND m.start_time='14:30:00');
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'WED','14:30:00','15:30:00','LAS 1004'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='EECS 4482' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='WED' AND m.start_time='14:30:00');
-
--- WINTER: KINE courses (same single-day pattern as FALL so no conflicts)
--- KINE 1000 (FRI)
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'FRI','09:30:00','10:30:00','HNE 100'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='KINE 1000' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='FRI' AND m.start_time='09:30:00');
-
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'FRI','10:30:00','11:30:00','HNE 100'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='KINE 1020' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='FRI' AND m.start_time='10:30:00');
-
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'FRI','12:30:00','13:30:00','HNE 200'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='KINE 2011' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='FRI' AND m.start_time='12:30:00');
-
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'FRI','14:30:00','15:30:00','HNE 200'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='KINE 2031' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='FRI' AND m.start_time='14:30:00');
-
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'MON','16:00:00','17:00:00','HNE 300'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='KINE 3012' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='MON' AND m.start_time='16:00:00');
-
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'WED','16:00:00','17:00:00','HNE 300'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='KINE 3030' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='WED' AND m.start_time='16:00:00');
-
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'TUE','16:00:00','17:00:00','HNE 400'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='KINE 4010' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='TUE' AND m.start_time='16:00:00');
-
-INSERT INTO section_meetings(section_id, day_of_week, start_time, end_time, location)
-SELECT s.id, 'THU','16:00:00','17:00:00','HNE 400'
-FROM sections s JOIN courses c ON c.id=s.course_id JOIN terms t ON t.id=s.term_id
-WHERE c.course_code='KINE 4020' AND t.season='WINTER' AND t.year=2027 AND s.section_code='A'
-AND NOT EXISTS (SELECT 1 FROM section_meetings m WHERE m.section_id=s.id AND m.day_of_week='THU' AND m.start_time='16:00:00');
+SELECT s.id,
+       CASE 
+           WHEN ROW_NUMBER() OVER (ORDER BY s.id) % 5 = 1 THEN 'MON'
+           WHEN ROW_NUMBER() OVER (ORDER BY s.id) % 5 = 2 THEN 'TUE'
+           WHEN ROW_NUMBER() OVER (ORDER BY s.id) % 5 = 3 THEN 'WED'
+           WHEN ROW_NUMBER() OVER (ORDER BY s.id) % 5 = 4 THEN 'THU'
+           ELSE 'FRI'
+       END AS day_of_week,
+       TIME(CONCAT(8 + (ROW_NUMBER() OVER (ORDER BY s.id) % 8), ':00:00')) AS start_time,
+       TIME(CONCAT(9 + (ROW_NUMBER() OVER (ORDER BY s.id) % 8), ':30:00')) AS end_time,
+       tr.room_name
+FROM sections s
+JOIN terms t ON t.id = s.term_id
+JOIN temp_rooms tr ON ((ROW_NUMBER() OVER (ORDER BY s.id) - 1) % (SELECT COUNT(*) FROM temp_rooms) + 1) = tr.id
+WHERE t.season='WINTER' AND t.year=2027
+  AND NOT EXISTS (
+      SELECT 1 FROM section_meetings m WHERE m.section_id = s.id
+  );
