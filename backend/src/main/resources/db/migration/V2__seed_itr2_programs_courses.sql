@@ -1,4 +1,4 @@
--- V3__seed_itr2_programs_courses.sql
+-- V2__seed_itr2_programs_courses.sql
 -- Adds two programs (Software Eng Security Stream + Kinesiology) and
 -- adds 2 courses per year for each program (total 16 courses).
 -- Also adds 1 section per course per term (FALL 2026 + WINTER 2027) with NO conflicts.
@@ -41,6 +41,15 @@ WHERE f.name = 'Health'
 AND NOT EXISTS (
   SELECT 1 FROM programs p WHERE p.name = 'Kinesiology'
 );
+
+-- -----
+-- program_requirements
+-- -----
+ALTER TABLE program_requirements
+ADD COLUMN min_courses INT DEFAULT NULL,
+ADD COLUMN max_courses INT DEFAULT NULL,
+ADD COLUMN min_credits INT DEFAULT NULL,
+ADD COLUMN selection_type VARCHAR(20) DEFAULT NULL;
 
 -- ---------------------------------------------------------
 -- 3) Courses (2 per year per program)
@@ -262,9 +271,33 @@ AND NOT EXISTS (
   SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.year_level=2 AND r.course_id=c.id
 );
 
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 2, c.id, 'REQUIRED', 'Core', 3
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='KINE 2049'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.year_level=2 AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 2, c.id, 'REQUIRED', 'Core', 4
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='KINE 2050'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.year_level=2 AND r.course_id=c.id
+);
+
 -- Year 3
 INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
 SELECT p.id, 3, c.id, 'REQUIRED', 'Core', 1
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='KINE 3000'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.year_level=3 AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 3, c.id, 'REQUIRED', 'Core', 2
 FROM programs p, courses c
 WHERE p.name='Kinesiology' AND c.course_code='KINE 3012'
 AND NOT EXISTS (
@@ -272,7 +305,15 @@ AND NOT EXISTS (
 );
 
 INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
-SELECT p.id, 3, c.id, 'REQUIRED', 'Core', 2
+SELECT p.id, 3, c.id, 'REQUIRED', 'Core', 3
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='KINE 3020'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.year_level=3 AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 3, c.id, 'REQUIRED', 'Core', 4
 FROM programs p, courses c
 WHERE p.name='Kinesiology' AND c.course_code='KINE 3030'
 AND NOT EXISTS (
@@ -294,6 +335,225 @@ FROM programs p, courses c
 WHERE p.name='Kinesiology' AND c.course_code='KINE 4020'
 AND NOT EXISTS (
   SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.year_level=4 AND r.course_id=c.id
+);
+--Elective Groups
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 4, c.id, 'ELECTIVE', 'KINE 4000 Level Options', 1
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='KINE 4375'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 4, c.id, 'ELECTIVE', 'KINE 4000 Level Options', 2
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='KINE 4340'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+-- Physics options (choose one path)
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 1, c.id, 'ELECTIVE', 'Physics Options', 1
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='PHYS 1410'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 1, c.id, 'ELECTIVE', 'Physics Options', 2
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='PHYS 1420'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+-- Physics sequence
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 1, c.id, 'ELECTIVE', 'Physics Sequence', 1
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='PHYS 1411'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 1, c.id, 'ELECTIVE', 'Physics Sequence', 2
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='PHYS 1412'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 1, c.id, 'ELECTIVE', 'Physics Sequence', 3
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='PHYS 1421'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 1, c.id, 'ELECTIVE', 'Physics Sequence', 4
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='PHYS 1422'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+-- Math options (6 credits required)
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 1, c.id, 'ELECTIVE', 'Math Options', 1
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='MATH 1506'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 1, c.id, 'ELECTIVE', 'Math Options', 2
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='MATH 1507'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 1, c.id, 'ELECTIVE', 'Math Options', 3
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='MATH 1505'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 1, c.id, 'ELECTIVE', 'Math Options', 4
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='MATH 1014'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 1, c.id, 'ELECTIVE', 'Math Options', 5
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='MATH 1025'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+--GENERAL EDUCATION
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 1, c.id, 'ELECTIVE', 'General Education', 1
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='HUMA 1105'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 1, c.id, 'ELECTIVE', 'General Education', 2
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='SOSC 1009'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+--EECS (COMPUTING OPTIONS)
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 1, c.id, 'ELECTIVE', 'Computing Options', 1
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='EECS 1520'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 1, c.id, 'ELECTIVE', 'Computing Options', 2
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='EECS 1540'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 1, c.id, 'ELECTIVE', 'Computing Options', 3
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='EECS 1570'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+--ADDITIONAL KINE ELECTIVES
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 3, c.id, 'ELECTIVE', 'KINE Electives', 1
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='KINE 3440'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 3, c.id, 'ELECTIVE', 'KINE Electives', 2
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='KINE 3620'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 3, c.id, 'ELECTIVE', 'KINE Electives', 3
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='KINE 3400'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 3, c.id, 'ELECTIVE', 'KINE Electives', 4
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='KINE 3100'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 2, c.id, 'ELECTIVE', 'Outside Major Science', 1
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='PSYC 1010'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+--OUTSIDE MAJOR SCIENCE
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 2, c.id, 'ELECTIVE', 'Outside Major Science', 2
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='BIOL 2040'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 2, c.id, 'ELECTIVE', 'Outside Major Science', 3
+FROM programs p, courses c
+WHERE p.name='Kinesiology' AND c.course_code='MATH 1510'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r WHERE r.program_id=p.id AND r.course_id=c.id
+);
+--PRACTICUM
+INSERT INTO program_requirements(program_id, year_level, course_id, req_type, group_name, display_order)
+SELECT p.id, 1, c.id, 'ELECTIVE', 'Practicum', 1
+FROM programs p
+JOIN courses c ON c.course_code IN (
+  'PKIN 0570','PKIN 0295','PKIN 0303','PKIN 0440',
+  'PKIN 0811','PKIN 0812','PKIN 0840','PKIN 0861','PKIN 0862',
+  'PKIN 0200','PKIN 0240','PKIN 0270',
+  'PKIN 0751','PKIN 0750','PKIN 0770',
+  'PKIN 0600','PKIN 0610'
+)
+WHERE p.name='Kinesiology'
+AND NOT EXISTS (
+  SELECT 1 FROM program_requirements r
+  WHERE r.program_id=p.id AND r.course_id=c.id
 );
 
 -- ---------------------------------------------------------
