@@ -1345,6 +1345,14 @@ body.theme-black .timeCell span {
   font-weight: 700;
 }
 
+.uiToggleFab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1000;
+  min-width: 120px;
+}
+
 .profilePage {
   padding-top: 24px;
   padding-bottom: 32px;
