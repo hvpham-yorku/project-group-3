@@ -1,6 +1,6 @@
 package com.yupathbuilder.backend.unit.util;
 
-import com.yupathbuilder.backend.model.Season;
+import com.yupathbuilder.backend.scheduler_system.model.Season;
 import com.yupathbuilder.backend.util.TermParser;
 import org.junit.jupiter.api.Test;
 
@@ -30,3 +30,4 @@ class TermParserUnitTest {
         assertThrows(IllegalArgumentException.class, () -> TermParser.parse("SPRING 2026"));
     }
 }
+

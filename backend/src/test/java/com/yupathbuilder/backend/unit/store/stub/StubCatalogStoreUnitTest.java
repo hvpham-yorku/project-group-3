@@ -1,7 +1,7 @@
 package com.yupathbuilder.backend.unit.store.stub;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yupathbuilder.backend.store.stub.StubCatalogStore;
+import com.yupathbuilder.backend.program_system.store.stub.StubCatalogStore;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,3 +35,4 @@ class StubCatalogStoreUnitTest {
         assertTrue(checklist.years().isEmpty());
     }
 }
+

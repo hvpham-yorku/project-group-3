@@ -1,6 +1,6 @@
 package com.yupathbuilder.backend.integration.store;
 
-import com.yupathbuilder.backend.store.CourseDetailsStore;
+import com.yupathbuilder.backend.course_catalog.store.CourseDetailsStore;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,3 +30,4 @@ class SqlCourseDetailsStoreIT {
         assertNull(courseDetailsStore.getDetails("NOPE 9999", "FALL", 2026));
     }
 }
+

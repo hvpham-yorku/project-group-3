@@ -2,12 +2,12 @@ package com.yupathbuilder.backend.unit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yupathbuilder.backend.authentication.AuthController;
-import com.yupathbuilder.backend.authentication.InvalidCredentialsException;
 import com.yupathbuilder.backend.authentication.AuthService;
 import com.yupathbuilder.backend.authentication.UserProfileService;
 import com.yupathbuilder.backend.authentication.dto.AuthResponse;
 import com.yupathbuilder.backend.authentication.dto.LoginRequest;
 import com.yupathbuilder.backend.authentication.dto.RegisterRequest;
+import com.yupathbuilder.backend.global_exception_handler.InvalidCredentialsException;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

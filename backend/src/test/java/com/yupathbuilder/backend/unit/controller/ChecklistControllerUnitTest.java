@@ -1,10 +1,8 @@
 package com.yupathbuilder.backend.unit.controller;
 
-import com.yupathbuilder.backend.authentication.entity.UserEntity;
-import com.yupathbuilder.backend.authentication.repo.UserRepo;
-import com.yupathbuilder.backend.checklist.dto.ChecklistResponseDto;
-import com.yupathbuilder.backend.controller.ChecklistController;
-import com.yupathbuilder.backend.store.CatalogStore;
+import com.yupathbuilder.backend.program_system.dto.ChecklistResponseDto;
+import com.yupathbuilder.backend.program_system.controller.ChecklistController;
+import com.yupathbuilder.backend.program_system.service.UserChecklistService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +14,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
-import java.util.Optional;
 
-import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -30,10 +27,7 @@ class ChecklistControllerUnitTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private UserRepo repo;
-
-    @MockitoBean
-    private CatalogStore store;
+    private UserChecklistService userChecklistService;
 
     private static UsernamePasswordAuthenticationToken studentAuth() {
         return new UsernamePasswordAuthenticationToken(
@@ -45,6 +39,8 @@ class ChecklistControllerUnitTest {
 
     @Test
     void myChecklistReturnsUnauthorizedWhenAuthenticationMissing() throws Exception {
+        doReturn(org.springframework.http.ResponseEntity.status(401).body("Unauthorized"))
+                .when(userChecklistService).getChecklistFor(null);
 
         mockMvc.perform(get("/api/me/checklist"))
                 .andExpect(status().isUnauthorized());
@@ -52,15 +48,8 @@ class ChecklistControllerUnitTest {
 
     @Test
     void myChecklistReturnsBadRequestWhenUserHasNoProgram() throws Exception {
-
-        UserEntity user = new UserEntity(
-                "wamiq@example.com",
-                "hash",
-                null
-        );
-
-        given(repo.findByEmail("wamiq@example.com"))
-                .willReturn(Optional.of(user));
+        doReturn(org.springframework.http.ResponseEntity.badRequest().body("User has no program selected"))
+                .when(userChecklistService).getChecklistFor(org.mockito.ArgumentMatchers.any());
 
         mockMvc.perform(get("/api/me/checklist")
                         .principal(studentAuth()))
@@ -69,18 +58,8 @@ class ChecklistControllerUnitTest {
 
     @Test
     void myChecklistReturnsChecklistForAuthenticatedUser() throws Exception {
-
-        UserEntity user = new UserEntity(
-                "wamiq@example.com",
-                "hash",
-                1L
-        );
-
-        given(repo.findByEmail("wamiq@example.com"))
-                .willReturn(Optional.of(user));
-
-        given(store.checklistByProgramId(1L))
-                .willReturn(new ChecklistResponseDto(1L, List.of()));
+        doReturn(org.springframework.http.ResponseEntity.ok(new ChecklistResponseDto(1L, List.of())))
+                .when(userChecklistService).getChecklistFor(org.mockito.ArgumentMatchers.any());
 
         mockMvc.perform(get("/api/me/checklist")
                         .principal(studentAuth()))
@@ -88,3 +67,4 @@ class ChecklistControllerUnitTest {
                 .andExpect(jsonPath("$.programId").value(1));
     }
 }
+

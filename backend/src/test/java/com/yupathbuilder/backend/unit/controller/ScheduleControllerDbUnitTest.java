@@ -1,10 +1,10 @@
 package com.yupathbuilder.backend.unit.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yupathbuilder.backend.controller.ScheduleControllerDb;
-import com.yupathbuilder.backend.schedule.dto.ChosenSectionDto;
-import com.yupathbuilder.backend.schedule.dto.ScheduleBuildResponse;
-import com.yupathbuilder.backend.store.ScheduleStore;
+//import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yupathbuilder.backend.scheduler_system.controller.ScheduleControllerDb;
+import com.yupathbuilder.backend.scheduler_system.dto.ChosenSectionDto;
+import com.yupathbuilder.backend.scheduler_system.dto.ScheduleBuildResponse;
+import com.yupathbuilder.backend.scheduler_system.service.ScheduleBuildService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -28,10 +28,10 @@ class ScheduleControllerDbUnitTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+    //private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     @MockitoBean
-    private ScheduleStore scheduleStore;
+    private ScheduleBuildService scheduleBuildService;
 
     @Test
     void buildMapsRequestBodyAndReturnsStoreResponse() throws Exception {
@@ -47,7 +47,7 @@ class ScheduleControllerDbUnitTest {
                 ))
         );
 
-        given(scheduleStore.build(eq("FALL 2026"), eq(List.of("EECS 1011", "MATH 1013"))))
+        given(scheduleBuildService.build(eq("FALL 2026"), eq(List.of("EECS 1011", "MATH 1013"))))
                 .willReturn(response);
 
         String body = """
@@ -68,7 +68,7 @@ class ScheduleControllerDbUnitTest {
 
     @Test
     void buildReturnsBadRequestWithMessageWhenStoreRejectsRequest() throws Exception {
-        given(scheduleStore.build(eq("SUMMER 2027"), eq(List.of("EECS 1011"))))
+        given(scheduleBuildService.build(eq("SUMMER 2027"), eq(List.of("EECS 1011"))))
                 .willThrow(new IllegalArgumentException("No sections for EECS 1011 in SUMMER 2027"));
 
         String body = """
@@ -85,3 +85,4 @@ class ScheduleControllerDbUnitTest {
                 .andExpect(jsonPath("$.message").value("No sections for EECS 1011 in SUMMER 2027"));
     }
 }
+

@@ -1,6 +1,6 @@
 package com.yupathbuilder.backend.util;
 
-import com.yupathbuilder.backend.model.Season;
+import com.yupathbuilder.backend.scheduler_system.model.Season;
 
 public final class TermParser {
   private TermParser() {}

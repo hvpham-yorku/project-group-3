@@ -46,7 +46,6 @@ VALUES
 
 ('EECS 4481', 'EECS', '4481', 'Computer Security Laboratory', 'Hands-on security lab work (selected for Year 4 demo).'),
 ('EECS 4482', 'EECS', '4482', 'Computer Security Management: Assessment and Forensics', 'Security assessment and forensics (selected for Year 4 demo).'),
--- Missing Software Engineering (Security Stream) courses
 
 ('EECS 3101', 'EECS', '3101', 'Design and Analysis of Algorithms', 'Core algorithms course required in Security Stream.'),
 ('EECS 3201', 'EECS', '3201', 'Digital Logic Design', 'Fundamentals of digital logic design.'),

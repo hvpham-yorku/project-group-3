@@ -1,6 +1,6 @@
 package com.yupathbuilder.backend.integration.store;
 
-import com.yupathbuilder.backend.store.ScheduleStore;
+import com.yupathbuilder.backend.scheduler_system.store.ScheduleStore;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,3 +35,4 @@ class SqlScheduleStoreIT {
         assertEquals("EECS 1011", response.chosenSections().get(0).courseCode());
     }
 }
+
