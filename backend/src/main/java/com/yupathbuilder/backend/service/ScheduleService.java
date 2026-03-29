@@ -47,12 +47,11 @@ public class ScheduleService {
         throw new IllegalArgumentException("No meeting times found for " + code + " in " + termString);
       }
 
-      // Prefer a non-conflicting section, but if none exists pick the first
-      // available section so overlaps can still be displayed to the user.
       var picked = withMeetings.stream()
           .filter(s -> !conflicts(toBlocks(s), used))
           .findFirst()
-          .orElse(withMeetings.get(0));
+          .orElseThrow(() -> new IllegalArgumentException(
+              "All sections for " + code + " conflict with the current schedule"));
 
       var pickedBlocks = toBlocks(picked);
       used.addAll(pickedBlocks);
