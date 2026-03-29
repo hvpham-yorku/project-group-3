@@ -25,4 +25,13 @@ class SqlScheduleStoreIT {
         assertEquals(2, response.chosenSections().size());
         assertEquals("EECS 1011", response.chosenSections().get(0).courseCode());
     }
+
+    @Test
+    void buildCreatesScheduleForSummerTerm() {
+        var response = scheduleStore.build("SUMMER 2027", List.of("EECS 1011", "MATH 1013"));
+
+        assertEquals("SUMMER 2027", response.term());
+        assertEquals(2, response.chosenSections().size());
+        assertEquals("EECS 1011", response.chosenSections().get(0).courseCode());
+    }
 }
