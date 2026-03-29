@@ -1,9 +1,9 @@
 package com.yupathbuilder.backend.unit.service;
 
-import com.yupathbuilder.backend.checklist.ChecklistService;
-import com.yupathbuilder.backend.entity.CourseEntity;
-import com.yupathbuilder.backend.entity.ProgramRequirementEntity;
-import com.yupathbuilder.backend.repo.ProgramRequirementRepo;
+import com.yupathbuilder.backend.program_system.service.ChecklistService;
+import com.yupathbuilder.backend.course_catalog.entity.CourseEntity;
+import com.yupathbuilder.backend.program_system.entity.ProgramRequirementEntity;
+import com.yupathbuilder.backend.program_system.repo.ProgramRequirementRepo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -78,3 +78,4 @@ class ChecklistServiceUnitTest {
         field.set(target, value);
     }
 }
+

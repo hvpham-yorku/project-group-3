@@ -1,6 +1,6 @@
 package com.yupathbuilder.backend.integration.store;
 
-import com.yupathbuilder.backend.store.CourseStore;
+import com.yupathbuilder.backend.course_catalog.store.CourseStore;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,3 +32,4 @@ class SqlCourseStoreIT {
         assertTrue(results.stream().anyMatch(c -> "EECS 3482".equals(c.getCourseCode()) || "EECS 4481".equals(c.getCourseCode()) || "EECS 4482".equals(c.getCourseCode())));
     }
 }
+

@@ -1,7 +1,7 @@
 package com.yupathbuilder.backend.unit.store.stub;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yupathbuilder.backend.store.stub.StubCourseStore;
+import com.yupathbuilder.backend.course_catalog.store.stub.StubCourseStore;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,3 +31,4 @@ class StubCourseStoreUnitTest {
         assertEquals(store.listCourses().size(), store.searchCourses("   ").size());
     }
 }
+

@@ -1,10 +1,10 @@
 package com.yupathbuilder.backend.unit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yupathbuilder.backend.controller.SavedCourseSelectionController;
-import com.yupathbuilder.backend.selection.dto.SaveCourseSelectionRequest;
-import com.yupathbuilder.backend.selection.dto.SavedCourseSelectionDto;
-import com.yupathbuilder.backend.service.SavedCourseSelectionService;
+import com.yupathbuilder.backend.scheduler_system.controller.SavedCourseSelectionController;
+import com.yupathbuilder.backend.scheduler_system.dto.SaveCourseSelectionRequest;
+import com.yupathbuilder.backend.scheduler_system.dto.SavedCourseSelectionDto;
+import com.yupathbuilder.backend.scheduler_system.service.SavedCourseSelectionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -83,3 +83,4 @@ class SavedCourseSelectionControllerUnitTest {
         );
     }
 }
+

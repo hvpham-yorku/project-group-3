@@ -1,5 +1,6 @@
 package com.yupathbuilder.backend.authentication;
 
+import com.yupathbuilder.backend.global_exception_handler.InvalidCredentialsException;
 import com.yupathbuilder.backend.authentication.dto.*;
 import com.yupathbuilder.backend.authentication.entity.UserEntity;
 import com.yupathbuilder.backend.authentication.jwt.JwtUtil;

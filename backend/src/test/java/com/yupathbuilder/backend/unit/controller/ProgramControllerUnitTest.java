@@ -1,9 +1,9 @@
 package com.yupathbuilder.backend.unit.controller;
 
-import com.yupathbuilder.backend.controller.ProgramController;
-import com.yupathbuilder.backend.entity.FacultyEntity;
-import com.yupathbuilder.backend.entity.ProgramEntity;
-import com.yupathbuilder.backend.store.CatalogStore;
+import com.yupathbuilder.backend.program_system.controller.ProgramController;
+import com.yupathbuilder.backend.program_system.entity.FacultyEntity;
+import com.yupathbuilder.backend.program_system.entity.ProgramEntity;
+import com.yupathbuilder.backend.program_system.service.ProgramCatalogService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -28,14 +28,14 @@ class ProgramControllerUnitTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private CatalogStore store;
+    private ProgramCatalogService programCatalogService;
 
     @Test
     void facultiesReturnsCatalogStoreData() throws Exception {
         FacultyEntity faculty = new FacultyEntity();
         faculty.setName("Engineering");
         setId(faculty, 1L);
-        given(store.listFaculties()).willReturn(List.of(faculty));
+        given(programCatalogService.listFaculties()).willReturn(List.of(faculty));
 
         mockMvc.perform(get("/api/faculties"))
                 .andExpect(status().isOk())
@@ -47,13 +47,13 @@ class ProgramControllerUnitTest {
         ProgramEntity program = new ProgramEntity();
         program.setName("Software Engineering (Security Stream)");
         program.setDegree("BEng");
-        given(store.listPrograms(1L)).willReturn(List.of(program));
+        given(programCatalogService.listPrograms(1L)).willReturn(List.of(program));
 
         mockMvc.perform(get("/api/programs").param("facultyId", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Software Engineering (Security Stream)"));
 
-        verify(store).listPrograms(1L);
+        verify(programCatalogService).listPrograms(1L);
     }
 
     private static void setId(Object target, Long value) throws Exception {
@@ -62,3 +62,4 @@ class ProgramControllerUnitTest {
         field.set(target, value);
     }
 }
+

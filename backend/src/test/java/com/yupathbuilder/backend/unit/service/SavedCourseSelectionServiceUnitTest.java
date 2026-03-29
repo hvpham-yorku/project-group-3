@@ -2,14 +2,14 @@ package com.yupathbuilder.backend.unit.service;
 
 import com.yupathbuilder.backend.authentication.entity.UserEntity;
 import com.yupathbuilder.backend.authentication.repo.UserRepo;
-import com.yupathbuilder.backend.entity.CourseEntity;
-import com.yupathbuilder.backend.entity.TermEntity;
-import com.yupathbuilder.backend.entity.UserSelectedCourseEntity;
-import com.yupathbuilder.backend.model.Season;
-import com.yupathbuilder.backend.repo.CourseRepo;
-import com.yupathbuilder.backend.repo.TermRepo;
-import com.yupathbuilder.backend.repo.UserSelectedCourseRepo;
-import com.yupathbuilder.backend.service.SavedCourseSelectionService;
+import com.yupathbuilder.backend.course_catalog.entity.CourseEntity;
+import com.yupathbuilder.backend.scheduler_system.entity.TermEntity;
+import com.yupathbuilder.backend.scheduler_system.entity.UserSelectedCourseEntity;
+import com.yupathbuilder.backend.scheduler_system.model.Season;
+import com.yupathbuilder.backend.course_catalog.repo.CourseRepo;
+import com.yupathbuilder.backend.scheduler_system.repo.TermRepo;
+import com.yupathbuilder.backend.scheduler_system.repo.UserSelectedCourseRepo;
+import com.yupathbuilder.backend.scheduler_system.service.SavedCourseSelectionService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -147,3 +147,4 @@ class SavedCourseSelectionServiceUnitTest {
         field.set(target, value);
     }
 }
+

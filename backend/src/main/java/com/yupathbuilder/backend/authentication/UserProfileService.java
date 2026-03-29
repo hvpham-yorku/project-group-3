@@ -5,8 +5,8 @@ import com.yupathbuilder.backend.authentication.dto.UpdateProfileRequest;
 import com.yupathbuilder.backend.authentication.dto.UserProfileResponse;
 import com.yupathbuilder.backend.authentication.entity.UserEntity;
 import com.yupathbuilder.backend.authentication.repo.UserRepo;
-import com.yupathbuilder.backend.entity.ProgramEntity;
-import com.yupathbuilder.backend.repo.ProgramRepo;
+import com.yupathbuilder.backend.program_system.entity.ProgramEntity;
+import com.yupathbuilder.backend.program_system.repo.ProgramRepo;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -124,3 +124,4 @@ public class UserProfileService {
         );
     }
 }
+

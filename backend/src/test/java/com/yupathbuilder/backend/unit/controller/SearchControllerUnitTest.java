@@ -1,8 +1,8 @@
 package com.yupathbuilder.backend.unit.controller;
 
-import com.yupathbuilder.backend.controller.SearchController;
-import com.yupathbuilder.backend.entity.CourseEntity;
-import com.yupathbuilder.backend.store.CourseStore;
+import com.yupathbuilder.backend.course_catalog.controller.SearchController;
+import com.yupathbuilder.backend.course_catalog.dto.CourseDto;
+import com.yupathbuilder.backend.course_catalog.service.CourseCatalogService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -28,7 +28,7 @@ class SearchControllerUnitTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private CourseStore courseStore;
+    private CourseCatalogService courseCatalogService;
 
     @Test
     void searchReturnsEmptyListWhenQueryBlank() throws Exception {
@@ -37,21 +37,21 @@ class SearchControllerUnitTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(0));
 
-        verifyNoInteractions(courseStore);
+        verifyNoInteractions(courseCatalogService);
     }
 
     @Test
     void searchReturnsMappedDtos() throws Exception {
-        CourseEntity course = new CourseEntity();
-        course.setCourseCode("EECS 2311");
-        course.setTitle("Software Development Project");
-        given(courseStore.searchCourses(eq("software"))).willReturn(List.of(course));
+        given(courseCatalogService.searchCourses(eq("software"))).willReturn(List.of(
+                new CourseDto("EECS 2311", "Software Development Project", null)
+        ));
 
         mockMvc.perform(get("/api/search/courses").param("q", "software"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].courseCode").value("EECS 2311"))
                 .andExpect(jsonPath("$[0].title").value("Software Development Project"));
 
-        verify(courseStore).searchCourses("software");
+        verify(courseCatalogService).searchCourses("software");
     }
 }
+

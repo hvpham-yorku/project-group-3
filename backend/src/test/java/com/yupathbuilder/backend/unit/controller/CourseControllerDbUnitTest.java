@@ -1,8 +1,8 @@
 package com.yupathbuilder.backend.unit.controller;
 
-import com.yupathbuilder.backend.controller.CourseControllerDb;
-import com.yupathbuilder.backend.entity.CourseEntity;
-import com.yupathbuilder.backend.store.CourseStore;
+import com.yupathbuilder.backend.course_catalog.controller.CourseControllerDb;
+import com.yupathbuilder.backend.course_catalog.dto.CourseDto;
+import com.yupathbuilder.backend.course_catalog.service.CourseCatalogService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -27,33 +27,32 @@ class CourseControllerDbUnitTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private CourseStore courseStore;
+    private CourseCatalogService courseCatalogService;
 
     @Test
     void listCoursesUsesListCoursesWhenQueryMissing() throws Exception {
-        CourseEntity course = new CourseEntity();
-        course.setCourseCode("EECS 1011");
-        course.setTitle("Computational Thinking Through Mechatronics");
-        given(courseStore.listCourses()).willReturn(List.of(course));
+        given(courseCatalogService.listCourses(null)).willReturn(List.of(
+                new CourseDto("EECS 1011", "Computational Thinking Through Mechatronics", null)
+        ));
 
         mockMvc.perform(get("/api/courses"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].courseCode").value("EECS 1011"));
 
-        verify(courseStore).listCourses();
+        verify(courseCatalogService).listCourses(null);
     }
 
     @Test
     void listCoursesUsesSearchWhenQueryProvided() throws Exception {
-        CourseEntity course = new CourseEntity();
-        course.setCourseCode("EECS 3311");
-        course.setTitle("Software Design");
-        given(courseStore.searchCourses(eq("design"))).willReturn(List.of(course));
+        given(courseCatalogService.listCourses(eq("design"))).willReturn(List.of(
+                new CourseDto("EECS 3311", "Software Design", null)
+        ));
 
         mockMvc.perform(get("/api/courses").param("q", "design"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].courseCode").value("EECS 3311"));
 
-        verify(courseStore).searchCourses("design");
+        verify(courseCatalogService).listCourses("design");
     }
 }
+
