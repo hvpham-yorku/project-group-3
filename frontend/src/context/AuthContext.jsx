@@ -52,6 +52,11 @@ export function AuthProvider({ children }) {
         }
       } catch {
         if (!ignore) {
+          // Token is missing/expired/invalid for protected endpoints.
+          // Clear auth so UI returns to login instead of showing repeated 403s.
+          clearAuth();
+          setToken("");
+          setUsername("");
           setProfile(null);
         }
       } finally {
@@ -92,10 +97,19 @@ export function AuthProvider({ children }) {
       return null;
     }
 
-    const data = await getProfile();
-    setProfile(data);
-    setProfileLoaded(true);
-    return data;
+    try {
+      const data = await getProfile();
+      setProfile(data);
+      setProfileLoaded(true);
+      return data;
+    } catch (e) {
+      clearAuth();
+      setToken("");
+      setUsername("");
+      setProfile(null);
+      setProfileLoaded(false);
+      throw e;
+    }
   }
 
   function syncProfile(nextProfile) {
