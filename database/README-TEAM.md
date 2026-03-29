@@ -45,6 +45,7 @@ cd backend
 # macOS/Linux:
 # cd backend
 # ./mvnw spring-boot:run
+# docker exec -it yupath-mysql mysql -u yupath -p yupathbuilder
 
 ## 5) What happens on startup?
 # Flyway runs migrations automatically from:
