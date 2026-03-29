@@ -117,10 +117,13 @@ export default function CourseSearch({
 
           return (
             <div key={code} className="row" style={{ display: "block" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-                <div>
-                  <b>{code}</b> {c.title}
-                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+                  <div>
+                    <b>{code}</b> {c.title}
+                    <div className="muted" style={{ marginTop: 4 }}>
+                      {c.description || "No description."}
+                    </div>
+                  </div>
 
                 <div style={{ display: "flex", gap: 8 }}>
                   <button className="btn" onClick={() => toggleInfo(code)}>
@@ -149,7 +152,7 @@ export default function CourseSearch({
                     <>
                       <div style={{ marginBottom: 10 }}>
                         <b>Description:</b>
-                        <div className="muted">{details.description || "No description."}</div>
+                        <div className="muted">{details.description || c.description || "No description."}</div>
                       </div>
 
                       <div>

@@ -140,10 +140,6 @@ export default function TopBar({
         </div>
 
         <div className="right">
-          <button className="btn themeToggle" onClick={onToggleTheme}>
-            {theme === "dark" ? "Light Mode" : "Dark Mode"}
-          </button>
-
           {isAuthed ? (
             <div className="accountMenu" ref={accountMenuRef}>
               <button

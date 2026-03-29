@@ -3,7 +3,7 @@ import { getMyChecklist } from "../../api/ChecklistApi.js";
 
 export default function ProgramChecklist() {
   const [data, setData] = useState(null);
-  const [openYears, setOpenYears] = useState(() => new Set([1]));
+  const [openYears, setOpenYears] = useState(() => new Set([1, "electives"]));
   const [checked, setChecked] = useState(() => new Set()); // local-only for now
   const [msg, setMsg] = useState("");
 
@@ -20,13 +20,66 @@ export default function ProgramChecklist() {
     })();
   }, []);
 
-  const years = useMemo(() => data?.years || [], [data]);
+  const sections = useMemo(() => {
+    const years = data?.years || [];
+    const electiveGroupsMap = new Map();
+    const regularSections = [];
 
-  function toggleYear(year) {
+    for (const y of years) {
+      const keptGroups = [];
+
+      for (const g of y.groups || []) {
+        const courses = g.courses || [];
+        const moved = courses.filter(
+          (c) => g.reqType === "ELECTIVE" || String(c.courseCode || "").startsWith("PKIN ")
+        );
+        const kept = courses.filter(
+          (c) => !(g.reqType === "ELECTIVE" || String(c.courseCode || "").startsWith("PKIN "))
+        );
+
+        if (kept.length > 0) {
+          keptGroups.push({ ...g, courses: kept });
+        }
+
+        if (moved.length > 0) {
+          const key = `${g.groupName || "Core"}||${g.reqType || "ELECTIVE"}`;
+          if (!electiveGroupsMap.has(key)) {
+            electiveGroupsMap.set(key, {
+              groupName: g.groupName || "Core",
+              reqType: g.reqType || "ELECTIVE",
+              courses: [],
+            });
+          }
+          electiveGroupsMap.get(key).courses.push(...moved);
+        }
+      }
+
+      if (keptGroups.length > 0) {
+        regularSections.push({
+          key: y.year,
+          label: `Year ${y.year}`,
+          groups: keptGroups,
+        });
+      }
+    }
+
+    const electiveGroups = Array.from(electiveGroupsMap.values());
+    if (electiveGroups.length > 0) {
+      regularSections.push({
+        key: "electives",
+        label: "Electives",
+        groups: electiveGroups,
+      });
+    }
+
+    return regularSections;
+  }, [data]);
+
+  function toggleYear(yearKey) {
     setOpenYears((prev) => {
       const next = new Set(prev);
-      if (next.has(year)) next.delete(year);
-      else next.add(year);
+      if (next.has(yearKey)) next.delete(yearKey);
+      else next.add(yearKey);
       return next;
     });
   }
@@ -53,26 +106,26 @@ export default function ProgramChecklist() {
 
       {data && (
         <div className="list checklistList">
-          {years.map((y) => {
-            const isOpen = openYears.has(y.year);
+          {sections.map((section) => {
+            const isOpen = openYears.has(section.key);
             return (
-              <div className="card inner" key={y.year}>
+              <div className="card inner" key={String(section.key)}>
                 <div className="row">
                   <div>
-                    <b>Year {y.year}</b>
+                    <b>{section.label}</b>
                     <div className="muted" style={{ fontSize: 12 }}>
-                      {y.groups?.reduce((n, g) => n + (g.courses?.length || 0), 0)} courses
+                      {section.groups?.reduce((n, g) => n + (g.courses?.length || 0), 0)} courses
                     </div>
                   </div>
 
-                  <button className="btn" onClick={() => toggleYear(y.year)}>
+                  <button className="btn" onClick={() => toggleYear(section.key)}>
                     {isOpen ? "Collapse" : "Expand"}
                   </button>
                 </div>
 
                 {isOpen && (
                   <div className="list checklistExpanded">
-                    {y.groups?.map((g, idx) => (
+                    {section.groups?.map((g, idx) => (
                       <div key={`${g.groupName}-${g.reqType}-${idx}`} className="card inner">
                         <div style={{ display: "flex", gap: 10, alignItems: "baseline" }}>
                           <b>{g.groupName || "Core"}</b>

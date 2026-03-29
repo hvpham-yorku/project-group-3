@@ -3,7 +3,6 @@ import Dashboard from "./pages/Dashboard.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import { useAuth } from "./context/AuthContext.jsx";
-
 export default function App() {
   const { isAuthed } = useAuth();
   const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "dark");
@@ -36,16 +35,37 @@ export default function App() {
   }
 
   if (!isAuthed) {
-    return <AuthPage theme={theme} onToggleTheme={toggleTheme} />;
+    return (
+      <>
+        <AuthPage theme={theme} onToggleTheme={toggleTheme} />
+        <button className="btn uiToggleFab" onClick={toggleTheme}>
+          {theme === "dark" ? "Light Mode" : "Dark Mode"}
+        </button>
+      </>
+    );
   }
 
   if (path === "/profile") {
-    return <ProfilePage theme={theme} onToggleTheme={toggleTheme} onNavigate={navigate} />;
+    return (
+      <>
+        <ProfilePage theme={theme} onToggleTheme={toggleTheme} onNavigate={navigate} />
+        <button className="btn uiToggleFab" onClick={toggleTheme}>
+          {theme === "dark" ? "Light Mode" : "Dark Mode"}
+        </button>
+      </>
+    );
   }
 
   if (path !== "/") {
     navigate("/");
   }
 
-  return <Dashboard theme={theme} onToggleTheme={toggleTheme} onNavigate={navigate} />;
+  return (
+    <>
+      <Dashboard theme={theme} onToggleTheme={toggleTheme} onNavigate={navigate} />
+      <button className="btn uiToggleFab" onClick={toggleTheme}>
+        {theme === "dark" ? "Light Mode" : "Dark Mode"}
+      </button>
+    </>
+  );
 }
