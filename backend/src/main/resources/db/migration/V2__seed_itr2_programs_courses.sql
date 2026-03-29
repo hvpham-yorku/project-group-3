@@ -45,8 +45,12 @@ VALUES
 ('EECS 3482', 'EECS', '3482', 'Introduction to Computer Security', 'Security foundations and threats (selected for Year 3 demo).'),
 
 ('EECS 4481', 'EECS', '4481', 'Computer Security Laboratory', 'Hands-on security lab work (selected for Year 4 demo).'),
+<<<<<<< HEAD
 ('EECS 4482', 'EECS', '4482', 'Computer Security Management: Assessment and Forensics', 'Security assessment and forensics (selected for Year 4 demo).'),
 -- Missing Software Engineering (Security Stream) courses
+=======
+('EECS 4482', 'EECS', '4482', 'Computer Security Management: Assessment and Forensics', 'Security assessment and forensics (selected for Year 4 demo).')
+>>>>>>> 8e6d385d52646a9d0d0089a759d45cd5d8bfdf2d
 
 ('EECS 3101', 'EECS', '3101', 'Design and Analysis of Algorithms', 'Core algorithms course required in Security Stream.'),
 ('EECS 3201', 'EECS', '3201', 'Digital Logic Design', 'Fundamentals of digital logic design.'),
@@ -55,7 +59,6 @@ VALUES
 ('EECS 3342', 'EECS', '3342', 'System Specification and Refinement', 'Software systems specification and refinement.'),
 ('LE/ENG 3000', 'ENG', '3000', 'Professional Engineering Practice', 'Professional practice and ethics for engineers.'),
 
--- Fourth Year / Advanced Software Engineering
 ('EECS 3216', 'EECS', '3216', 'Digital Systems Engineering: Modeling, Implementation and Validation', 'Advanced digital systems engineering.'),
 ('EECS 3481', 'EECS', '3481', 'Applied Cryptography', 'Applied cryptography principles — required for security focus.'),
 ('EECS 4312', 'EECS', '4312', 'Software Engineering Requirements', 'Software requirements engineering.'),
