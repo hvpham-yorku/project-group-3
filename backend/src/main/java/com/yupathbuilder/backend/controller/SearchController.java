@@ -27,7 +27,7 @@ public class SearchController {
     var list = courseStore.searchCourses(q);
 
     return list.stream()
-        .map(c -> new CourseDto(c.getCourseCode(), c.getTitle()))
+        .map(c -> new CourseDto(c.getCourseCode(), c.getTitle(), c.getDescription()))
         .toList();
   }
 }
