@@ -1,6 +1,6 @@
 package com.yupathbuilder.backend.unit.controller;
 
-import com.yupathbuilder.backend.controller.HealthController;
+import com.yupathbuilder.backend.system_status.controller.HealthController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -25,3 +25,4 @@ class HealthControllerUnitTest {
                 .andExpect(content().string("OK"));
     }
 }
+

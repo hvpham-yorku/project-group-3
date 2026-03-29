@@ -1,6 +1,6 @@
 package com.yupathbuilder.backend.unit.store.stub;
 
-import com.yupathbuilder.backend.store.stub.StubScheduleStore;
+import com.yupathbuilder.backend.scheduler_system.store.stub.StubScheduleStore;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;

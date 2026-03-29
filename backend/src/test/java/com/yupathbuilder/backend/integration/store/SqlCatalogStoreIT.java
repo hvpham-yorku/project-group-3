@@ -1,6 +1,6 @@
 package com.yupathbuilder.backend.integration.store;
 
-import com.yupathbuilder.backend.store.CatalogStore;
+import com.yupathbuilder.backend.program_system.store.CatalogStore;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,3 +36,4 @@ class SqlCatalogStoreIT {
         assertTrue(checklist.years().stream().flatMap(y -> y.groups().stream()).flatMap(g -> g.courses().stream()).anyMatch(c -> "EECS 1011".equals(c.courseCode())));
     }
 }
+

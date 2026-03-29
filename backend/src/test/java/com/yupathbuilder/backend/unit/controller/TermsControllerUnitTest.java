@@ -1,9 +1,8 @@
 package com.yupathbuilder.backend.unit.controller;
 
-import com.yupathbuilder.backend.controller.TermsController;
-import com.yupathbuilder.backend.entity.TermEntity;
-import com.yupathbuilder.backend.model.Season;
-import com.yupathbuilder.backend.repo.TermRepo;
+import com.yupathbuilder.backend.scheduler_system.controller.TermsController;
+import com.yupathbuilder.backend.scheduler_system.dto.TermDto;
+import com.yupathbuilder.backend.scheduler_system.service.TermService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
@@ -29,27 +27,16 @@ class TermsControllerUnitTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private TermRepo termRepo;
+    private TermService termService;
 
     @Test
     void listTermsMapsEntitiesToDtos() throws Exception {
-        TermEntity term = new TermEntity();
-        term.setSeason(Season.FALL);
-        term.setYear(2026);
-        setId(term, 5L);
-
-        given(termRepo.findAll()).willReturn(List.of(term));
+        given(termService.listTerms()).willReturn(List.of(new TermDto(5L, "FALL", 2026)));
 
         mockMvc.perform(get("/api/terms"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(5))
                 .andExpect(jsonPath("$[0].season").value("FALL"))
                 .andExpect(jsonPath("$[0].year").value(2026));
-    }
-
-    private static void setId(Object target, Long value) throws Exception {
-        Field field = target.getClass().getDeclaredField("id");
-        field.setAccessible(true);
-        field.set(target, value);
     }
 }

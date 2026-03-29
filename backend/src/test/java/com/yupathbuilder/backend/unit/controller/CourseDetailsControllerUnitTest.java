@@ -1,10 +1,10 @@
 package com.yupathbuilder.backend.unit.controller;
 
-import com.yupathbuilder.backend.controller.CourseDetailsController;
-import com.yupathbuilder.backend.dto.CourseDetailsDto;
-import com.yupathbuilder.backend.dto.MeetingDto;
-import com.yupathbuilder.backend.dto.SectionInfoDto;
-import com.yupathbuilder.backend.store.CourseDetailsStore;
+import com.yupathbuilder.backend.course_catalog.controller.CourseDetailsController;
+import com.yupathbuilder.backend.course_catalog.dto.CourseDetailsDto;
+import com.yupathbuilder.backend.course_catalog.dto.MeetingDto;
+import com.yupathbuilder.backend.course_catalog.dto.SectionInfoDto;
+import com.yupathbuilder.backend.course_catalog.service.CourseDetailsService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -27,11 +27,11 @@ class CourseDetailsControllerUnitTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private CourseDetailsStore store;
+    private CourseDetailsService courseDetailsService;
 
     @Test
     void detailsReturnsCourseDetailsWhenFound() throws Exception {
-        given(store.getDetails("EECS 2311", "FALL", 2026)).willReturn(
+        given(courseDetailsService.getDetails("EECS 2311", "FALL", 2026)).willReturn(
                 new CourseDetailsDto(
                         "EECS 2311",
                         "Software Development Project",
@@ -49,9 +49,10 @@ class CourseDetailsControllerUnitTest {
 
     @Test
     void detailsReturnsNotFoundWhenStoreReturnsNull() throws Exception {
-        given(store.getDetails("NOPE 9999", "FALL", 2026)).willReturn(null);
+        given(courseDetailsService.getDetails("NOPE 9999", "FALL", 2026)).willReturn(null);
 
         mockMvc.perform(get("/api/courses/NOPE 9999/details").param("season", "FALL").param("year", "2026"))
                 .andExpect(status().isNotFound());
     }
 }
+

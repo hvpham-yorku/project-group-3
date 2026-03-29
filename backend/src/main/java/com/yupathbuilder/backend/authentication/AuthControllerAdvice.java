@@ -1,5 +1,6 @@
 package com.yupathbuilder.backend.authentication;
 
+import com.yupathbuilder.backend.global_exception_handler.InvalidCredentialsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

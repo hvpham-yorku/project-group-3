@@ -1,13 +1,13 @@
 package com.yupathbuilder.backend.unit.service;
 
-import com.yupathbuilder.backend.entity.CourseEntity;
-import com.yupathbuilder.backend.entity.SectionEntity;
-import com.yupathbuilder.backend.entity.SectionMeetingEntity;
-import com.yupathbuilder.backend.entity.TermEntity;
-import com.yupathbuilder.backend.model.Season;
-import com.yupathbuilder.backend.repo.SectionRepo;
-import com.yupathbuilder.backend.repo.TermRepo;
-import com.yupathbuilder.backend.service.ScheduleService;
+import com.yupathbuilder.backend.course_catalog.entity.CourseEntity;
+import com.yupathbuilder.backend.scheduler_system.entity.SectionEntity;
+import com.yupathbuilder.backend.scheduler_system.entity.SectionMeetingEntity;
+import com.yupathbuilder.backend.scheduler_system.entity.TermEntity;
+import com.yupathbuilder.backend.scheduler_system.model.Season;
+import com.yupathbuilder.backend.scheduler_system.repo.SectionRepo;
+import com.yupathbuilder.backend.scheduler_system.repo.TermRepo;
+import com.yupathbuilder.backend.scheduler_system.service.ScheduleService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

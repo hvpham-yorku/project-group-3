@@ -1,6 +1,6 @@
 package com.yupathbuilder.backend.unit.store.stub;
 
-import com.yupathbuilder.backend.store.stub.StubTimeRules;
+import com.yupathbuilder.backend.scheduler_system.store.stub.StubTimeRules;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,3 +24,4 @@ class StubTimeRulesUnitTest {
         assertFalse(slot.meetings().isEmpty());
     }
 }
+
