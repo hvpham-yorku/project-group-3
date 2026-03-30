@@ -8,6 +8,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { listFaculties, listPrograms } from "../../api/ProgramApi.js";
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 /**
  * Renders the sign-up form for new users.
  */
@@ -107,9 +109,11 @@ export default function RegisterCard({ onRegister }) {
     if (!fn) return setMsg("Please enter your first name.");
     if (!ln) return setMsg("Please enter your last name.");
     if (!em) return setMsg("Please enter your email.");
+    if (!EMAIL_RE.test(em)) return setMsg("Please enter a valid email address.");
     if (!facultyId) return setMsg("Please choose a faculty.");
     if (!programId) return setMsg("Please choose a program.");
     if (!password) return setMsg("Please enter a password.");
+    if (password.length < 6) return setMsg("Password must be at least 6 characters.");
     if (password !== confirmPassword) return setMsg("Passwords do not match.");
 
     try {
@@ -169,6 +173,7 @@ export default function RegisterCard({ onRegister }) {
           <input
             value={email}
             onChange={(event) => setEmail(event.target.value)}
+            type="email"
             autoComplete="username"
             placeholder="you@email.com"
           />
@@ -242,6 +247,7 @@ export default function RegisterCard({ onRegister }) {
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 type={showPass ? "text" : "password"}
+                minLength={6}
                 autoComplete="new-password"
                 placeholder="Create a password"
               />
@@ -261,6 +267,7 @@ export default function RegisterCard({ onRegister }) {
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
               type={showPass ? "text" : "password"}
+              minLength={6}
               autoComplete="new-password"
               placeholder="Repeat password"
             />

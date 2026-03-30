@@ -37,6 +37,15 @@ export default function App() {
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
+  useEffect(() => {
+    // Logging out should always return the app to the public auth entry route
+    // instead of preserving stale authenticated-only paths like /profile.
+    if (!isAuthed && path !== "/") {
+      window.history.replaceState({}, "", "/");
+      setPath("/");
+    }
+  }, [isAuthed, path]);
+
   function toggleTheme() {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   }

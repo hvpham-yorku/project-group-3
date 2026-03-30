@@ -12,10 +12,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,26 +32,30 @@ class SearchControllerUnitTest {
 
     @Test
     void searchReturnsEmptyListWhenQueryBlank() throws Exception {
+        given(courseCatalogService.searchCourses(eq("   "), isNull(), isNull())).willReturn(List.of());
+
         mockMvc.perform(get("/api/search/courses").param("q", "   "))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(0));
 
-        verifyNoInteractions(courseCatalogService);
+        verify(courseCatalogService).searchCourses("   ", null, null);
     }
 
     @Test
-    void searchReturnsMappedDtos() throws Exception {
-        given(courseCatalogService.searchCourses(eq("software"))).willReturn(List.of(
+    void searchReturnsMappedDtosForRequestedTerm() throws Exception {
+        given(courseCatalogService.searchCourses(eq("software"), eq("FALL"), eq(2026))).willReturn(List.of(
                 new CourseDto("EECS 2311", "Software Development Project", null)
         ));
 
-        mockMvc.perform(get("/api/search/courses").param("q", "software"))
+        mockMvc.perform(get("/api/search/courses")
+                        .param("q", "software")
+                        .param("season", "FALL")
+                        .param("year", "2026"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].courseCode").value("EECS 2311"))
                 .andExpect(jsonPath("$[0].title").value("Software Development Project"));
 
-        verify(courseCatalogService).searchCourses("software");
+        verify(courseCatalogService).searchCourses("software", "FALL", 2026);
     }
 }
-

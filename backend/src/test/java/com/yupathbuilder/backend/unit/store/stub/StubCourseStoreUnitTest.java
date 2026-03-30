@@ -2,6 +2,7 @@ package com.yupathbuilder.backend.unit.store.stub;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yupathbuilder.backend.course_catalog.store.stub.StubCourseStore;
+import com.yupathbuilder.backend.scheduler_system.model.Season;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,5 +31,11 @@ class StubCourseStoreUnitTest {
     void searchCoursesReturnsAllForBlankQuery() {
         assertEquals(store.listCourses().size(), store.searchCourses("   ").size());
     }
-}
 
+    @Test
+    void searchCoursesByTermUsesSameStubFilteringButPreservesBlankSearchBehavior() {
+        assertTrue(store.searchCourses("security", Season.FALL, 2026).stream()
+                .anyMatch(c -> "EECS 3482".equals(c.getCourseCode())));
+        assertTrue(store.searchCourses("   ", Season.FALL, 2026).isEmpty());
+    }
+}

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yupathbuilder.backend.course_catalog.entity.CourseEntity;
 import com.yupathbuilder.backend.course_catalog.store.CourseStore;
+import com.yupathbuilder.backend.scheduler_system.model.Season;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.ClassPathResource;
@@ -55,6 +56,17 @@ public class StubCourseStore implements CourseStore {
     }
 
     /**
+     * Stub catalog data is not term-scoped, so term-aware searches reuse the
+     * same in-memory filtering rules while preserving the shared store
+     * contract.
+     */
+    @Override
+    public List<CourseEntity> searchCourses(String q, Season season, Integer year) {
+        if (q == null || q.isBlank()) return List.of();
+        return searchCourses(q);
+    }
+
+    /**
      * Loads stub course data and adapts it into the entity shape used by the
      * rest of the application.
      */
@@ -97,4 +109,3 @@ public class StubCourseStore implements CourseStore {
      */
     private record CourseJson(Long id, String courseCode, String title, String description) {}
 }
-

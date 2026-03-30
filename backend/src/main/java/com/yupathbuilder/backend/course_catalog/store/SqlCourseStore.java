@@ -2,6 +2,7 @@ package com.yupathbuilder.backend.course_catalog.store;
 
 import com.yupathbuilder.backend.course_catalog.entity.CourseEntity;
 import com.yupathbuilder.backend.course_catalog.repo.CourseRepo;
+import com.yupathbuilder.backend.scheduler_system.model.Season;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -50,5 +51,21 @@ public class SqlCourseStore implements CourseStore {
                 )
                 .toList();
     }
-}
 
+    /**
+     * Performs a term-aware search when season and year are supplied, otherwise
+     * falls back to the catalog-wide search behavior.
+     */
+    @Override
+    public List<CourseEntity> searchCourses(String q, Season season, Integer year) {
+        if (q == null || q.isBlank()) {
+            return List.of();
+        }
+
+        if (season == null || year == null) {
+            return searchCourses(q);
+        }
+
+        return courseRepo.searchByTerm(q.trim(), season, year);
+    }
+}

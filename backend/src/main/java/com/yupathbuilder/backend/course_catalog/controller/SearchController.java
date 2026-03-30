@@ -31,8 +31,7 @@ public class SearchController {
       @RequestParam(name = "season", required = false) String season,
       @RequestParam(name = "year", required = false) Integer year
   ) {
-    return courseCatalogService.searchCourses(q);
+    return courseCatalogService.searchCourses(q, season, year);
   }
 }
-
 

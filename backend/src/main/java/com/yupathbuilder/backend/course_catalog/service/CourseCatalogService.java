@@ -2,6 +2,7 @@ package com.yupathbuilder.backend.course_catalog.service;
 
 import com.yupathbuilder.backend.course_catalog.dto.CourseDto;
 import com.yupathbuilder.backend.course_catalog.store.CourseStore;
+import com.yupathbuilder.backend.scheduler_system.model.Season;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,6 +45,22 @@ public class CourseCatalogService {
         }
 
         return courseStore.searchCourses(q).stream()
+            .map(c -> new CourseDto(c.getCourseCode(), c.getTitle(), c.getDescription()))
+            .toList();
+    }
+
+    /**
+     * Performs an explicit search scoped to a term when season and year are
+     * supplied.
+     */
+    public List<CourseDto> searchCourses(String q, String season, Integer year) {
+        if (q == null || q.trim().isEmpty()) {
+            return List.of();
+        }
+
+        Season parsedSeason = season == null || season.isBlank() ? null : Season.parse(season);
+
+        return courseStore.searchCourses(q, parsedSeason, year).stream()
             .map(c -> new CourseDto(c.getCourseCode(), c.getTitle(), c.getDescription()))
             .toList();
     }

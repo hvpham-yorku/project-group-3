@@ -1,6 +1,7 @@
 package com.yupathbuilder.backend.integration.store;
 
 import com.yupathbuilder.backend.course_catalog.store.CourseStore;
+import com.yupathbuilder.backend.scheduler_system.model.Season;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,5 +32,12 @@ class SqlCourseStoreIT {
         assertFalse(results.isEmpty());
         assertTrue(results.stream().anyMatch(c -> "EECS 3482".equals(c.getCourseCode()) || "EECS 4481".equals(c.getCourseCode()) || "EECS 4482".equals(c.getCourseCode())));
     }
-}
 
+    @Test
+    void searchCoursesByTermFiltersSeededRowsFromRealDatabase() {
+        var results = courseStore.searchCourses("EECS 1011", Season.FALL, 2026);
+
+        assertFalse(results.isEmpty());
+        assertTrue(results.stream().anyMatch(c -> "EECS 1011".equals(c.getCourseCode())));
+    }
+}
