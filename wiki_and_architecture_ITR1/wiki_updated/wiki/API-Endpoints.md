@@ -1,51 +1,160 @@
-# API Endpoints (ITR2)
+# API Endpoints - Final Iteration 3 Summary
 
-> These are the main routes used by the frontend for ITR2.
+This page summarizes the backend endpoints that are visible in the current Spring controllers. It is intended as a release-level reference rather than a full OpenAPI specification.
 
-## Auth
-- `POST /api/auth/login`
-  - body: `{ "username": "<email>", "password": "..." }`
-  - returns: `{ "token": "...", "username": "..." }`
+## Authentication And Profile
 
-- `POST /api/auth/register`
-  - body:
-    ```json
-    {
-      "firstName": "...",
-      "lastName": "...",
-      "email": "...",
-      "programId": 1,
-      "password": "...",
-      "confirmPassword": "..."
-    }
-    ```
-  - returns: `{ "token": "...", "username": "..." }`
+Base path:
 
-## Catalog (faculties/programs)
+- `/api/authentication`
+
+Endpoints:
+
+- `POST /api/authentication/register`
+- `POST /api/authentication/login`
+- `GET /api/authentication/me`
+- `GET /api/authentication/profile`
+- `PUT /api/authentication/profile`
+- `PUT /api/authentication/profile/password`
+
+Typical register payload:
+
+```json
+{
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "email": "jane@yorku.ca",
+  "programId": 1,
+  "password": "secret123",
+  "confirmPassword": "secret123"
+}
+```
+
+Typical login payload:
+
+```json
+{
+  "email": "jane@yorku.ca",
+  "password": "secret123"
+}
+```
+
+Successful authentication returns a JWT wrapper:
+
+```json
+{
+  "token": "jwt-token-here",
+  "username": "jane@yorku.ca"
+}
+```
+
+## Faculty And Program Catalog
+
 - `GET /api/faculties`
-  - returns: list of faculties
-
+- `GET /api/programs`
 - `GET /api/programs?facultyId=<id>`
-  - returns: list of programs (filtered by faculty if provided)
 
-## Checklist
-- `GET /api/me/checklist` (protected)
-  - returns: checklist grouped by year + group for the logged-in user
+These endpoints are used during registration and profile editing.
 
-## Courses
-- `GET /api/courses?q=<query>&season=<FALL|WINTER>&year=<YYYY>` (protected)
-  - used by the course search UI
-  - in STUB mode, `season/year` are accepted for compatibility
+## Program Checklist
 
-- `GET /api/courses/{courseCode}/details?season=<...>&year=<...>` (protected)
-  - used by the “More Info” panel
+- `GET /api/me/checklist`
 
-## Schedule
-- `POST /api/schedule/build` (protected)
-  - body: `{ "term": "FALL 2026", "courseCodes": ["EECS 2311", "MATH 1013"] }`
-  - returns: `{ "term": "...", "chosenSections": [...] }`
+This endpoint returns the checklist for the authenticated user's current program.
 
-## Notes
-- Protected endpoints require header:
-  - `Authorization: Bearer <JWT>`
-- The backend supports `app.store=sql|stub` (dependency injection) to switch between real DB and stub data.
+## Course Catalog
+
+Search endpoints:
+
+- `GET /api/search/courses?q=<query>&season=<FALL|WINTER|SUMMER>&year=<YYYY>`
+- `GET /api/courses?q=<query>&season=<FALL|WINTER|SUMMER>&year=<YYYY>`
+
+Course details endpoint:
+
+- `GET /api/courses/{courseCode}/details?season=<FALL|WINTER|SUMMER>&year=<YYYY>`
+
+Notes:
+
+- The codebase contains both `/api/search/courses` and `/api/courses` for course lookup.
+- The frontend currently uses term-specific search and details requests.
+
+## Terms
+
+- `GET /api/terms`
+
+The backend exposes this endpoint, but the current frontend term selector is still hard-coded to a fixed list of terms.
+
+## Saved Selected Courses
+
+Base path:
+
+- `/api/me/selected-courses`
+
+Endpoints:
+
+- `GET /api/me/selected-courses`
+- `POST /api/me/selected-courses`
+- `DELETE /api/me/selected-courses?term=<TERM>&courseCode=<CODE>`
+
+Create payload:
+
+```json
+{
+  "term": "FALL 2026",
+  "courseCode": "EECS 1011"
+}
+```
+
+Response shape:
+
+```json
+{
+  "term": "FALL 2026",
+  "courseCode": "EECS 1011"
+}
+```
+
+## Schedule Building
+
+Base path:
+
+- `/api/schedule`
+
+Endpoint:
+
+- `POST /api/schedule/build`
+
+Typical payload:
+
+```json
+{
+  "term": "SUMMER 2027",
+  "courseCodes": ["EECS 1011", "MATH 1013"]
+}
+```
+
+The response includes the resolved term label and the chosen sections used to render the weekly schedule grid.
+
+## System Status
+
+- `GET /api/ping`
+- `GET /api/health`
+
+These endpoints provide lightweight liveness and health responses.
+
+## Authentication Requirement
+
+Protected endpoints require:
+
+```text
+Authorization: Bearer <JWT>
+```
+
+Public endpoints are limited to registration, login, and the lightweight status endpoints.
+
+## Important Release Notes
+
+The endpoint list above reflects the controller mappings in the current repository. It also highlights a final-release mismatch:
+
+- the backend exposes `/api/terms`
+- the frontend currently does not consume it dynamically

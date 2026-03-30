@@ -1,323 +1,187 @@
 # YU Path Builder
 
-YU Path Builder is a full-stack web application that helps York University students explore courses, view course details, build a conflict-free weekly schedule, and check program requirements.
+YU Path Builder is a full-stack course planning application for York University students. The system allows an authenticated user to register, log in, browse the course catalog, inspect section details for a specific term, save selected courses per term, build a weekly schedule, and review the checklist for the user's program.
 
-This project was developed using a React + Vite frontend and a Spring Boot backend. For Iteration 2, the backend supports two persistence modes:
-- SQL mode using MySQL + Flyway
-- STUB mode using JSON stub data
+This repository contains the final Iteration 3 state of the project. The frontend is a React + Vite application, and the backend is a Spring Boot REST API with JWT-based authentication, MySQL/Flyway support, and a parallel stub-data mode.
 
-## Features
+## Final Iteration 3 Scope
+
+The final repository state shows the following user-facing capabilities:
 
 - User registration and login
+- Authenticated profile viewing and editing
+- Password change for authenticated users
+- Faculty and program selection
+- Program checklist retrieval for the authenticated user
 - Course search
-- Course details ("More Info")
-- Program checklist
-- Support for both SQL and STUB data sources
+- Course details by term, including section meetings
+- Saved selected courses per term
+- Schedule generation for multiple terms, including Summer 2027
+- Conflict visualization in the generated schedule
 
-## Tech Stack
+The codebase also contains important Iteration 3 engineering work:
 
-### Frontend
-- React
-- Vite
+- Backend refactoring from a flatter package layout into feature-based modules
+- Clearer store seams for SQL-backed and stub-backed behavior
+- Explicit unit and integration test separation in the backend test suite
 
-### Backend
-- Spring Boot
-- Spring Data JPA
-- JWT authentication
-- Flyway
+## Iteration 3 Highlights
 
-### Persistence
-- MySQL (SQL mode)
-- JSON stub data (STUB mode)
+Compared with the earlier iteration documentation, Iteration 3 introduced or finalized the following major changes:
 
-## Architecture Overview
+1. Profile management became part of the authenticated workflow.
+   The frontend now includes a profile page, and the backend exposes `/api/authentication/profile` and `/api/authentication/profile/password`.
 
-The system follows a client/server architecture:
+2. Selected courses are now persisted per term.
+   The backend exposes `/api/me/selected-courses`, and the dashboard reloads saved selections after refresh.
 
-- Frontend (React + Vite): provides the UI for login/register, course search, course details, schedule building, and checklist viewing
-- Backend (Spring Boot): exposes REST APIs for authentication, catalog access, course search/details, schedule generation, and checklist retrieval
-- Persistence layer supports two modes:
-  - SQL mode with MySQL + Flyway migrations
-  - STUB mode with JSON stub data
+3. Schedule support was extended to additional seeded terms.
+   The current repository includes Summer 2027 data and tests for that term.
 
-A single configuration switch selects the store implementation:
-- `app.store=sql` (default)
-- `app.store=stub`
+4. The backend was reorganized by feature.
+   The final package structure separates `authentication`, `course_catalog`, `program_system`, `scheduler_system`, and `system_status`.
 
-The backend uses dependency injection to switch between implementations of:
-- `CatalogStore`
-- `CourseStore`
-- `CourseDetailsStore`
-- `ScheduleStore`
+5. Documentation and test boundaries were improved.
+   The backend integration tests now document the SQL seams around the store interfaces, and the wiki has been updated to describe the final release state.
 
-### Schedule Build Flow
-
-1. The user selects course codes in the frontend
-2. The frontend sends `POST /api/schedule/build`
-3. The backend resolves the correct store implementation
-4. A conflict-free schedule is generated and returned
-5. The frontend renders the weekly schedule grid
-
-### Architecture Diagram
-
-```mermaid
-flowchart LR
-  UI[React + Vite] -->|/api/*| API[Spring Boot]
-
-  API --> AUTH[Auth: JWT]
-
-  API --> STORE[Store Interfaces]
-  STORE -->|app.store=sql| SQL[SQL Stores]
-  STORE -->|app.store=stub| STUB[Stub Stores]
-
-  SQL --> DB[(MySQL)]
-  DB --> FLY[Flyway Migrations/Seed]
-
-  STUB --> JSON[(stub-data/*.json)]
-
-  API --> UI
-```
-
-## Repository Structure
+## Repository Layout
 
 ```text
 project-group-3/
-├── frontend/                # React + Vite UI
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── auth/
-│   │   │   └── dashboard/
-│   │   ├── pages/
-│   │   └── api/
-│   └── vite.config.js
-│
-├── backend/                 # Spring Boot API
-│   └── src/main/
-│       ├── java/com/yupathbuilder/backend/
-│       │   ├── controller/
-│       │   ├── service/
-│       │   ├── repo/
-│       │   ├── store/
-│       │   └── store/stub/
-│       └── resources/
-│           ├── db/migration/
-│           ├── stub-data/
-│           ├── application.properties
-│           └── application-stub.properties
-│
-└── database/                # DB setup instructions
-    ├── docker-compose.yml
-    ├── README-TA.md
-    └── README-TEAM.md
+|-- frontend/                         React + Vite client
+|-- backend/                          Spring Boot backend
+|-- database/                         Database setup documentation and Docker compose
+|-- docs/                             Historical project artifacts and log pointers
+`-- wiki_and_architecture_ITR1/       Wiki export and planning/architecture docs
 ```
 
-## Prerequisites
+The final backend package layout is:
 
-Before running the project, make sure you have:
-- Node.js
-- Java 25
-- Docker Desktop or Docker Engine
+```text
+backend/src/main/java/com/yupathbuilder/backend/
+|-- authentication/
+|-- config/
+|-- course_catalog/
+|-- global_exception_handler/
+|-- program_system/
+|-- scheduler_system/
+|-- system_status/
+`-- util/
+```
 
-Database setup instructions are available in:
-- `database/README-TA.md`
-- `database/README-TEAM.md`
+## Documentation Index
+
+The repository keeps the final release documentation in the following files:
+
+- Root overview: [`README.md`](README.md)
+- Wiki home: [`wiki_and_architecture_ITR1/wiki_updated/wiki/Home.md`](wiki_and_architecture_ITR1/wiki_updated/wiki/Home.md)
+- Run guide: [`wiki_and_architecture_ITR1/wiki_updated/wiki/How-to-Run.md`](wiki_and_architecture_ITR1/wiki_updated/wiki/How-to-Run.md)
+- Architecture: [`wiki_and_architecture_ITR1/wiki_updated/wiki/Architecture.md`](wiki_and_architecture_ITR1/wiki_updated/wiki/Architecture.md)
+- API summary: [`wiki_and_architecture_ITR1/wiki_updated/wiki/API-Endpoints.md`](wiki_and_architecture_ITR1/wiki_updated/wiki/API-Endpoints.md)
+- Repository structure: [`wiki_and_architecture_ITR1/wiki_updated/wiki/Repo-Structure.md`](wiki_and_architecture_ITR1/wiki_updated/wiki/Repo-Structure.md)
+- Refactoring notes: [`wiki_and_architecture_ITR1/wiki_updated/wiki/Refactoring.md`](wiki_and_architecture_ITR1/wiki_updated/wiki/Refactoring.md)
+- Preserved ITR2 plan: [`wiki_and_architecture_ITR1/wiki_updated/Planning_document_ITR2.md`](wiki_and_architecture_ITR1/wiki_updated/Planning_document_ITR2.md)
+- ITR3 planning and traceability: [`wiki_and_architecture_ITR1/wiki_updated/Planning_document_ITR3.md`](wiki_and_architecture_ITR1/wiki_updated/Planning_document_ITR3.md)
+- Project log: [`wiki_and_architecture_ITR1/wiki_updated/wiki/log.md`](wiki_and_architecture_ITR1/wiki_updated/wiki/log.md)
 
 ## Running the Project
 
-### Option 1: SQL mode (MySQL + Flyway)
+The current repository supports two backend modes in principle:
 
-#### 1. Start the database
-From the repo root:
+- SQL mode using MySQL + Flyway
+- STUB mode using JSON-backed data
+
+Detailed instructions are in the wiki run guide and the database READMEs:
+
+- [`wiki_and_architecture_ITR1/wiki_updated/wiki/How-to-Run.md`](wiki_and_architecture_ITR1/wiki_updated/wiki/How-to-Run.md)
+- [`database/README-TA.md`](database/README-TA.md)
+- [`database/README-TEAM.md`](database/README-TEAM.md)
+
+Quick summary:
+
+### Frontend
 
 ```bash
-docker compose -f database/docker-compose.yml up -d
+cd frontend
+npm install
+npm run dev
 ```
 
-#### 2. Verify the container is running
+### Backend, intended SQL mode
+
 ```bash
-docker ps
-```
-
-#### 3. Run the backend
-##### Windows
-```bat
 cd backend
-.\mvnw.cmd clean package
-.\mvnw.cmd spring-boot:run
-```
-
-##### macOS/Linux
-```bash
-cd backend
-./mvnw clean package
 ./mvnw spring-boot:run
 ```
 
-Flyway runs automatically when the backend starts.
+On Windows:
 
-#### 4. Run the frontend
-Open another terminal:
-
-```bat
-cd frontend
-npm install
-npm run dev
-```
-
-If PowerShell blocks npm, use:
-
-```bat
-npm.cmd run dev
-```
-
-Then open the Vite URL, usually:
-
-```text
-http://localhost:5173/
-```
-
-### Option 2: STUB mode (no database required)
-
-#### Run the backend in STUB mode
-##### Windows
 ```bat
 cd backend
-.\mvnw.cmd clean package
+.\mvnw.cmd spring-boot:run
+```
+
+### Backend, intended stub mode
+
+```bash
+cd backend
+./mvnw spring-boot:run -Dspring-boot.run.profiles=stub
+```
+
+On Windows:
+
+```bat
+cd backend
 .\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=stub
 ```
 
-##### macOS/Linux
-```bash
-cd backend
-./mvnw clean package
-./mvnw spring-boot:run "-Dspring-boot.run.profiles=stub"
-```
+## Testing
 
-#### Run the frontend
-Open another terminal:
+Backend test execution is documented in [`backend/src/test/README_TESTS.txt`](backend/src/test/README_TESTS.txt).
 
-```bat
-cd frontend
-npm install
-npm run dev
-```
+Summary:
 
-### Database connection details
-- Host: `localhost`
-- Port: `3306`
-- Database: `yupathbuilder`
-- Username: `yupath`
-- Password: `yupathpass`
+- Unit tests: `.\mvnw.cmd test` or `./mvnw test`
+- Integration tests: `.\mvnw.cmd verify` or `./mvnw verify`
 
-### Stop the database
-From the repo root:
+The integration tests are SQL-backed and exercise the store seams against a real MySQL database.
 
-```bash
-docker compose -f database/docker-compose.yml down
-```
+## Known Issues In The Final Repository State
 
-### Reset the database completely
+The final release documentation preserves several unresolved issues because they are visible in the repository and should not be hidden:
 
-```bash
-docker compose -f database/docker-compose.yml down -v
-docker compose -f database/docker-compose.yml up -d
-```
+1. SQL Docker setup is not fully aligned out of the box.
+   `database/docker-compose.yml` currently exposes MySQL on host port `3307`, while `backend/src/main/resources/application.properties` points to `localhost:3306`.
 
-## Main API Endpoints
+2. Stub mode is not fully release-ready in the committed state.
+   `backend/src/main/resources/application-stub.properties` still contains unresolved merge markers.
 
-### Auth
-- `POST /api/auth/login`
-- `POST /api/auth/register`
+3. The frontend term picker is still static.
+   The backend exposes `/api/terms`, but the current dashboard term selector is hard-coded to `FALL 2026`, `WINTER 2027`, and `SUMMER 2027`.
 
-#### Login request body
-```json
-{
-  "username": "student@yorku.ca",
-  "password": "yourPassword"
-}
-```
+4. Checklist completion is not persisted.
+   The checklist checkboxes are currently local UI state only.
 
-#### Register request body
-```json
-{
-  "firstName": "John",
-  "lastName": "Doe",
-  "email": "john@yorku.ca",
-  "programId": 1,
-  "password": "yourPassword",
-  "confirmPassword": "yourPassword"
-}
-```
+## Traceability To Earlier Iterations
 
-### Catalog
-- `GET /api/faculties`
-- `GET /api/programs?facultyId=<id>`
+This repository does not erase the earlier iteration story. The final release still traces back to the initial goals:
 
-### Checklist
-- `GET /api/me/checklist`
+- Build a term schedule
+- Support longer-term degree planning
+- Save planning work
+- Provide rule or checklist feedback
 
-### Courses
-- `GET /api/courses?q=<query>&season=<FALL|WINTER>&year=<YYYY>`
-- `GET /api/courses/{courseCode}/details?season=<...>&year=<...>`
+By the end of Iteration 3:
 
-### Schedule
-- `POST /api/schedule/build`
+- Term-based schedule building is delivered
+- Checklist-based requirement feedback is delivered
+- Saved course selections by term are delivered
+- Full degree timeline planning and plan comparison are still not implemented as complete end-user workflows
 
-#### Example request body
-```json
-{
-  "term": "FALL 2026",
-  "courseCodes": ["EECS 2311", "MATH 1013"]
-}
-```
+See the planning documents for the detailed evolution:
 
-### Protected Routes
-Protected endpoints require:
-```text
-Authorization: Bearer <JWT>
-```
-
-## Design Decisions
-
-Some important design choices in this project include:
-- React + Vite for a fast and modular frontend
-- Spring Boot for structured backend development and testing
-- Dependency Injection to support both SQL and STUB persistence modes
-- Backtracking for schedule generation, since it handles section selection and conflict pruning naturally
-
-## Common Issues
-
-### Vite proxy ECONNREFUSED
-If the frontend shows proxy errors for `/api/...`, the backend is not running or the port does not match the Vite proxy configuration.
-
-Check:
-- backend is running first
-- backend port matches `vite.config.js`
-
-### Backend resources changed
-If you update backend resource files, restart the backend.
-
-### Flyway checksum mismatch
-If Flyway reports migration checksum mismatch, your local database was created with an older version of the migration files. In local development, recreating the database is usually the cleanest fix.
-
-### PowerShell blocks npm
-If PowerShell gives a script policy error, run:
-```bat
-npm.cmd run dev
-```
-
-## Notes
-
-- SQL mode is the default mode
-- STUB mode is useful for demos and testing without MySQL
-- The repository includes a top-level `database/` folder to simplify setup for teammates and TAs
-
-## Additional Documentation
-
-For more detailed documentation, see:
-- `database/README-TA.md`
-- `database/README-TEAM.md`
-- `docs/LOG.md` or `wiki/log.md` if you keep the project log separately
+- [`wiki_and_architecture_ITR1/wiki_updated/Planning_document_ITR2.md`](wiki_and_architecture_ITR1/wiki_updated/Planning_document_ITR2.md)
+- [`wiki_and_architecture_ITR1/wiki_updated/Planning_document_ITR3.md`](wiki_and_architecture_ITR1/wiki_updated/Planning_document_ITR3.md)
 
 ## Team
 

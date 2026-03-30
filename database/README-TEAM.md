@@ -1,80 +1,86 @@
-# ===============================
-# FILE: database/README-TEAM.md
-# ===============================
-# Database Setup (Team) — Local MySQL Install
-#
-# This README is for teammates who want a local MySQL installation (no Docker).
-# The backend uses Flyway migrations to create and seed tables automatically.
+# Database Setup For Teammates
 
-## 0) Download MySQL
-# Official MySQL downloads:
-# MySQL Community Server:
-# https://dev.mysql.com/downloads/mysql/
-#
-# MySQL Workbench (optional GUI — NOT required):
-# https://dev.mysql.com/downloads/workbench/
+This document describes the SQL-backed backend setup for team members.
 
-## 1) Install MySQL Server
-# Install MySQL Community Server and ensure the MySQL service is running.
+## Intended SQL Runtime
 
-## 2) Create database + user (one time)
-# Open MySQL Workbench (or any SQL client) and run:
+The backend defaults to:
 
-# SQL:
-# CREATE DATABASE IF NOT EXISTS yupathbuilder;
-#
-# CREATE USER IF NOT EXISTS 'yupath'@'localhost' IDENTIFIED BY 'yupathpass';
-# GRANT ALL PRIVILEGES ON yupathbuilder.* TO 'yupath'@'localhost';
-# FLUSH PRIVILEGES;
+- database: `yupathbuilder`
+- username: `yupath`
+- password: `yupathpass`
+- host: `localhost`
+- port: `3306`
 
-## 3) Configure backend connection
-# Edit:
-# backend/src/main/resources/application.properties
-#
-# Make sure it contains (or matches):
-# spring.datasource.url=jdbc:mysql://localhost:3306/yupathbuilder?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-# spring.datasource.username=yupath
-# spring.datasource.password=yupathpass
+These values come from:
 
-## 4) Run backend (SQL mode)
-# Windows (PowerShell):
+- `backend/src/main/resources/application.properties`
+
+## Local MySQL Setup
+
+Create the database and user once:
+
+```sql
+CREATE DATABASE IF NOT EXISTS yupathbuilder;
+CREATE USER IF NOT EXISTS 'yupath'@'localhost' IDENTIFIED BY 'yupathpass';
+GRANT ALL PRIVILEGES ON yupathbuilder.* TO 'yupath'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+Run the backend:
+
+```bat
 cd backend
-.\mvnw.cmd clean package
 .\mvnw.cmd spring-boot:run
+```
 
-# macOS/Linux:
-# cd backend
-# ./mvnw spring-boot:run
+Or on macOS/Linux:
 
-## 5) What happens on startup?
-# Flyway runs migrations automatically from:
-# backend/src/main/resources/db/migration/
-#
-# It will create tables and seed initial data (no manual import needed).
+```bash
+cd backend
+./mvnw spring-boot:run
+```
 
-## 6) Run backend (STUB mode — no DB required)
-# If you want to run without MySQL:
+## Docker Compose Option
+
+The repository also contains `database/docker-compose.yml`.
+
+Docker now maps host port `3306` to container port `3306`, which matches the backend datasource configuration in `backend/src/main/resources/application.properties`.
+
+If you want to use Docker instead of a local MySQL installation, you can start it directly with:
+
+```bash
+docker compose -f database/docker-compose.yml up -d
+```
+
+## Flyway
+
+Flyway runs automatically on backend startup in SQL mode and applies the migrations in:
+
+- `backend/src/main/resources/db/migration/`
+
+## Stub Mode
+
+The intended stub command is:
+
+```bat
 cd backend
 .\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=stub
+```
 
-## What to do in case of a Docker error (Posible solution)
+However, the current repository state still contains unresolved merge markers in `backend/src/main/resources/application-stub.properties`. That issue has been documented and not silently corrected in this release documentation pass.
 
-That Docker error means port 3306 is already being used on your PC (usually a local MySQL service), so Docker can’t bind it.
+## Testing
 
-1) Check what’s using 3306:
-netstat -aon | findstr :3306
-Then see the process name:
-tasklist /FI "PID eq <PID>"
+Backend tests are split between unit and integration suites:
 
-2) If it’s MySQL (mysqld / MySQL80), stop it:
-Open Services (Win+R -> services.msc) -> find “MySQL80” (or “MySQL”) -> Stop
-Then run again:
-docker compose -f database/docker-compose.yml up -d
+- `.\mvnw.cmd test` runs unit tests
+- `.\mvnw.cmd verify` runs unit plus integration tests
 
-Alternative (if you want to keep local MySQL running):
-Change docker-compose ports from "3306:3306" to "3307:3306"
-And update backend DB URL to use localhost:3307
+The integration tests require a working SQL database.
 
-If docker ps shows nothing, try:
-docker ps -a
-docker compose -f database/docker-compose.yml ps
+## Related Documentation
+
+- [`../README.md`](../README.md)
+- [`README-TA.md`](README-TA.md)
+- [`../backend/src/test/README_TESTS.txt`](../backend/src/test/README_TESTS.txt)
