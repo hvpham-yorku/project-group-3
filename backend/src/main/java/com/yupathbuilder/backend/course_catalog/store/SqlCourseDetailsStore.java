@@ -12,6 +12,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * SQL-backed course details store that joins course metadata with section and
+ * meeting information for a requested term.
+ */
 @Component
 @Profile("!stub")
 @ConditionalOnProperty(name = "app.store", havingValue = "sql", matchIfMissing = true)
@@ -25,6 +29,10 @@ public class SqlCourseDetailsStore implements CourseDetailsStore {
     this.sectionRepo = sectionRepo;
   }
 
+  /**
+   * Builds the detailed course response from relational course and section
+   * data.
+   */
   @Override
   public CourseDetailsDto getDetails(String courseCode, String season, int year) {
     var course = courseRepo.findByCourseCode(courseCode);
@@ -32,6 +40,7 @@ public class SqlCourseDetailsStore implements CourseDetailsStore {
 
     var sec = sectionRepo.findSectionsWithMeetings(courseCode, Season.parse(season), year);
 
+    // Each section is flattened into the DTO shape expected by the frontend.
     var sections = sec.stream().map(s -> {
       var meetings = (s.getMeetings() == null ? List.<MeetingDto>of() :
           s.getMeetings().stream()
@@ -46,6 +55,7 @@ public class SqlCourseDetailsStore implements CourseDetailsStore {
       return new SectionInfoDto(s.getSectionCode(), meetings);
     }).toList();
 
+    // The API exposes the term as a single user-facing string.
     var termString = Season.parse(season).name() + " " + year;
 
     return new CourseDetailsDto(

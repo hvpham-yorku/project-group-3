@@ -11,6 +11,13 @@ import org.springframework.stereotype.Service;
 import java.time.LocalTime;
 import java.util.*;
 
+/**
+ * SQL-backed schedule construction service.
+ *
+ * <p>This service resolves the requested term and course offerings, then builds
+ * a conflict-free schedule by selecting the first compatible section for each
+ * requested course.</p>
+ */
 @Service
 @Profile("!stub")
 public class ScheduleService {
@@ -23,6 +30,10 @@ public class ScheduleService {
     this.sectionRepo = sectionRepo;
   }
 
+  /**
+   * Builds a schedule by greedily choosing the first non-conflicting section
+   * for each requested course.
+   */
   public ScheduleBuildResponse build(String termString, List<String> courseCodes) {
     var termKey = TermParser.parse(termString);
     var term = termRepo.findBySeasonAndYear(termKey.season(), termKey.year());
@@ -47,6 +58,7 @@ public class ScheduleService {
         throw new IllegalArgumentException("No meeting times found for " + code + " in " + termString);
       }
 
+      // The current strategy is deterministic: pick the first compatible section.
       var picked = withMeetings.stream()
           .filter(s -> !conflicts(toBlocks(s), used))
           .findFirst()
@@ -62,11 +74,18 @@ public class ScheduleService {
     return new ScheduleBuildResponse(termString, chosen);
   }
 
+  /**
+   * Returns whether any time block in one section overlaps a previously chosen
+   * block.
+   */
   private boolean conflicts(List<Block> a, List<Block> b) {
     for (var x : a) for (var y : b) if (x.conflicts(y)) return true;
     return false;
   }
 
+  /**
+   * Converts a section's meetings into comparable time blocks.
+   */
   private List<Block> toBlocks(com.yupathbuilder.backend.scheduler_system.entity.SectionEntity s) {
     var out = new ArrayList<Block>();
     for (var m : s.getMeetings()) {
@@ -75,10 +94,15 @@ public class ScheduleService {
     return out;
   }
 
+  /**
+   * Collapses the chosen section into the DTO expected by the frontend schedule
+   * view.
+   */
   private ChosenSectionDto toChosenDto(String courseCode, String sectionCode, List<Block> blocks) {
     var first = blocks.get(0);
     var days = new ArrayList<String>();
     for (var b : blocks) {
+      // Meetings that share the same time and location are represented as one row with combined days.
       if (sameSlot(first, b)) days.add(b.day);
     }
     String dayStr = String.join(",", days);
@@ -93,13 +117,23 @@ public class ScheduleService {
     );
   }
 
+  /**
+   * Returns whether two blocks represent the same teaching slot on different
+   * days.
+   */
   private boolean sameSlot(Block a, Block b) {
     return Objects.equals(a.start, b.start) &&
         Objects.equals(a.end, b.end) &&
         Objects.equals(a.location, b.location);
   }
 
+  /**
+   * Internal comparable schedule block used for conflict detection.
+   */
   private record Block(String day, LocalTime start, LocalTime end, String location) {
+    /**
+     * Returns whether two blocks overlap on the same day.
+     */
     boolean conflicts(Block o) {
       if (!Objects.equals(day, o.day)) return false;
       return start.isBefore(o.end) && o.start.isBefore(end);

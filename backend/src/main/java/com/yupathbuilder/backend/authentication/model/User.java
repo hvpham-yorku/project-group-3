@@ -1,5 +1,9 @@
 package com.yupathbuilder.backend.authentication.model;
 
+/**
+ * Lightweight authentication domain model retained for internal data transfer
+ * outside the JPA layer.
+ */
 public class User {
 
     private Long id;

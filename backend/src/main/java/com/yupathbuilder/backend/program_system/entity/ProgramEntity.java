@@ -2,6 +2,9 @@ package com.yupathbuilder.backend.program_system.entity;
 
 import jakarta.persistence.*;
 
+/**
+ * JPA entity representing an academic program within a faculty.
+ */
 @Entity
 @Table(name = "programs")
 public class ProgramEntity {

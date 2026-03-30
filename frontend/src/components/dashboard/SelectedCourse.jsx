@@ -1,3 +1,10 @@
+/**
+ * Selected-courses and schedule-result panel for the dashboard.
+ *
+ * This component shows the user's current selections for the active term,
+ * exposes removal actions, and renders the built schedule plus conflict
+ * details when available.
+ */
 import React, { useMemo } from "react";
 import ScheduleGrid from "../ScheduleGrid.jsx";
 import {
@@ -6,6 +13,10 @@ import {
   formatRange,
 } from "../../utils/scheduleConflicts.js";
 
+/**
+ * Renders term-scoped selections and the schedule output that results from
+ * building them.
+ */
 export default function SelectedCourses({
   selected,
   removeKey,
@@ -13,6 +24,7 @@ export default function SelectedCourses({
   selectedTerm,
   msg,
 }) {
+  // The same flattened key format used in Dashboard is decoded again here for term filtering.
   const prefix = useMemo(() => {
     const [seasonRaw, yearRaw] = selectedTerm.trim().split(/\s+/);
     const season = (seasonRaw || "FALL").toUpperCase();
@@ -25,6 +37,7 @@ export default function SelectedCourses({
     [selected, prefix]
   );
 
+  // Conflict details are derived from the built schedule so they stay in sync with the grid view.
   const conflicts = useMemo(
     () => (schedule ? detectScheduleConflicts(schedule.chosenSections) : { hasConflicts: false, segments: [] }),
     [schedule]

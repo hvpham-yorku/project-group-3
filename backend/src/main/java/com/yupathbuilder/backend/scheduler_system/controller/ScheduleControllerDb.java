@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Exposes schedule-building endpoints for authenticated clients.
+ */
 @RestController
 @RequestMapping("/api/schedule")
 public class ScheduleControllerDb {
@@ -18,6 +21,9 @@ public class ScheduleControllerDb {
     this.scheduleBuildService = scheduleBuildService;
   }
 
+  /**
+   * Builds a schedule for the requested term and set of course codes.
+   */
   @PostMapping("/build")
   public ScheduleBuildResponse build(@RequestBody ScheduleBuildRequest req) {
     List<String> codes = req.courseCodes() == null ? List.of() : Arrays.asList(req.courseCodes());

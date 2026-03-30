@@ -3,6 +3,9 @@ package com.yupathbuilder.backend.scheduler_system.entity;
 import com.yupathbuilder.backend.scheduler_system.model.Season;
 import jakarta.persistence.*;
 
+/**
+ * JPA entity representing an academic term.
+ */
 @Entity
 @Table(
     name = "terms",

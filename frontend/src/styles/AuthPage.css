@@ -1,3 +1,7 @@
+/* Supplemental authentication page stylesheet.
+ * This file currently contains a minimal override layer for auth layouts and
+ * appears to coexist with broader auth styling defined in index.css.
+ */
 .authContainer {
   display: grid;
   place-items: center;

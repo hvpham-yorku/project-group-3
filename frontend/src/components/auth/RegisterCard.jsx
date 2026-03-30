@@ -1,6 +1,16 @@
+/**
+ * Registration form card used by the authentication page.
+ *
+ * This component manages registration form state, dependent faculty/program
+ * loading, and local validation before delegating account creation to the
+ * parent callback.
+ */
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { listFaculties, listPrograms } from "../../api/ProgramApi.js";
 
+/**
+ * Renders the sign-up form for new users.
+ */
 export default function RegisterCard({ onRegister }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -20,6 +30,7 @@ export default function RegisterCard({ onRegister }) {
   const boxRef = useRef(null);
 
   useEffect(() => {
+    // Faculties are loaded once because they are the root input for program selection.
     (async () => {
       try {
         const data = await listFaculties();
@@ -38,6 +49,7 @@ export default function RegisterCard({ onRegister }) {
       return;
     }
 
+    // Changing faculty invalidates any previously chosen program.
     (async () => {
       try {
         const data = await listPrograms(facultyId);
@@ -51,6 +63,7 @@ export default function RegisterCard({ onRegister }) {
   }, [facultyId]);
 
   useEffect(() => {
+    // The custom combo box closes when the user clicks outside it.
     function onDocClick(event) {
       if (!boxRef.current) return;
       if (!boxRef.current.contains(event.target)) setProgramOpen(false);
@@ -60,6 +73,7 @@ export default function RegisterCard({ onRegister }) {
     return () => document.removeEventListener("mousedown", onDocClick);
   }, []);
 
+  // Client-side filtering keeps program search responsive after the list has loaded.
   const filteredPrograms = useMemo(() => {
     const query = programQuery.trim().toLowerCase();
     if (!query) return programs;
@@ -70,12 +84,18 @@ export default function RegisterCard({ onRegister }) {
     });
   }, [programQuery, programs]);
 
+  /**
+   * Applies a selected program from the dropdown to the form state.
+   */
   function pickProgram(program) {
     setProgramId(program.id);
     setProgramQuery(`${program.degree ? `${program.degree} ` : ""}${program.name}`);
     setProgramOpen(false);
   }
 
+  /**
+   * Validates the registration form locally before delegating account creation.
+   */
   async function submit(event) {
     event.preventDefault();
     setMsg("");

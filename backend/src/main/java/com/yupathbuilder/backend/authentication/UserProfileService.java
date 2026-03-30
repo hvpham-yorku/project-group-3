@@ -10,6 +10,12 @@ import com.yupathbuilder.backend.program_system.repo.ProgramRepo;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Handles authenticated user profile reads and updates.
+ *
+ * <p>This service owns profile-specific validation such as program existence,
+ * password change rules, and profile image constraints.</p>
+ */
 @Service
 public class UserProfileService {
 
@@ -25,11 +31,19 @@ public class UserProfileService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Loads the current user's profile and enriches it with related program and
+     * faculty details when available.
+     */
     public UserProfileResponse getProfile(String email) {
         UserEntity user = getUserByEmail(email);
         return toResponse(user, getProgram(user.getProgramId()));
     }
 
+    /**
+     * Updates mutable profile fields for the current user and returns the saved
+     * representation.
+     */
     public UserProfileResponse updateProfile(String email, UpdateProfileRequest req) {
         UserEntity user = getUserByEmail(email);
         ProgramEntity program = getRequiredProgram(req.programId());
@@ -38,6 +52,7 @@ public class UserProfileService {
         user.setLastName(req.lastName().trim());
         user.setProgramId(program.getId());
 
+        // Explicit removal wins over any image payload included in the request.
         if (req.removeProfileImage()) {
             user.setProfileImageData(null);
         } else if (req.profileImageData() != null) {
@@ -50,6 +65,10 @@ public class UserProfileService {
         return toResponse(user, program);
     }
 
+    /**
+     * Changes the current user's password after verifying the existing password
+     * and enforcing basic safety rules.
+     */
     public void changePassword(String email, ChangePasswordRequest req) {
         UserEntity user = getUserByEmail(email);
 
@@ -69,11 +88,19 @@ public class UserProfileService {
         userRepo.save(user);
     }
 
+    /**
+     * Resolves a user by email and fails fast when the authenticated principal
+     * no longer maps to a stored account.
+     */
     private UserEntity getUserByEmail(String email) {
         return userRepo.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
+    /**
+     * Loads program details when the user has a selected program. A missing
+     * program is tolerated when building a read response.
+     */
     private ProgramEntity getProgram(Long programId) {
         if (programId == null) {
             return null;
@@ -81,11 +108,19 @@ public class UserProfileService {
         return programRepo.findWithFacultyById(programId).orElse(null);
     }
 
+    /**
+     * Loads the selected program for profile updates and treats missing program
+     * references as invalid client input.
+     */
     private ProgramEntity getRequiredProgram(Long programId) {
         return programRepo.findWithFacultyById(programId)
                 .orElseThrow(() -> new IllegalArgumentException("Selected program does not exist"));
     }
 
+    /**
+     * Performs lightweight validation for profile image data before it is
+     * stored as a data URL string.
+     */
     private void validateProfileImage(String imageData) {
         if (imageData.isBlank()) {
             return;
@@ -98,6 +133,10 @@ public class UserProfileService {
         }
     }
 
+    /**
+     * Builds the API response while flattening related program and faculty
+     * information for frontend consumption.
+     */
     private UserProfileResponse toResponse(UserEntity user, ProgramEntity program) {
         Long facultyId = null;
         String programName = null;

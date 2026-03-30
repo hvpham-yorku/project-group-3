@@ -1,3 +1,9 @@
+/**
+ * Login form card used by the authentication page.
+ *
+ * This component owns only local form state and delegates the actual
+ * authentication request to the parent-provided callback.
+ */
 import React, { useState } from "react";
 
 /**
@@ -5,12 +11,18 @@ import React, { useState } from "react";
  * Parent must pass:
  *   onLogin(email, password)
  */
+/**
+ * Renders the sign-in form for existing users.
+ */
 export default function LoginCard({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [msg, setMsg] = useState("");
 
+  /**
+   * Validates the login form locally and delegates the actual sign-in request.
+   */
   async function submit(e) {
     e.preventDefault();
     setMsg("");

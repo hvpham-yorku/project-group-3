@@ -2,6 +2,12 @@ package com.yupathbuilder.backend.course_catalog.entity;
 
 import jakarta.persistence.*;
 
+/**
+ * JPA entity representing a catalog course definition.
+ *
+ * <p>This entity stores the descriptive course data shared by catalog,
+ * scheduling, and program requirement features.</p>
+ */
 @Entity
 @Table(name = "courses")
 public class CourseEntity {

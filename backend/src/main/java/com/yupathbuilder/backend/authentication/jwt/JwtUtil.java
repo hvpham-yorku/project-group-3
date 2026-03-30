@@ -10,6 +10,12 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
+/**
+ * Encapsulates JWT creation and validation for the authentication subsystem.
+ *
+ * <p>Tokens issued by this utility carry the authenticated user identifier as
+ * the subject and a simple role claim consumed by the security filter.</p>
+ */
 public class JwtUtil {
 
     private final Key key;
@@ -20,6 +26,9 @@ public class JwtUtil {
         this.expirationMinutes = expirationMinutes;
     }
 
+    /**
+     * Generates a signed JWT for the authenticated user.
+     */
     public String generateToken(String username, String role) {
 
         Instant now = Instant.now();
@@ -34,6 +43,10 @@ public class JwtUtil {
                 .compact();
     }
 
+    /**
+     * Parses and validates a JWT, returning its claims only when signature and
+     * expiration checks succeed.
+     */
     public Claims parse(String token) {
 
         return Jwts.parserBuilder()

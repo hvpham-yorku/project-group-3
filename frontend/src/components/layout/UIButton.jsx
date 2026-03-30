@@ -1,6 +1,16 @@
+/**
+ * Legacy theme toggle button.
+ *
+ * This component switches between the older red/black body class themes. It is
+ * separate from the current light/dark theme flow and appears to be retained
+ * for compatibility or experimentation.
+ */
 import React, { useState, useEffect } from "react";
 import "../../index.css"; // updated to match your CSS file name
 
+/**
+ * Renders a floating button that toggles the legacy UI theme classes.
+ */
 function UIButton() {
   const [UI, setUI] = useState(localStorage.getItem("theme") || "Red");
 
@@ -11,6 +21,7 @@ function UIButton() {
   };
 
   useEffect(() => {
+    // The legacy theme system relies on body classes rather than CSS variables.
     document.body.classList.remove("theme-red", "theme-black");
     document.body.classList.add(UI === "Red" ? "theme-red" : "theme-black");
   }, [UI]);

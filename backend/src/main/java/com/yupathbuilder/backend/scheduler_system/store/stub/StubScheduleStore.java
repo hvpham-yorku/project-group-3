@@ -10,10 +10,20 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Stub-backed schedule store used when the application runs without a
+ * database.
+ *
+ * <p>This implementation builds deterministic schedules from hard-coded stub
+ * time rules so frontend flows remain testable.</p>
+ */
 @Component
 @ConditionalOnProperty(name = "app.store", havingValue = "stub")
 public class StubScheduleStore implements ScheduleStore {
 
+  /**
+   * Builds a deterministic schedule from stub time rules.
+   */
   @Override
   public ScheduleBuildResponse build(String termString, List<String> courseCodes) {
     if (courseCodes == null) courseCodes = List.of();
@@ -44,6 +54,9 @@ public class StubScheduleStore implements ScheduleStore {
     return new ScheduleBuildResponse(termString, chosen);
   }
 
+  /**
+   * Extracts the season token from a user-facing term string.
+   */
   private String parseSeasonFromTerm(String termString) {
     if (termString == null) return "FALL";
     String t = termString.trim().toUpperCase();

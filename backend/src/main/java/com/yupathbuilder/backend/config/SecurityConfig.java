@@ -19,14 +19,27 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+/**
+ * Central Spring Security configuration for the backend application.
+ *
+ * <p>This class wires the core security beans used by authentication and
+ * endpoint protection, including password hashing, JWT support, the filter
+ * chain, and development CORS settings.</p>
+ */
 @Configuration
 public class SecurityConfig {
 
+    /**
+     * Provides the password encoder used to hash and verify user passwords.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Creates the JWT utility using application-provided signing settings.
+     */
     @Bean
     public JwtUtil jwtUtil(
             @Value("${app.jwt.secret}") String secret,
@@ -35,6 +48,13 @@ public class SecurityConfig {
         return new JwtUtil(secret, expMinutes);
     }
 
+    /**
+     * Configures the stateless security filter chain used by the API.
+     *
+     * <p>Authentication is performed through JWTs rather than HTTP sessions, so
+     * the custom JWT filter is inserted before Spring's username/password
+     * authentication filter.</p>
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtUtil jwt) throws Exception {
         http
@@ -55,6 +75,10 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Registers the CORS policy used by local frontend clients during
+     * development.
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();

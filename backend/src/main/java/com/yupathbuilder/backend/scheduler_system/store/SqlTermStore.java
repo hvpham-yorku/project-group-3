@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * SQL-backed implementation of the term store.
+ */
 @Component
 @ConditionalOnProperty(name = "app.store", havingValue = "sql", matchIfMissing = true)
 public class SqlTermStore implements TermStore {
@@ -17,6 +20,9 @@ public class SqlTermStore implements TermStore {
         this.termRepo = termRepo;
     }
 
+    /**
+     * Maps persisted term entities into transport DTOs for the API.
+     */
     @Override
     public List<TermDto> listTerms() {
         return termRepo.findAll().stream()

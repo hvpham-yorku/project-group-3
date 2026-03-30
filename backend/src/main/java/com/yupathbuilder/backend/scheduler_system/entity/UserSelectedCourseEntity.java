@@ -6,6 +6,10 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
+/**
+ * JPA entity representing a course the user has explicitly saved for later
+ * scheduling.
+ */
 @Entity
 @Table(
     name = "user_selected_courses",

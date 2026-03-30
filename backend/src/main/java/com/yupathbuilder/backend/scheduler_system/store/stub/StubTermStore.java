@@ -7,10 +7,16 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Stub-backed term store that returns a fixed set of academic terms.
+ */
 @Component
 @ConditionalOnProperty(name = "app.store", havingValue = "stub")
 public class StubTermStore implements TermStore {
 
+    /**
+     * Returns the hard-coded term list used in stub mode.
+     */
     @Override
     public List<TermDto> listTerms() {
         return List.of(

@@ -1,6 +1,15 @@
+/**
+ * Course search and term-selection panel for the dashboard.
+ *
+ * This component owns debounced course lookup, on-demand details loading, and
+ * the add/remove actions that feed the selected-course workflow.
+ */
 import React, { useEffect, useMemo, useState } from "react";
 import { searchCourses, getCourseDetails } from "../../api/CourseApi.js";
 
+/**
+ * Renders the search UI for browsing courses within the selected term.
+ */
 export default function CourseSearch({
   selectedSet,
   savedCourseTermByCode,
@@ -20,6 +29,7 @@ export default function CourseSearch({
   const [loadingByCode, setLoadingByCode] = useState({});
 
   // parse season/year from selectedTerm
+  // The backend details and search endpoints expect term data as separate season/year values.
   const { season, year } = useMemo(() => {
     const parts = selectedTerm.trim().split(/\s+/);
     return {
@@ -37,6 +47,7 @@ export default function CourseSearch({
   }, [season, year]);
 
   useEffect(() => {
+    // Debouncing keeps the search responsive without firing a request on every keystroke.
     const t = setTimeout(async () => {
       try {
         const data = await searchCourses(q, season, year);
@@ -50,6 +61,10 @@ export default function CourseSearch({
     return () => clearTimeout(t);
   }, [q, season, year]);
 
+  /**
+   * Expands or collapses course details and lazily loads details the first time
+   * a course is opened for the current term.
+   */
   async function toggleInfo(courseCode) {
     const next = !expanded[courseCode];
     setExpanded((prev) => ({ ...prev, [courseCode]: next }));
@@ -112,6 +127,7 @@ export default function CourseSearch({
         {results.slice(0, 15).map((c) => {
           const code = c.courseCode;
           const selectionKey = `${season}-${year}-${code}`;
+          // A course can be saved elsewhere, so the search UI explains why add is disabled.
           const savedInTerm = savedCourseTermByCode[code] || "";
           const savedElsewhere = Boolean(savedInTerm) && savedInTerm !== selectedTerm;
           const isOpen = !!expanded[code];

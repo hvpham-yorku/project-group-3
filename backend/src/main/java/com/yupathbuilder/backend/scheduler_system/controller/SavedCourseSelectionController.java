@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Exposes endpoints for persisting and managing a user's selected courses.
+ */
 @RestController
 @RequestMapping("/api/me/selected-courses")
 public class SavedCourseSelectionController {
@@ -20,11 +23,18 @@ public class SavedCourseSelectionController {
         this.savedCourseSelectionService = savedCourseSelectionService;
     }
 
+    /**
+     * Returns the current authenticated user's saved course selections.
+     */
     @GetMapping
     public List<SavedCourseSelectionDto> list(Authentication auth) {
         return savedCourseSelectionService.listSelections(auth.getName());
     }
 
+    /**
+     * Saves a course selection for the current user and returns the persisted
+     * representation.
+     */
     @PostMapping
     public ResponseEntity<SavedCourseSelectionDto> save(
             Authentication auth,
@@ -38,6 +48,9 @@ public class SavedCourseSelectionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
+    /**
+     * Removes a previously saved course selection for the current user.
+     */
     @DeleteMapping
     public ResponseEntity<Void> remove(
             Authentication auth,

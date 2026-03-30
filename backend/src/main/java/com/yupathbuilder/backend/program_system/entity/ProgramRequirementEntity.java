@@ -3,10 +3,19 @@ package com.yupathbuilder.backend.program_system.entity;
 import com.yupathbuilder.backend.course_catalog.entity.CourseEntity;
 import jakarta.persistence.*;
 
+/**
+ * JPA entity representing a single program requirement row.
+ *
+ * <p>Each row links a program to a course and captures how that course should
+ * appear in the generated checklist.</p>
+ */
 @Entity
 @Table(name = "program_requirements")
 public class ProgramRequirementEntity {
 
+    /**
+     * Identifies whether a checklist item is mandatory or elective.
+     */
     public enum ReqType { REQUIRED, ELECTIVE }
 
     @Id

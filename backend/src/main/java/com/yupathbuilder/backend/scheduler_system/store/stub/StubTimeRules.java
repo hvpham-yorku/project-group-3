@@ -5,10 +5,20 @@ import com.yupathbuilder.backend.course_catalog.dto.MeetingDto;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Holds deterministic meeting patterns used by stub scheduling and course
+ * details flows.
+ *
+ * <p>The goal is not to model real data perfectly, but to provide stable and
+ * repeatable schedules across requests in stub mode.</p>
+ */
 public final class StubTimeRules {
 
   private StubTimeRules() {}
 
+  /**
+   * Synthetic section assignment and meeting list for a single stub course.
+   */
   public record Slot(String section, List<MeetingDto> meetings) {}
 
   private static final Map<String, Slot> FALL = Map.ofEntries(
@@ -135,6 +145,10 @@ public final class StubTimeRules {
       )))
   );
 
+  /**
+   * Returns the stub schedule slot for a course and season, falling back to a
+   * generic evening slot when no explicit mapping exists.
+   */
   public static Slot slotFor(String courseCode, String season) {
     String code = (courseCode == null) ? "" : courseCode.trim().toUpperCase();
     boolean winter = season != null && season.trim().equalsIgnoreCase("WINTER");

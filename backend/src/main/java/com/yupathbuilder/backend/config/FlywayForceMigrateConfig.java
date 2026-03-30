@@ -8,10 +8,21 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+/**
+ * Forces Flyway migration execution during startup when the SQL-backed
+ * application profile is active.
+ *
+ * <p>This configuration exists to ensure schema repair and migration happen
+ * explicitly before the rest of the application depends on the database.</p>
+ */
 @Configuration
 @Profile("!stub")
 public class FlywayForceMigrateConfig {
 
+  /**
+   * Runs Flyway repair and migrate on startup using the application's primary
+   * data source.
+   */
   @Bean
   CommandLineRunner forceFlywayMigrate(
       DataSource dataSource,
@@ -28,6 +39,7 @@ public class FlywayForceMigrateConfig {
           .load();
 
       if (repairOnStartup) {
+        // Repair is opt-in because it changes Flyway metadata history.
         System.out.println(">>> Flyway forced repair: starting...");
         flyway.repair();
       }

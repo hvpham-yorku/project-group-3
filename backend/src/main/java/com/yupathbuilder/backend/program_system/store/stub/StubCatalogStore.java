@@ -14,6 +14,12 @@ import org.springframework.stereotype.Component;
 import java.io.InputStream;
 import java.util.*;
 
+/**
+ * Stub-backed implementation of the program catalog store.
+ *
+ * <p>This store loads faculties, programs, and checklist payloads from bundled
+ * JSON resources so the application can run without database access.</p>
+ */
 @Component
 @ConditionalOnProperty(name = "app.store", havingValue = "stub")
 public class StubCatalogStore implements CatalogStore {
@@ -28,11 +34,17 @@ public class StubCatalogStore implements CatalogStore {
         this.checklistByProgram = loadChecklists(mapper);
     }
 
+    /**
+     * Returns the in-memory faculty snapshot loaded at startup.
+     */
     @Override
     public List<FacultyEntity> listFaculties() {
         return faculties;
     }
 
+    /**
+     * Returns all stub programs or those belonging to a selected faculty.
+     */
     @Override
     public List<ProgramEntity> listPrograms(Long facultyId) {
         if (facultyId == null) return programs;
@@ -41,6 +53,10 @@ public class StubCatalogStore implements CatalogStore {
                 .toList();
     }
 
+    /**
+     * Returns the checklist for a program, falling back to an empty checklist
+     * when stub data is missing for that program.
+     */
     @Override
     public ChecklistResponseDto checklistByProgramId(Long programId) {
         ChecklistResponseDto dto = checklistByProgram.get(programId);
@@ -53,6 +69,9 @@ public class StubCatalogStore implements CatalogStore {
 
     /* -------------------- Loaders -------------------- */
 
+    /**
+     * Loads faculty records from stub JSON and adapts them into entity objects.
+     */
     private static List<FacultyEntity> loadFaculties(ObjectMapper mapper) {
         List<FacultyJson> rows = readJson(mapper, "stub-data/faculties.json", new TypeReference<>() {});
         List<FacultyEntity> out = new ArrayList<>();
@@ -66,6 +85,10 @@ public class StubCatalogStore implements CatalogStore {
         return Collections.unmodifiableList(out);
     }
 
+    /**
+     * Loads programs and reconnects them to the previously loaded faculty
+     * entities.
+     */
     private static List<ProgramEntity> loadPrograms(ObjectMapper mapper, List<FacultyEntity> faculties) {
         Map<Long, FacultyEntity> facultyMap = new HashMap<>();
         for (FacultyEntity f : faculties) facultyMap.put(f.getId(), f);
@@ -84,6 +107,9 @@ public class StubCatalogStore implements CatalogStore {
         return Collections.unmodifiableList(out);
     }
 
+    /**
+     * Loads checklist payloads that are already shaped close to the API DTO.
+     */
     private static Map<Long, ChecklistResponseDto> loadChecklists(ObjectMapper mapper) {
         List<ChecklistJson> rows = readJson(mapper, "stub-data/checklists.json", new TypeReference<>() {});
         Map<Long, ChecklistResponseDto> out = new HashMap<>();
@@ -101,6 +127,9 @@ public class StubCatalogStore implements CatalogStore {
         return Collections.unmodifiableMap(out);
     }
 
+    /**
+     * Reads a stub JSON resource into the requested target type.
+     */
     private static <T> T readJson(ObjectMapper mapper, String path, TypeReference<T> type) {
         try {
             ClassPathResource res = new ClassPathResource(path);
@@ -113,6 +142,10 @@ public class StubCatalogStore implements CatalogStore {
     }
 
     // helper to set @Id without changing entity code
+    /**
+     * Assigns entity IDs reflectively so stub data can behave like persisted
+     * entities without changing the entity classes.
+     */
     private static void setIdReflective(Object entity, Long id) {
         try {
             var f = entity.getClass().getDeclaredField("id");
@@ -123,10 +156,19 @@ public class StubCatalogStore implements CatalogStore {
 
     /* -------------------- JSON record models -------------------- */
 
+    /**
+     * JSON shape for stub faculty records.
+     */
     private record FacultyJson(Long id, String name) {}
 
+    /**
+     * JSON shape for stub program records.
+     */
     private record ProgramJson(Long id, Long facultyId, String name, String degree) {}
 
+    /**
+     * JSON shape for stub checklist records.
+     */
     private record ChecklistJson(
             Long programId,
             List<ChecklistResponseDto.YearDto> years
