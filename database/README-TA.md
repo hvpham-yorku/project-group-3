@@ -1,113 +1,103 @@
-# =========================
-# FILE: database/README-TA.md
-# =========================
-# Database Setup (TA) — Docker (Recommended)
-#
-# This project supports two modes:
-# 1) SQL mode (real MySQL database + Flyway migrations)
-# 2) STUB mode (no database; JSON stub data)
-#
-# This README is the TA-friendly setup using Docker (fast + consistent).
+# Database Setup For TAs
 
-## 0) Requirements
-# - Docker Desktop installed and running
-# Download Docker Desktop:
-# https://www.docker.com/products/docker-desktop/
+This document explains how the SQL-backed version of YU Path Builder is intended to run for evaluation.
 
-## 1) Start MySQL with Docker
-# From the repo root:
+The project has two backend modes:
 
-docker compose -f database/docker-compose.yml up -d
+- SQL mode using MySQL + Flyway
+- STUB mode using JSON-backed data
 
-## 2) Verify the container is running
-docker ps
+For the final repository state, SQL mode is the best-supported evaluation path.
 
-## 3) Database connection details (Docker)
-# Host: localhost
-# Port: 3306
-# Database: yupathbuilder
-# Username: yupath
-# Password: yupathpass
-# Root password: root
-#
-# Note: Flyway runs automatically when the backend starts and will create/seed tables.
+## Option 1: Use Local MySQL On Port 3306
 
-## 4) Run backend (SQL mode)
-# Windows (PowerShell):
+This is the simplest way to match the backend defaults as currently committed.
+
+Expected database settings:
+
+- Host: `localhost`
+- Port: `3306`
+- Database: `yupathbuilder`
+- Username: `yupath`
+- Password: `yupathpass`
+
+Then run the backend:
+
+```bat
 cd backend
-.\mvnw.cmd clean package
 .\mvnw.cmd spring-boot:run
+```
 
-# macOS/Linux:
-# cd backend
-# ./mvnw spring-boot:run
+Or on macOS/Linux:
 
-## 5) Run backend (STUB mode — no DB required)
-# Windows (command prompt):
+```bash
 cd backend
-.\mvnw.cmd clean package
+./mvnw spring-boot:run
+```
+
+## Option 2: Use The Provided Docker Compose
+
+The repository includes:
+
+```bash
+docker compose -f database/docker-compose.yml up -d
+```
+
+This starts MySQL on host port `3306`, which now matches the backend SQL datasource configuration in `backend/src/main/resources/application.properties`.
+
+That means the Dockerized database can be used directly with the committed backend SQL configuration.
+
+## Flyway Behavior
+
+When SQL mode starts successfully, Flyway runs automatically from:
+
+- `backend/src/main/resources/db/migration/`
+
+The SQL migrations create and seed the database content used by:
+
+- catalog search
+- course details
+- terms
+- schedule building
+- user accounts
+- saved selected courses
+- program requirements
+
+## Frontend
+
+Start the frontend in a separate terminal:
+
+```bat
+cd frontend
+npm install
+npm run dev
+```
+
+## Stub Mode Note
+
+The intended stub command is:
+
+```bat
+cd backend
 .\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=stub
+```
 
-# macOS/Linux:
-# cd backend
-# ./mvnw spring-boot:run "-Dspring-boot.run.profiles=stub"
+However, the final repository currently contains unresolved merge markers in `backend/src/main/resources/application-stub.properties`, so stub mode should be treated as a known issue in the committed state.
 
-## 6) Stop the database
-# From the repo root:
-docker compose -f database/docker-compose.yml down
+## Suggested TA Validation Paths
 
-## 7) Reset the database completely (delete all data)
-docker compose -f database/docker-compose.yml down -v
-docker compose -f database/docker-compose.yml up -d
+If the backend is running successfully, the most important flows to validate are:
 
-## Demo Login (for quick testing)
+1. Register and log in
+2. Search courses by code or keyword
+3. Inspect course details for a selected term
+4. Save and remove selected courses by term
+5. Build a schedule
+6. Review the program checklist
+7. Open the profile page and test profile updates
 
-Use this account to log in and test features immediately:
+## Related Documentation
 
-Email: jostin@test.com
-Password: 123456
-
-If the account does not exist yet:
-1) Open the Register page
-2) Register with a email/password above
-3) Select a Faculty (engineering) and Program (Software engineering)
-4) Login normally
-
-Note: In STUB mode, the program/course data comes from JSON stub files.
-In SQL mode, the program/course data comes from the MySQL database and Flyway migrations.
-
-## What to test inside the app (ITR2)
-
-1) Auth
-- Register a new user (first/last/email/password + faculty/program selection)
-- Login using email + password
-
-2) Course Search
-- Search courses (e.g., "EECS", "MATH")
-- Open “More Info” and verify sections/meetings display for the selected term
-
-3) Build Schedule
-- Add courses to Selected Courses
-- Click Build Schedule
-- Verify the generated schedule matches the term and shows day/time/location
-
-4) Program Checklist
-- Verify checklist loads and shows courses grouped by year (STUB: minimal; SQL: seeded)
-
-## What to do in case of a Docker error (Posible solution)
-
-That Docker error means port 3306 is already being used on your PC (usually a local MySQL service), so Docker can’t bind it.
-
-1) Check what’s using 3306:
-netstat -aon | findstr :3306
-Then see the process name:
-tasklist /FI "PID eq <PID>"
-
-2) If it’s MySQL (mysqld / MySQL80), stop it:
-Open Services (Win+R -> services.msc) -> find “MySQL80” (or “MySQL”) -> Stop
-Then run again:
-docker compose -f database/docker-compose.yml up -d
-
-If docker ps shows nothing, try:
-docker ps -a
-docker compose -f database/docker-compose.yml ps
+- [`../README.md`](../README.md)
+- [`README-TEAM.md`](README-TEAM.md)
+- [`../wiki_and_architecture_ITR1/wiki_updated/wiki/How-to-Run.md`](../wiki_and_architecture_ITR1/wiki_updated/wiki/How-to-Run.md)

@@ -1,70 +1,63 @@
-# Getting Started with Create React App
+# Frontend Overview
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This directory contains the React + Vite client for YU Path Builder.
 
-## Available Scripts
+The frontend is responsible for:
 
-In the project directory, you can run:
+- authentication entry screens
+- authenticated navigation
+- course search and course-details display
+- saved selected-course management
+- schedule rendering and conflict presentation
+- profile management
+- program checklist display
 
-### `npm start`
+## Main Entry Points
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- `src/main.jsx` bootstraps the React application
+- `src/App.jsx` acts as the top-level shell and lightweight router
+- `src/context/AuthContext.jsx` owns shared authentication state
+- `src/pages/AuthPage.jsx` renders the sign-in and registration flow
+- `src/pages/Dashboard.jsx` renders the main planning workflow
+- `src/pages/ProfilePage.jsx` renders user profile management
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Running The Frontend
 
-### `npm test`
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+The Vite development server typically runs on `http://localhost:5173/`.
 
-### `npm run build`
+## Backend Dependency
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Most frontend features require the backend to be running because the client calls authenticated API endpoints for:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- login and registration
+- faculty and program lookup
+- course search
+- course details
+- schedule building
+- saved selected courses
+- profile management
+- checklist retrieval
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+For the full project run guide, see:
 
-### `npm run eject`
+- [`../README.md`](../README.md)
+- [`../wiki_and_architecture_ITR1/wiki_updated/wiki/How-to-Run.md`](../wiki_and_architecture_ITR1/wiki_updated/wiki/How-to-Run.md)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Current Release Notes
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+The final Iteration 3 frontend includes:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- a profile page and account navigation
+- schedule conflict display improvements
+- persistent saved-course loading by term
+- a reorganized page/component/API/context structure
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Known limitation:
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- The term selector is currently hard-coded in the dashboard instead of loading `/api/terms` dynamically.

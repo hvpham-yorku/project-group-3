@@ -1,2 +1,17 @@
-Log File:
-https://docs.google.com/document/d/1LYoEl20Pes2iZr40KSX8sZK3L9I9q3rJaF4uu-Lc-CM/edit?usp=sharing
+Repository log pointer
+======================
+
+The canonical repository-maintained project log is now:
+
+- wiki_and_architecture_ITR1/wiki_updated/wiki/log.md
+
+Historical external working document:
+
+- https://docs.google.com/document/d/1LYoEl20Pes2iZr40KSX8sZK3L9I9q3rJaF4uu-Lc-CM/edit?usp=sharing
+
+Notes
+=====
+
+1. The repository log preserves Iteration 1 and Iteration 2 entries that were already documented in detail.
+2. Iteration 3 entries are based on committed repository evidence where explicit meeting minutes were not available.
+3. Missing historical details are marked with TODO placeholders instead of being invented.
