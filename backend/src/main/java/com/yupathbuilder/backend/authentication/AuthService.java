@@ -9,6 +9,13 @@ import com.yupathbuilder.backend.authentication.repo.UserRepo;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Coordinates registration and login operations for the authentication flow.
+ *
+ * <p>This service is responsible for normalizing identity data, persisting new
+ * users, verifying password hashes, and issuing JWTs after successful
+ * authentication.</p>
+ */
 @Service
 public class AuthService {
 
@@ -22,14 +29,16 @@ public class AuthService {
         this.jwt = jwt;
     }
 
-    /*
-     * Register new user
+    /**
+     * Creates a new user account after validating the request and returns a JWT
+     * for the new authenticated session.
      */
     public AuthResponse register(RegisterRequest req) {
 
     if (!req.password().equals(req.confirmPassword()))
         throw new IllegalArgumentException("Passwords do not match");
 
+    // Email normalization keeps uniqueness checks and token subjects stable.
     String email = req.email().trim().toLowerCase();
 
     if (repo.existsByEmail(email))
@@ -50,11 +59,13 @@ public class AuthService {
     return new AuthResponse(token, email);
     }
 
-    /*
-     * Login user
+    /**
+     * Validates a login attempt and returns a JWT when the credentials are
+     * correct.
      */
     public AuthResponse login(LoginRequest req) {
 
+    // Login uses the same normalization strategy as registration.
     String email = req.email().trim().toLowerCase();
 
     UserEntity user = repo.findByEmail(email)
@@ -66,5 +77,5 @@ public class AuthService {
     String token = jwt.generateToken(user.getEmail(), "USER");
 
     return new AuthResponse(token, user.getEmail());
-}
+    }
 }

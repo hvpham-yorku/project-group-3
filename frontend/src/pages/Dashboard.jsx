@@ -1,3 +1,9 @@
+/**
+ * Main authenticated dashboard for schedule planning.
+ *
+ * This page coordinates selected-course persistence, course search, checklist
+ * display, and schedule generation for the currently chosen term.
+ */
 import React, { useEffect, useMemo, useState } from "react";
 import TopBar from "../components/layout/TopBar.jsx";
 import { buildSchedule } from "../api/ScheduleApi.js";
@@ -11,6 +17,9 @@ import CourseSearch from "../components/dashboard/CourseSearch.jsx";
 import SelectedCourses from "../components/dashboard/SelectedCourse.jsx";
 import ProgramChecklist from "../components/dashboard/ProgramChecklist.jsx";
 
+/**
+ * Composes the core schedule-building workflow after sign-in.
+ */
 export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
   const [selectedTerm, setSelectedTerm] = useState("FALL 2026");
   const [selected, setSelected] = useState([]);
@@ -21,6 +30,7 @@ export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
 
   const selectedSet = useMemo(() => new Set(selected), [selected]);
 
+  // Keys combine term and course so one course can be represented distinctly per term in UI state.
   const prefixOf = (term) => {
     const [seasonRaw, yearRaw] = term.trim().split(/\s+/);
     const season = (seasonRaw || "FALL").toUpperCase();
@@ -30,6 +40,7 @@ export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
 
   const keyOf = (term, courseCode) => `${prefixOf(term)}${courseCode}`;
 
+  // Saved selections are stored as flattened keys and decoded when the term or course is needed separately.
   const parseKey = (key) => {
     const firstDash = key.indexOf("-");
     const secondDash = key.indexOf("-", firstDash + 1);
@@ -39,6 +50,7 @@ export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
     };
   };
 
+  // This lookup lets the search UI explain when a course is already saved under a different term.
   const savedCourseTermByCode = useMemo(() => {
     return Object.fromEntries(
       selected.map((key) => {
@@ -51,6 +63,7 @@ export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
   useEffect(() => {
     let ignore = false;
 
+    // Load persisted selected courses once so dashboard state matches the backend immediately after refresh.
     async function loadSelectedCourses() {
       try {
         const saved = await listSelectedCourses();
@@ -73,6 +86,10 @@ export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
     };
   }, []);
 
+  /**
+   * Adds or removes a course for the currently selected term and keeps the
+   * local selection cache synchronized with the backend.
+   */
   async function toggleCourse(courseCode) {
     setSchedule(null);
     setScheduleMsg("");
@@ -96,6 +113,9 @@ export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
     }
   }
 
+  /**
+   * Removes a saved course selection identified by the flattened UI key.
+   */
   async function removeKey(key) {
     setSchedule(null);
     setScheduleMsg("");
@@ -115,6 +135,7 @@ export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
 
   const prefix = useMemo(() => prefixOf(selectedTerm), [selectedTerm]);
 
+  // Derived selection subsets keep the child components focused on the active term only.
   const selectedForTerm = useMemo(
     () => selected.filter((k) => k.startsWith(prefix)),
     [selected, prefix]
@@ -125,6 +146,9 @@ export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
     [selectedForTerm, prefix]
   );
 
+  /**
+   * Requests a built schedule for the currently active term selection.
+   */
   async function onBuildSchedule() {
     setScheduleMsg("");
     setSchedule(null);
@@ -137,11 +161,13 @@ export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
   }
 
   useEffect(() => {
+    // Body-level styling widens the layout once a schedule grid is present.
     document.body.classList.toggle("hasSchedule", Boolean(schedule));
     return () => document.body.classList.remove("hasSchedule");
   }, [schedule]);
 
   useEffect(() => {
+    // Changing term invalidates the previously built schedule output.
     setSchedule(null);
     setScheduleMsg("");
   }, [selectedTerm]);

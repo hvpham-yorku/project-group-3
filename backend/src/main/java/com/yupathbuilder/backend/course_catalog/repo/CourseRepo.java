@@ -7,8 +7,15 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
+/**
+ * Persistence gateway for course catalog records stored in the database.
+ */
 public interface CourseRepo extends JpaRepository<CourseEntity, Long> {
 
+  /**
+   * Searches courses that are offered in a specific term and match the supplied
+   * text query.
+   */
   @Query("""
   SELECT DISTINCT c
   FROM CourseEntity c
@@ -22,8 +29,15 @@ public interface CourseRepo extends JpaRepository<CourseEntity, Long> {
 """)
 List<CourseEntity> searchByTerm(@Param("q") String q, @Param("season") com.yupathbuilder.backend.scheduler_system.model.Season season, @Param("year") int year);
 
+  /**
+   * Resolves a course by its normalized course code.
+   */
   CourseEntity findByCourseCode(String courseCode);
 
+  /**
+   * Performs a lightweight case-insensitive search suitable for suggestions and
+   * search previews.
+   */
   List<CourseEntity> findTop20ByCourseCodeContainingIgnoreCaseOrTitleContainingIgnoreCase(
       String code,
       String title

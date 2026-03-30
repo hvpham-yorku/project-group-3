@@ -4,6 +4,9 @@ import com.yupathbuilder.backend.course_catalog.entity.CourseEntity;
 import jakarta.persistence.*;
 import java.util.List;
 
+/**
+ * JPA entity representing a specific section of a course offering in a term.
+ */
 @Entity
 @Table(name="sections")
 public class SectionEntity {
@@ -20,6 +23,7 @@ public class SectionEntity {
   @JoinColumn(name="term_id")
   private TermEntity term;
 
+  // Section labels may be alphabetic or numeric depending on source data.
   @Column(name="section_code", nullable=false)
   private String sectionCode; // A, B, 01...
 

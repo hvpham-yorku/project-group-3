@@ -3,6 +3,9 @@ package com.yupathbuilder.backend.scheduler_system.entity;
 import jakarta.persistence.*;
 import java.time.LocalTime;
 
+/**
+ * JPA entity representing a single meeting time within a section.
+ */
 @Entity
 @Table(name="section_meetings")
 public class SectionMeetingEntity {

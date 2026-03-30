@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * SQL-backed implementation of the program catalog store.
+ */
 @Component
 @Profile("!stub")
 @ConditionalOnProperty(name = "app.store", havingValue = "sql", matchIfMissing = true)
@@ -27,17 +30,26 @@ public class SqlCatalogStore implements CatalogStore {
         this.checklistService = checklistService;
     }
 
+    /**
+     * Returns all persisted faculties.
+     */
     @Override
     public List<FacultyEntity> listFaculties() {
         return facultyRepo.findAll();
     }
 
+    /**
+     * Returns all programs or only those associated with a faculty.
+     */
     @Override
     public List<ProgramEntity> listPrograms(Long facultyId) {
         if (facultyId == null) return programRepo.findAll();
         return programRepo.findByFaculty_IdOrderByNameAsc(facultyId);
     }
 
+    /**
+     * Delegates checklist generation to the SQL checklist service.
+     */
     @Override
     public ChecklistResponseDto checklistByProgramId(Long programId) {
         return checklistService.byProgramId(programId);

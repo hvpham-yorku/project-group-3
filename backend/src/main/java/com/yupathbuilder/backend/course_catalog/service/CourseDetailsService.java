@@ -4,6 +4,9 @@ import com.yupathbuilder.backend.course_catalog.dto.CourseDetailsDto;
 import com.yupathbuilder.backend.course_catalog.store.CourseDetailsStore;
 import org.springframework.stereotype.Service;
 
+/**
+ * Provides course detail lookups for a specific course and academic term.
+ */
 @Service
 public class CourseDetailsService {
 
@@ -13,6 +16,9 @@ public class CourseDetailsService {
         this.courseDetailsStore = courseDetailsStore;
     }
 
+    /**
+     * Retrieves the detailed course representation for the requested term.
+     */
     public CourseDetailsDto getDetails(String courseCode, String season, int year) {
         return courseDetailsStore.getDetails(courseCode, season, year);
     }

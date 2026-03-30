@@ -1,6 +1,15 @@
+/**
+ * Program checklist panel displayed on the dashboard.
+ *
+ * This component loads the authenticated user's checklist and renders it in a
+ * collapsible structure grouped by academic year and elective sections.
+ */
 import React, { useEffect, useMemo, useState } from "react";
 import { getMyChecklist } from "../../api/ChecklistApi.js";
 
+/**
+ * Renders the checklist view for the signed-in user's program.
+ */
 export default function ProgramChecklist() {
   const [data, setData] = useState(null);
   const [openYears, setOpenYears] = useState(() => new Set([1, "electives"]));
@@ -20,6 +29,7 @@ export default function ProgramChecklist() {
     })();
   }, []);
 
+  // Elective-like items are collected into a shared section so the checklist stays easier to scan.
   const sections = useMemo(() => {
     const years = data?.years || [];
     const electiveGroupsMap = new Map();
@@ -75,6 +85,9 @@ export default function ProgramChecklist() {
     return regularSections;
   }, [data]);
 
+  /**
+   * Expands or collapses one checklist section.
+   */
   function toggleYear(yearKey) {
     setOpenYears((prev) => {
       const next = new Set(prev);
@@ -84,6 +97,9 @@ export default function ProgramChecklist() {
     });
   }
 
+  /**
+   * Toggles the local completion checkbox state for a checklist course.
+   */
   function toggleCourse(courseId) {
     setChecked((prev) => {
       const next = new Set(prev);

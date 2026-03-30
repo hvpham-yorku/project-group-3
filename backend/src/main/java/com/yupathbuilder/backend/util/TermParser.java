@@ -2,11 +2,24 @@ package com.yupathbuilder.backend.util;
 
 import com.yupathbuilder.backend.scheduler_system.model.Season;
 
+/**
+ * Utility for converting user-facing term strings into structured term keys.
+ *
+ * <p>This helper is shared by scheduling-related services so term parsing rules
+ * stay consistent across endpoints and persistence lookups.</p>
+ */
 public final class TermParser {
   private TermParser() {}
 
+  /**
+   * Structured representation of a parsed academic term.
+   */
   public record TermKey(Season season, int year) {}
 
+  /**
+   * Parses terms in the canonical format {@code SEASON YEAR}, for example
+   * {@code FALL 2026}.
+   */
   public static TermKey parse(String term) {
     // accepts "FALL 2026"
     if (term == null) throw new IllegalArgumentException("term is required");

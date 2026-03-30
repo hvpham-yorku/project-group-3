@@ -6,6 +6,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Coordinates catalog listing and search operations for course endpoints.
+ *
+ * <p>This service insulates controllers from the active storage implementation
+ * and maps course entities into API-facing DTOs.</p>
+ */
 @Service
 public class CourseCatalogService {
 
@@ -15,6 +21,9 @@ public class CourseCatalogService {
         this.courseStore = courseStore;
     }
 
+    /**
+     * Returns the full catalog or a filtered subset when a query is supplied.
+     */
     public List<CourseDto> listCourses(String q) {
         var courses = (q == null || q.isBlank())
             ? courseStore.listCourses()
@@ -25,6 +34,10 @@ public class CourseCatalogService {
             .toList();
     }
 
+    /**
+     * Performs an explicit search and returns an empty list for blank queries to
+     * avoid unintentionally returning the full catalog.
+     */
     public List<CourseDto> searchCourses(String q) {
         if (q == null || q.trim().isEmpty()) {
             return List.of();

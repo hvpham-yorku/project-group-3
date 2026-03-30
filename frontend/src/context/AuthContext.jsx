@@ -1,3 +1,10 @@
+/**
+ * Shared authentication context for the frontend.
+ *
+ * This module owns session persistence, profile hydration, and the auth
+ * actions consumed across pages and components. It is the main bridge between
+ * backend auth APIs and the rest of the React tree.
+ */
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
   login as apiLogin,
@@ -26,7 +33,11 @@ import {
 
 const AuthContext = createContext(null);
 
+/**
+ * Provides authentication state and auth-related actions to the application.
+ */
 export function AuthProvider({ children }) {
+  // Stored auth is rehydrated on first render so refreshes keep the session alive.
   const [token, setToken] = useState(getToken());
   const [username, setUsername] = useState(getUsername());
   const [profile, setProfile] = useState(null);
@@ -44,6 +55,7 @@ export function AuthProvider({ children }) {
     let ignore = false;
     setProfileLoaded(false);
 
+    // Once a token exists, eagerly load the profile used by navigation and account UI.
     async function loadProfile() {
       try {
         const data = await getProfile();
@@ -72,6 +84,9 @@ export function AuthProvider({ children }) {
     };
   }, [token]);
 
+  /**
+   * Authenticates an existing user and synchronizes local auth storage.
+   */
   async function login(username, password) {
     const res = await apiLogin(username, password);
     setAuth(res.token, res.username);
@@ -81,6 +96,9 @@ export function AuthProvider({ children }) {
     setProfileLoaded(false);
   }
 
+  /**
+   * Registers a new user and stores the returned authenticated session.
+   */
   async function register(payload) {
     const res = await apiRegister(payload);
     setAuth(res.token, res.username);
@@ -90,6 +108,9 @@ export function AuthProvider({ children }) {
     setProfileLoaded(false);
   }
 
+  /**
+   * Re-fetches the authenticated user's profile from the backend.
+   */
   async function refreshProfile() {
     if (!getToken()) {
       setProfile(null);
@@ -112,6 +133,10 @@ export function AuthProvider({ children }) {
     }
   }
 
+  /**
+   * Applies a freshly updated profile to context and keeps the stored username
+   * aligned with the backend's canonical email value.
+   */
   function syncProfile(nextProfile) {
     setProfile(nextProfile || null);
     setProfileLoaded(Boolean(nextProfile));
@@ -122,6 +147,9 @@ export function AuthProvider({ children }) {
     }
   }
 
+  /**
+   * Clears the authenticated session from both memory and persistent storage.
+   */
   function logout() {
     clearAuth();
     setToken("");
@@ -153,6 +181,9 @@ export function AuthProvider({ children }) {
 /**
  * Custom Hook
  * Cleaner access instead of useContext(AuthContext)
+ */
+/**
+ * Returns the shared authentication context.
  */
 export function useAuth() {
   const context = useContext(AuthContext);

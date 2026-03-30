@@ -1,3 +1,9 @@
+/**
+ * Authenticated user profile page.
+ *
+ * This page loads editable account data, faculty/program choices, and password
+ * management actions while keeping the shared auth profile synchronized.
+ */
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import TopBar from "../components/layout/TopBar.jsx";
 import { getProfile, updateProfile, changePassword } from "../api/ProfileApi.js";
@@ -6,6 +12,10 @@ import { useAuth } from "../context/AuthContext.jsx";
 
 const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
+/**
+ * Reads an image file into a data URL so it can be previewed and submitted to
+ * the backend as profile image data.
+ */
 function readFileAsDataUrl(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -15,6 +25,9 @@ function readFileAsDataUrl(file) {
   });
 }
 
+/**
+ * Renders profile editing and password management for the signed-in user.
+ */
 export default function ProfilePage({ theme, onToggleTheme, onNavigate }) {
   const { syncProfile } = useAuth();
   const [profile, setProfile] = useState(null);
@@ -38,6 +51,7 @@ export default function ProfilePage({ theme, onToggleTheme, onNavigate }) {
   const boxRef = useRef(null);
 
   useEffect(() => {
+    // Load both profile data and faculty options up front because the form depends on both.
     (async () => {
       try {
         const [profileData, facultyData] = await Promise.all([
@@ -72,6 +86,7 @@ export default function ProfilePage({ theme, onToggleTheme, onNavigate }) {
       return;
     }
 
+    // Programs are dependent on the currently selected faculty.
     (async () => {
       try {
         const data = await listPrograms(facultyId);
@@ -83,6 +98,7 @@ export default function ProfilePage({ theme, onToggleTheme, onNavigate }) {
   }, [facultyId]);
 
   useEffect(() => {
+    // The custom program combo box closes when focus moves outside of its container.
     function onDocClick(event) {
       if (!boxRef.current) return;
       if (!boxRef.current.contains(event.target)) setProgramOpen(false);
@@ -92,6 +108,7 @@ export default function ProfilePage({ theme, onToggleTheme, onNavigate }) {
     return () => document.removeEventListener("mousedown", onDocClick);
   }, []);
 
+  // Client-side filtering keeps the combo list responsive after program data has loaded.
   const filteredPrograms = useMemo(() => {
     const query = programQuery.trim().toLowerCase();
     if (!query) return programs;
@@ -101,12 +118,18 @@ export default function ProfilePage({ theme, onToggleTheme, onNavigate }) {
     });
   }, [programQuery, programs]);
 
+  /**
+   * Applies a program selection from the combo list to the editable form state.
+   */
   function pickProgram(program) {
     setProgramId(String(program.id));
     setProgramQuery(`${program.degree ? `${program.degree} ` : ""}${program.name}`);
     setProgramOpen(false);
   }
 
+  /**
+   * Validates and loads an image file for profile-photo preview and submission.
+   */
   async function handlePhotoChange(event) {
     setError("");
     const file = event.target.files?.[0];
@@ -131,6 +154,9 @@ export default function ProfilePage({ theme, onToggleTheme, onNavigate }) {
     }
   }
 
+  /**
+   * Persists editable profile fields and updates the shared auth profile cache.
+   */
   async function submitProfile(event) {
     event.preventDefault();
     setProfileMsg("");
@@ -172,6 +198,9 @@ export default function ProfilePage({ theme, onToggleTheme, onNavigate }) {
     }
   }
 
+  /**
+   * Submits a password change request for the current user.
+   */
   async function submitPassword(event) {
     event.preventDefault();
     setPasswordMsg("");

@@ -1,11 +1,25 @@
+/**
+ * Root application shell for the frontend.
+ *
+ * This component coordinates top-level concerns such as theme persistence,
+ * lightweight client-side navigation, and which page should be shown for the
+ * current authentication state.
+ */
 import React, { useEffect, useState } from "react";
 import Dashboard from "./pages/Dashboard.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import { useAuth } from "./context/AuthContext.jsx";
+
+/**
+ * Chooses the active page and maintains top-level UI state shared across the
+ * authenticated experience.
+ */
 export default function App() {
   const { isAuthed } = useAuth();
+  // Theme preference is persisted so the experience survives page reloads.
   const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "dark");
+  // Navigation is intentionally managed through the History API instead of a routing library.
   const [path, setPath] = useState(() => window.location.pathname || "/");
 
   useEffect(() => {
@@ -14,6 +28,7 @@ export default function App() {
   }, [theme]);
 
   useEffect(() => {
+    // Keep local UI state aligned with browser back/forward navigation.
     function onPopState() {
       setPath(window.location.pathname || "/");
     }
@@ -57,6 +72,7 @@ export default function App() {
   }
 
   if (path !== "/") {
+    // Authenticated users only support a small set of routes in this lightweight router.
     navigate("/");
   }
 

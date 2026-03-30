@@ -7,8 +7,15 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
+/**
+ * Persistence gateway for section records and their meeting schedules.
+ */
 public interface SectionRepo extends JpaRepository<SectionEntity, Long> {
 
+  /**
+   * Returns all sections for a course offering in a term, eagerly loading
+   * meetings to avoid lazy-loading issues during schedule construction.
+   */
   @Query("""
     SELECT DISTINCT s
     FROM SectionEntity s

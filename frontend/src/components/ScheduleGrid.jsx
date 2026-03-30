@@ -1,3 +1,10 @@
+/**
+ * Schedule grid renderer for built schedules.
+ *
+ * This component transforms chosen section data into a calendar-style matrix,
+ * highlights conflicts, and exposes display controls such as sizing, printing,
+ * and fullscreen mode.
+ */
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   detectScheduleConflicts,
@@ -6,6 +13,10 @@ import {
   getScheduleDays,
 } from "../utils/scheduleConflicts.js";
 
+/**
+ * Compares slot states so adjacent rows with identical meaning can be merged
+ * into a single rendered table cell.
+ */
 function sameState(a, b) {
   if (!a || !b || a.type !== b.type) return false;
   if (a.type === "empty") return false;
@@ -13,6 +24,9 @@ function sameState(a, b) {
   return a.signature === b.signature;
 }
 
+/**
+ * Renders a time-grid view of chosen sections for a single academic term.
+ */
 export default function ScheduleGrid({ chosenSections, termLabel }) {
   const DAYS = getScheduleDays();
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -28,6 +42,7 @@ export default function ScheduleGrid({ chosenSections, termLabel }) {
   const END_DAY_MIN = 19 * 60;
   const SLOT_MINUTES = 30;
 
+  // Slots define the visible half-hour rows that the grid can render.
   const slots = useMemo(() => {
     const list = [];
     for (let start = START_DAY_MIN; start < END_DAY_MIN; start += SLOT_MINUTES) {
@@ -59,6 +74,7 @@ export default function ScheduleGrid({ chosenSections, termLabel }) {
     [chosenSections]
   );
 
+  // Active days receive more width so sparse schedules stay readable.
   const activeDays = useMemo(() => {
     const used = new Set(events.map((event) => event.day));
     return DAYS.map((day) => used.has(day.key));
@@ -151,6 +167,10 @@ export default function ScheduleGrid({ chosenSections, termLabel }) {
     window.localStorage.setItem("schedule-size-index", String(sizeIndex));
   }, [sizeIndex]);
 
+  /**
+   * Toggles fullscreen mode for the schedule grid wrapper when supported by the
+   * browser.
+   */
   async function toggleFullscreen() {
     try {
       if (!document.fullscreenElement && wrapRef.current?.requestFullscreen) {
@@ -166,10 +186,17 @@ export default function ScheduleGrid({ chosenSections, termLabel }) {
     }
   }
 
+  /**
+   * Opens the browser print flow for the current schedule view.
+   */
   function printSchedule() {
     window.print();
   }
 
+  /**
+   * Returns the merged table cell for a day/slot position, or {@code null}
+   * when that position is already covered by a rowspan from an earlier slot.
+   */
   function renderBlock(dayKey, slotIndex) {
     const dayInfo = dayBlocks[dayKey];
     if (dayInfo.covered.has(slotIndex)) return null;

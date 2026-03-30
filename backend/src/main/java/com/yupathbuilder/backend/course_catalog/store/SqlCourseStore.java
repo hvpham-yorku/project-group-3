@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * SQL-backed implementation of the course catalog store.
+ */
 @Component
 @Profile("!stub")
 @ConditionalOnProperty(name = "app.store", havingValue = "sql", matchIfMissing = true)
@@ -19,11 +22,20 @@ public class SqlCourseStore implements CourseStore {
         this.courseRepo = courseRepo;
     }
 
+    /**
+     * Returns all courses stored in the database.
+     */
     @Override
     public List<CourseEntity> listCourses() {
         return courseRepo.findAll();
     }
 
+    /**
+     * Performs a case-insensitive free-text search over persisted courses.
+     *
+     * <p>The current implementation filters in memory after loading the course
+     * set, which keeps the matching logic centralized.</p>
+     */
     @Override
     public List<CourseEntity> searchCourses(String q) {
         if (q == null || q.isBlank()) return courseRepo.findAll();

@@ -1,7 +1,17 @@
+/**
+ * Shared top navigation and account menu for the frontend.
+ *
+ * This component adapts its layout for authenticated and unauthenticated
+ * screens, handles sticky header behavior, and exposes account navigation
+ * actions such as profile access and logout.
+ */
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 
+/**
+ * Returns the best display name for the current account context.
+ */
 function getAccountName(profile, fallbackUsername) {
   const fullName = [profile?.firstName, profile?.lastName]
     .filter(Boolean)
@@ -11,6 +21,9 @@ function getAccountName(profile, fallbackUsername) {
   return fullName || fallbackUsername || "My Account";
 }
 
+/**
+ * Returns initials for the account avatar fallback when no profile image is available.
+ */
 function getAccountInitials(profile, fallbackUsername) {
   const letters = [profile?.firstName?.[0], profile?.lastName?.[0]]
     .filter(Boolean)
@@ -24,6 +37,9 @@ function getAccountInitials(profile, fallbackUsername) {
   return (fallbackUsername || "U").slice(0, 2).toUpperCase();
 }
 
+/**
+ * Renders the shared site header and contextual account menu.
+ */
 export default function TopBar({
   theme = "dark",
   onToggleTheme,
@@ -51,6 +67,7 @@ export default function TopBar({
       return undefined;
     }
 
+    // Sticky header styling changes once the user scrolls beyond the expanded topbar.
     function onScroll() {
       setIsPastTopbar(window.scrollY > 64);
     }
@@ -65,6 +82,7 @@ export default function TopBar({
       return undefined;
     }
 
+    // The account menu closes on outside interaction and Escape for predictable keyboard behavior.
     function onDocumentClick(event) {
       const clickedTrigger = accountTriggerRef.current?.contains(event.target);
       const clickedDropdown = accountDropdownRef.current?.contains(event.target);
@@ -94,6 +112,7 @@ export default function TopBar({
       return undefined;
     }
 
+    // The dropdown is portaled to document.body, so its screen position must be recomputed manually.
     function updateMenuPosition() {
       const rect = accountTriggerRef.current?.getBoundingClientRect();
       if (!rect) {
@@ -175,6 +194,7 @@ export default function TopBar({
       </div>
 
       {menuOpen && menuPosition && createPortal(
+        // Portaling avoids clipping issues caused by the layered sticky header containers.
         <div
           ref={accountDropdownRef}
           className="accountDropdown"

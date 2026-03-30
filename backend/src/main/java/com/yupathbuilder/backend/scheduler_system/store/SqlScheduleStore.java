@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * SQL-backed implementation of the schedule store.
+ */
 @Component
 @Profile("!stub")
 @ConditionalOnProperty(name = "app.store", havingValue = "sql", matchIfMissing = true)
@@ -19,6 +22,9 @@ public class SqlScheduleStore implements ScheduleStore {
     this.scheduleService = scheduleService;
   }
 
+  /**
+   * Delegates schedule construction to the SQL scheduling service.
+   */
   @Override
   public ScheduleBuildResponse build(String termString, List<String> courseCodes) {
     return scheduleService.build(termString, courseCodes);

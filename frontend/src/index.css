@@ -1,4 +1,10 @@
+/* Core global stylesheet for the React frontend.
+ * This file defines shared design tokens, application layout, schedule grid
+ * styling, profile/auth screens, and a small set of legacy theme overrides
+ * still used by parts of the UI.
+ */
 /* Global styles for the Vite + React frontend UI. */
+/* Shared design tokens power both dark and light theme variants. */
 :root {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   --bg: #0b1220;
@@ -28,6 +34,7 @@
   color: var(--text);
 }
 
+/* Light mode swaps the token palette without changing component structure. */
 body[data-theme="light"] {
   --bg: #f5f3f1;
   --text: #1c2330;
@@ -70,6 +77,7 @@ code { opacity: 0.9; }
 
 .app { min-height: 100vh; }
 
+/* Header chrome supports three visual modes: expanded, collapsed, and simplified auth layouts. */
 .siteHeader {
   position: relative;
   z-index: 20;
@@ -381,6 +389,7 @@ body[data-theme="light"] .accountDropdown {
   margin: 0 auto;
 }
 
+/* The dashboard widens after schedule generation so the timetable remains readable. */
 /* When a schedule is built, use more horizontal space for better readability */
 body.hasSchedule .container {
   max-width: 1850px;
@@ -612,6 +621,7 @@ body[data-theme="light"] .pill {
 }
 
 
+/* Shared schedule-grid tokens let the grid scale between compact and expanded modes. */
 /* --- Schedule Grid --- */
 .schedWrap {
   margin-top: 12px;
@@ -979,6 +989,7 @@ body[data-theme="dark"] .officeNav {
 }
 
 @media print {
+  /* Print mode strips navigational and interactive UI so the schedule becomes the primary artifact. */
   .siteHeader,
   .searchPanel,
   .checklistPanel,
@@ -1023,6 +1034,7 @@ body[data-theme="dark"] .officeNav {
   }
 }
 
+/* Legacy theme-red/theme-black overrides remain below for compatibility with the older UIButton flow. */
 body[data-theme="light"] .officeBar,
 body[data-theme="light"] .officeNav {
   display: flex;
@@ -1353,6 +1365,7 @@ body.theme-black .timeCell span {
   min-width: 120px;
 }
 
+/* Profile page styles extend the shared card/layout system used elsewhere in the app. */
 .profilePage {
   padding-top: 24px;
   padding-bottom: 32px;

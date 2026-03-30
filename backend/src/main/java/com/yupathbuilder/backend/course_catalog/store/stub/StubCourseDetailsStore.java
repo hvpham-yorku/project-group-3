@@ -12,6 +12,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Stub-backed course details store that synthesizes deterministic section data
+ * for local development and demos.
+ */
 @Component
 @ConditionalOnProperty(name = "app.store", havingValue = "stub")
 public class StubCourseDetailsStore implements CourseDetailsStore {
@@ -22,6 +26,9 @@ public class StubCourseDetailsStore implements CourseDetailsStore {
     this.courseStore = courseStore;
   }
 
+  /**
+   * Builds a stable course-details response from stub catalog data.
+   */
   @Override
   public CourseDetailsDto getDetails(String courseCode, String season, int year) {
     CourseEntity c = courseStore.listCourses().stream()
@@ -44,6 +51,7 @@ public class StubCourseDetailsStore implements CourseDetailsStore {
 //         new MeetingDto("WED", "10:30", "11:30", "LAS 1004")
 //       );
 
+// StubTimeRules keeps generated schedules deterministic across requests.
 var slot = StubTimeRules.slotFor(c.getCourseCode(), season);
 
 var sections = List.of(

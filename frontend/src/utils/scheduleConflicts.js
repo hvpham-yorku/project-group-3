@@ -1,3 +1,9 @@
+/**
+ * Schedule normalization and conflict-detection helpers.
+ *
+ * This module converts backend schedule payloads into a frontend-friendly event
+ * model that can be rendered in the grid and analyzed for overlapping times.
+ */
 const DAY_DEFS = [
   { short: "Mon", label: "Monday", pluralLabel: "Mondays", key: "MON" },
   { short: "Tue", label: "Tuesday", pluralLabel: "Tuesdays", key: "TUE" },
@@ -8,6 +14,9 @@ const DAY_DEFS = [
 
 const DAY_LOOKUP = Object.fromEntries(DAY_DEFS.map((day) => [day.key, day]));
 
+/**
+ * Converts a time string such as {@code 09:30} into minutes from midnight.
+ */
 export function toMinutes(value) {
   if (!value) return null;
   const parts = String(value).split(":");
@@ -16,6 +25,10 @@ export function toMinutes(value) {
   return hh * 60 + mm;
 }
 
+/**
+ * Parses the day format returned by the schedule UI/backend into canonical day
+ * keys used by the scheduler utilities.
+ */
 export function parseScheduleDays(value) {
   if (!value) return [];
   const raw = String(value).trim();
@@ -47,26 +60,41 @@ export function parseScheduleDays(value) {
   return compact;
 }
 
+/**
+ * Returns the ordered weekday definitions used by the schedule UI.
+ */
 export function getScheduleDays() {
   return DAY_DEFS;
 }
 
+/**
+ * Formats a minute offset as an {@code H:MM} time string.
+ */
 export function formatMinutes(mins) {
   const hh = Math.floor(mins / 60);
   const mm = mins % 60;
   return `${hh}:${String(mm).padStart(2, "0")}`;
 }
 
+/**
+ * Formats a start/end minute pair into a human-readable time range.
+ */
 export function formatRange(start, end) {
   return `${formatMinutes(start)} - ${formatMinutes(end)}`;
 }
 
+/**
+ * Returns the display label for a schedule day key.
+ */
 export function formatDayLabel(dayKey, plural = false) {
   const day = DAY_LOOKUP[dayKey];
   if (!day) return dayKey;
   return plural ? day.pluralLabel : day.label;
 }
 
+/**
+ * Builds a stable identifier for a rendered schedule occurrence.
+ */
 export function buildOccurrenceId(section, dayKey) {
   return [
     section.courseCode,
@@ -78,6 +106,10 @@ export function buildOccurrenceId(section, dayKey) {
   ].join("|");
 }
 
+/**
+ * Expands the backend's chosen section rows into per-day occurrences so the
+ * schedule grid and conflict logic can operate on individual time blocks.
+ */
 export function expandChosenSections(chosenSections = [], visibleRange) {
   const rangeStart = visibleRange?.start ?? Number.NEGATIVE_INFINITY;
   const rangeEnd = visibleRange?.end ?? Number.POSITIVE_INFINITY;
@@ -109,6 +141,10 @@ export function expandChosenSections(chosenSections = [], visibleRange) {
   return occurrences;
 }
 
+/**
+ * Detects overlapping schedule segments and returns both segment details and
+ * the set of event IDs involved in conflicts.
+ */
 export function detectScheduleConflicts(chosenSections = [], visibleRange) {
   const occurrences = expandChosenSections(chosenSections, visibleRange);
   const byDay = new Map();
@@ -124,6 +160,7 @@ export function detectScheduleConflicts(chosenSections = [], visibleRange) {
     const dayOccurrences = byDay.get(day.key) ?? [];
     if (dayOccurrences.length < 2) continue;
 
+    // Breakpoints allow conflict segments to be split exactly where event boundaries change.
     const breakpoints = [...new Set(dayOccurrences.flatMap((item) => [item.start, item.end]))]
       .sort((a, b) => a - b);
 

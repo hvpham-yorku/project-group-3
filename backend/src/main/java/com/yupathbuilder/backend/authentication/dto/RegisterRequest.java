@@ -5,6 +5,16 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+/**
+ * Request payload for new account registration.
+ *
+ * @param firstName user first name captured during onboarding
+ * @param lastName user last name captured during onboarding
+ * @param email user email address used as the unique login identifier
+ * @param programId selected academic program linked to the account
+ * @param password raw password to hash before persistence
+ * @param confirmPassword confirmation copy used to prevent accidental mismatch
+ */
 public record RegisterRequest(
         @NotBlank @Size(min = 1, max = 60) String firstName,
         @NotBlank @Size(min = 1, max = 60) String lastName,

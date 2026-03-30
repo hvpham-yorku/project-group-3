@@ -3,6 +3,13 @@ package com.yupathbuilder.backend.authentication.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * JPA representation of an authenticated user account stored in the
+ * {@code users} table.
+ *
+ * <p>This entity stores authentication credentials together with the minimal
+ * profile data required by the application.</p>
+ */
 @Entity
 @Table(name = "users")
 public class UserEntity {
@@ -27,6 +34,7 @@ public class UserEntity {
     private Long programId;
 
     @Lob
+    // Stored as a data URL string so the frontend can render it directly.
     @Column(name = "profile_image_data")
     private String profileImageData;
 

@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Exposes the dedicated course search endpoint used by the frontend search UI.
+ */
 @RestController
 @RequestMapping("/api/search")
 public class SearchController {
@@ -16,6 +19,12 @@ public class SearchController {
     this.courseCatalogService = courseCatalogService;
   }
 
+  /**
+   * Performs a free-text search against the course catalog.
+   *
+   * <p>Season and year are currently accepted for API compatibility, although
+   * this endpoint only delegates query-based searching.</p>
+   */
   @GetMapping("/courses")
   public List<CourseDto> search(
       @RequestParam(name = "q", defaultValue = "") String q,
