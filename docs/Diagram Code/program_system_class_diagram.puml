@@ -1,0 +1,150 @@
+@startuml Program System Feature Class Diagram
+
+package "Controllers" {
+    class ProgramController {
+        - programCatalogService: ProgramCatalogService
+        + faculties(): List<FacultyEntity>
+        + programs(facultyId: Long): List<ProgramEntity>
+    }
+
+    class ChecklistController {
+        - userChecklistService: UserChecklistService
+        + myChecklist(auth: Authentication): ResponseEntity<?>
+    }
+}
+
+package "Services" {
+    class ProgramCatalogService {
+        - catalogStore: CatalogStore
+        + listFaculties(): List<FacultyEntity>
+        + listPrograms(facultyId: Long): List<ProgramEntity>
+    }
+
+    class ChecklistService {
+        - repo: ProgramRequirementRepo
+        + byProgramId(programId: Long): ChecklistResponseDto
+    }
+
+    class UserChecklistService {
+        - userRepo: UserRepo
+        - catalogStore: CatalogStore
+        + getChecklistFor(auth: Authentication): ResponseEntity<?>
+    }
+}
+
+package "Stores" {
+    interface CatalogStore {
+        + listFaculties(): List<FacultyEntity>
+        + listPrograms(facultyId: Long): List<ProgramEntity>
+        + checklistByProgramId(programId: Long): ChecklistResponseDto
+    }
+
+    class SqlCatalogStore {
+        - facultyRepo: FacultyRepo
+        - programRepo: ProgramRepo
+        - checklistService: ChecklistService
+        + listFaculties(): List<FacultyEntity>
+        + listPrograms(facultyId: Long): List<ProgramEntity>
+        + checklistByProgramId(programId: Long): ChecklistResponseDto
+    }
+}
+
+package "Data Access" {
+    class FacultyEntity {
+        - id: Long
+        - name: String
+        + getters and setters
+    }
+
+    class ProgramEntity {
+        - id: Long
+        - faculty: FacultyEntity
+        - name: String
+        - degree: String
+        + getters and setters
+    }
+
+    class ProgramRequirementEntity {
+        - id: Long
+        - program: ProgramEntity
+        - yearLevel: Byte
+        - course: CourseEntity
+        - reqType: ReqType
+        - groupName: String
+        - displayOrder: int
+        + getters
+    }
+
+    enum ReqType {
+        REQUIRED
+        ELECTIVE
+    }
+
+    interface FacultyRepo {
+        + findAll(): List<FacultyEntity>
+    }
+
+    interface ProgramRepo {
+        + findAll(): List<ProgramEntity>
+        + findByFaculty_IdOrderByNameAsc(facultyId: Long): List<ProgramEntity>
+        + findWithFacultyById(id: Long): Optional<ProgramEntity>
+    }
+
+    interface ProgramRequirementRepo {
+        + findChecklist(programId: Long): List<ProgramRequirementEntity>
+    }
+}
+
+package "DTOs" {
+    record ChecklistResponseDto {
+        + programId: Long
+        + years: List<YearDto>
+    }
+
+    record YearDto {
+        + year: int
+        + groups: List<GroupDto>
+    }
+
+    record GroupDto {
+        + groupName: String
+        + reqType: String
+        + courses: List<CourseDto>
+    }
+
+    record CourseDto {
+        + id: Long
+        + courseCode: String
+        + title: String
+    }
+}
+
+' Relationships
+ProgramController --> ProgramCatalogService : uses
+ChecklistController --> UserChecklistService : uses
+
+ProgramCatalogService --> CatalogStore : uses
+UserChecklistService --> CatalogStore : uses
+UserChecklistService --> "UserRepo" : uses
+
+SqlCatalogStore ..|> CatalogStore : implements
+SqlCatalogStore --> FacultyRepo : uses
+SqlCatalogStore --> ProgramRepo : uses
+SqlCatalogStore --> ChecklistService : uses
+
+ChecklistService --> ProgramRequirementRepo : uses
+
+FacultyRepo --> FacultyEntity : manages
+ProgramRepo --> ProgramEntity : manages
+ProgramRequirementRepo --> ProgramRequirementEntity : manages
+
+ProgramEntity --> FacultyEntity : faculty *
+ProgramRequirementEntity --> ProgramEntity : program *
+ProgramRequirementEntity --> "CourseEntity" : course *
+
+ChecklistService --> ChecklistResponseDto : returns
+ChecklistResponseDto --> YearDto : contains
+YearDto --> GroupDto : contains
+GroupDto --> CourseDto : contains
+
+@enduml

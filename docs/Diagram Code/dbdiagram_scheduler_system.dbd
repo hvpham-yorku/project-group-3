@@ -1,0 +1,140 @@
+// dbdiagram.io schema for YU Path Builder scheduler database
+
+Table users {
+  id bigint [pk, increment]
+  email varchar(255) [unique, not null]
+  password_hash varchar(255) [not null]
+  program_id bigint
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+}
+
+Table roles {
+  id bigint [pk, increment]
+  name varchar(50) [unique, not null]
+}
+
+Table user_roles {
+  user_id bigint [not null]
+  role_id bigint [not null]
+  bigint pk(user_id, role_id)
+}
+
+Table faculties {
+  id bigint [pk, increment]
+  name varchar(120) [unique, not null]
+}
+
+Table programs {
+  id bigint [pk, increment]
+  faculty_id bigint
+  name varchar(160) [not null]
+  degree varchar(60)
+}
+
+Table courses {
+  id bigint [pk, increment]
+  course_code varchar(30) [unique, not null]
+  subject varchar(10)
+  catalog_number varchar(10)
+  title varchar(255) [not null]
+  description text
+}
+
+Table terms {
+  id bigint [pk, increment]
+  season enum('FALL','WINTER','SUMMER') [not null]
+  year int [not null]
+  indexes {
+    (season, year) [unique]
+  }
+}
+
+Table sections {
+  id bigint [pk, increment]
+  course_id bigint [not null]
+  term_id bigint [not null]
+  section_code varchar(20) [not null]
+  component enum('LEC','LAB','TUT','SEM') [not null, default: 'LEC']
+  instructor varchar(255)
+  capacity int
+  enrolled int
+}
+
+Table section_meetings {
+  id bigint [pk, increment]
+  section_id bigint [not null]
+  day_of_week enum('MON','TUE','WED','THU','FRI','SAT','SUN') [not null]
+  start_time time [not null]
+  end_time time [not null]
+  location varchar(120)
+}
+
+Table program_requirements {
+  id bigint [pk, increment]
+  program_id bigint [not null]
+  year_level tinyint [not null]
+  course_id bigint [not null]
+  req_type enum('REQUIRED','ELECTIVE') [not null, default: 'REQUIRED']
+  group_name varchar(120)
+  display_order int [not null, default: 0]
+  indexes {
+    (program_id, year_level, course_id) [unique]
+    (program_id, year_level)
+  }
+}
+
+Table user_course_progress {
+  user_id bigint [not null]
+  course_id bigint [not null]
+  status enum('NOT_STARTED','IN_PROGRESS','COMPLETED') [not null, default: 'NOT_STARTED']
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  bigint pk(user_id, course_id)
+}
+
+Table user_schedules {
+  id bigint [pk, increment]
+  user_id bigint [not null]
+  term_id bigint [not null]
+  name varchar(100)
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+}
+
+Table user_schedule_sections {
+  schedule_id bigint [not null]
+  section_id bigint [not null]
+  bigint pk(schedule_id, section_id)
+}
+
+Table user_selected_courses {
+  id bigint [pk, increment]
+  user_id bigint [not null]
+  term_id bigint [not null]
+  course_id bigint [not null]
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  indexes {
+    (user_id, term_id)
+    (user_id, course_id) [unique]
+    (user_id, term_id, course_id) [unique]
+  }
+}
+
+// relationships
+Ref: user_roles.user_id > users.id
+Ref: user_roles.role_id > roles.id
+Ref: programs.faculty_id > faculties.id
+Ref: users.program_id > programs.id
+Ref: sections.course_id > courses.id
+Ref: sections.term_id > terms.id
+Ref: section_meetings.section_id > sections.id
+Ref: program_requirements.program_id > programs.id
+Ref: program_requirements.course_id > courses.id
+Ref: user_course_progress.user_id > users.id
+Ref: user_course_progress.course_id > courses.id
+Ref: user_schedules.user_id > users.id
+Ref: user_schedules.term_id > terms.id
+Ref: user_schedule_sections.schedule_id > user_schedules.id
+Ref: user_schedule_sections.section_id > sections.id
+Ref: user_selected_courses.user_id > users.id
+Ref: user_selected_courses.term_id > terms.id
+Ref: user_selected_courses.course_id > courses.id

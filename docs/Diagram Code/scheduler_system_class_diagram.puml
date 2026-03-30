@@ -1,0 +1,201 @@
+@startuml Scheduler System Feature Class Diagram
+
+package "Controllers" {
+    class TermsController {
+        - termService: TermService
+        + listTerms(): List<TermDto>
+    }
+
+    class ScheduleControllerDb {
+        - scheduleBuildService: ScheduleBuildService
+        + build(req: ScheduleBuildRequest): ScheduleBuildResponse
+    }
+
+    class SavedCourseSelectionController {
+        - savedCourseSelectionService: SavedCourseSelectionService
+        + list(auth: Authentication): List<SavedCourseSelectionDto>
+        + save(auth: Authentication, req: SaveCourseSelectionRequest): ResponseEntity<SavedCourseSelectionDto>
+        + remove(auth: Authentication, term: String, courseCode: String): ResponseEntity<Void>
+    }
+}
+
+package "Services" {
+    class TermService {
+        - termStore: TermStore
+        + listTerms(): List<TermDto>
+    }
+
+    class ScheduleService {
+        - termRepo: TermRepo
+        - sectionRepo: SectionRepo
+        + build(termString: String, courseCodes: List<String>): ScheduleBuildResponse
+    }
+
+    class ScheduleBuildService {
+        - scheduleStore: ScheduleStore
+        + build(term: String, courseCodes: List<String>): ScheduleBuildResponse
+    }
+
+    class SavedCourseSelectionService {
+        - userRepo: UserRepo
+        - termRepo: TermRepo
+        - courseRepo: CourseRepo
+        - userSelectedCourseRepo: UserSelectedCourseRepo
+        + listSelections(email: String): List<SavedCourseSelectionDto>
+        + saveSelection(email: String, termString: String, courseCode: String): SavedCourseSelectionDto
+        + removeSelection(email: String, termString: String, courseCode: String): void
+    }
+}
+
+package "Stores" {
+    interface TermStore {
+        + listTerms(): List<TermDto>
+    }
+
+    interface ScheduleStore {
+        + build(termString: String, courseCodes: List<String>): ScheduleBuildResponse
+    }
+
+    class SqlTermStore {
+        - termRepo: TermRepo
+        + listTerms(): List<TermDto>
+    }
+
+    class SqlScheduleStore {
+        - scheduleService: ScheduleService
+        + build(termString: String, courseCodes: List<String>): ScheduleBuildResponse
+    }
+}
+
+package "Data Access" {
+    class TermEntity {
+        - id: Long
+        - season: Season
+        - year: int
+        + getters and setters
+    }
+
+    class SectionEntity {
+        - id: Long
+        - course: CourseEntity
+        - term: TermEntity
+        - sectionCode: String
+        - meetings: List<SectionMeetingEntity>
+        + getters
+    }
+
+    class SectionMeetingEntity {
+        - id: Long
+        - section: SectionEntity
+        - dayOfWeek: String
+        - startTime: LocalTime
+        - endTime: LocalTime
+        - location: String
+        + getters
+    }
+
+    class UserSelectedCourseEntity {
+        - id: Long
+        - user: UserEntity
+        - term: TermEntity
+        - course: CourseEntity
+        - createdAt: LocalDateTime
+        + getters and setters
+    }
+
+    enum Season {
+        FALL
+        WINTER
+        SUMMER
+        + parse(s: String): Season
+    }
+
+    interface TermRepo {
+        + findAll(): List<TermEntity>
+        + findBySeasonAndYear(season: Season, year: int): TermEntity
+    }
+
+    interface SectionRepo {
+        + findAll(): List<SectionEntity>
+        + findSectionsWithMeetings(courseCode: String, season: Season, year: int): List<SectionEntity>
+    }
+
+    interface UserSelectedCourseRepo {
+        + findByUserIdOrderByTermYearAscTermSeasonAscCourseCourseCodeAsc(userId: Long): List<UserSelectedCourseEntity>
+        + findByUserIdAndCourseCourseCode(userId: Long, courseCode: String): Optional<UserSelectedCourseEntity>
+        + deleteByUserIdAndTermIdAndCourseId(userId: Long, termId: Long, courseId: Long): void
+    }
+}
+
+package "DTOs" {
+    record TermDto {
+        + id: Long
+        + season: String
+        + year: int
+    }
+
+    record ScheduleBuildRequest {
+        + term: String
+        + courseCodes: String[]
+    }
+
+    record ScheduleBuildResponse {
+        + term: String
+        + chosenSections: List<ChosenSectionDto>
+    }
+
+    record ChosenSectionDto {
+        + courseCode: String
+        + sectionId: String
+        + days: String
+        + startTime: String
+        + endTime: String
+        + location: String
+    }
+
+    record SavedCourseSelectionDto {
+        + term: String
+        + courseCode: String
+    }
+
+    record SaveCourseSelectionRequest {
+        + term: String
+        + courseCode: String
+    }
+}
+
+' Relationships
+TermsController --> TermService : uses
+ScheduleControllerDb --> ScheduleBuildService : uses
+SavedCourseSelectionController --> SavedCourseSelectionService : uses
+
+TermService --> TermStore : uses
+ScheduleBuildService --> ScheduleStore : uses
+SavedCourseSelectionService --> "UserRepo" : uses
+SavedCourseSelectionService --> TermRepo : uses
+SavedCourseSelectionService --> "CourseRepo" : uses
+SavedCourseSelectionService --> UserSelectedCourseRepo : uses
+
+SqlTermStore ..|> TermStore : implements
+SqlScheduleStore ..|> ScheduleStore : implements
+
+SqlTermStore --> TermRepo : uses
+SqlScheduleStore --> ScheduleService : uses
+ScheduleService --> TermRepo : uses
+ScheduleService --> SectionRepo : uses
+
+TermRepo --> TermEntity : manages
+SectionRepo --> SectionEntity : manages
+UserSelectedCourseRepo --> UserSelectedCourseEntity : manages
+
+SectionEntity --> "CourseEntity" : course *
+SectionEntity --> TermEntity : term *
+SectionMeetingEntity --> SectionEntity : section *
+UserSelectedCourseEntity --> "UserEntity" : user *
+UserSelectedCourseEntity --> TermEntity : term *
+UserSelectedCourseEntity --> "CourseEntity" : course *
+
+ScheduleBuildService --> ScheduleBuildResponse : returns
+ScheduleBuildResponse --> ChosenSectionDto : contains
+
+@enduml

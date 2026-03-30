@@ -1,0 +1,155 @@
+@startuml Authentication Feature Class Diagram
+
+package "Authentication" {
+    class AuthController {
+        - authService: AuthService
+        - userProfileService: UserProfileService
+        + register(req: RegisterRequest): ResponseEntity<AuthResponse>
+        + login(req: LoginRequest): ResponseEntity<AuthResponse>
+        + me(): String
+        + profile(auth: Authentication): ResponseEntity<UserProfileResponse>
+        + updateProfile(auth: Authentication, req: UpdateProfileRequest): ResponseEntity<UserProfileResponse>
+        + changePassword(auth: Authentication, req: ChangePasswordRequest): ResponseEntity<Void>
+    }
+
+    class AuthService {
+        - repo: UserRepo
+        - encoder: PasswordEncoder
+        - jwt: JwtUtil
+        + register(req: RegisterRequest): AuthResponse
+        + login(req: LoginRequest): AuthResponse
+    }
+
+    class UserProfileService {
+        - userRepo: UserRepo
+        - programRepo: ProgramRepo
+        - passwordEncoder: PasswordEncoder
+        + getProfile(email: String): UserProfileResponse
+        + updateProfile(email: String, req: UpdateProfileRequest): UserProfileResponse
+        + changePassword(email: String, req: ChangePasswordRequest): void
+    }
+
+    class UserEntity {
+        - id: Long
+        - email: String
+        - firstName: String
+        - lastName: String
+        - passwordHash: String
+        - programId: Long
+        - profileImageData: String
+        - createdAt: LocalDateTime
+        + getters and setters
+    }
+
+    interface UserRepo {
+        + findByEmail(email: String): Optional<UserEntity>
+        + existsByEmail(email: String): boolean
+    }
+
+    class JwtUtil {
+        - key: Key
+        - expirationMinutes: long
+        + generateToken(username: String, role: String): String
+        + parse(token: String): Claims
+    }
+
+    class JwtAuthFilter {
+        - jwt: JwtUtil
+        + doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain): void
+    }
+
+    class UserMapper {
+        {static} + toModel(entity: UserEntity): User
+        {static} + toEntity(model: User): UserEntity
+    }
+
+    class User {
+        - id: Long
+        - email: String
+        - passwordHash: String
+        - programId: Long
+    }
+
+    enum UserRole {
+        STUDENT
+        ADMIN
+    }
+
+    class AuthControllerAdvice {
+        + handleInvalidCredentials(ex: InvalidCredentialsException): ResponseEntity<ErrorResponse>
+        + handleIllegalArgument(ex: IllegalArgumentException): ResponseEntity<ErrorResponse>
+    }
+
+    record ErrorResponse {
+        + message: String
+    }
+}
+
+package "DTOs" {
+    record AuthResponse {
+        + token: String
+        + email: String
+    }
+
+    record RegisterRequest {
+        + email: String
+        + firstName: String
+        + lastName: String
+        + password: String
+        + confirmPassword: String
+        + programId: Long
+    }
+
+    record LoginRequest {
+        + email: String
+        + password: String
+    }
+
+    record UserProfileResponse {
+        + id: Long
+        + email: String
+        + firstName: String
+        + lastName: String
+        + programId: Long
+        + facultyId: Long
+        + programName: String
+        + programDegree: String
+        + profileImageData: String
+    }
+
+    record UpdateProfileRequest {
+        + firstName: String
+        + lastName: String
+        + programId: Long
+        + profileImageData: String
+        + removeProfileImage: boolean
+    }
+
+    record ChangePasswordRequest {
+        + currentPassword: String
+        + newPassword: String
+        + confirmPassword: String
+    }
+}
+
+' Relationships
+AuthController --> AuthService : uses
+AuthController --> UserProfileService : uses
+AuthService --> UserRepo : uses
+AuthService --> JwtUtil : uses
+UserProfileService --> UserRepo : uses
+UserProfileService --> "ProgramRepo" : uses
+JwtAuthFilter --> JwtUtil : uses
+UserMapper --> UserEntity : maps
+UserMapper --> User : maps
+AuthControllerAdvice --> AuthController : advises
+
+UserRepo --> UserEntity : manages
+UserEntity --> "ProgramEntity" : references (programId)
+
+' External dependencies
+AuthService --> "PasswordEncoder" : uses
+UserProfileService --> "PasswordEncoder" : uses
+JwtAuthFilter --> "SecurityContextHolder" : sets authentication
+
+@enduml
