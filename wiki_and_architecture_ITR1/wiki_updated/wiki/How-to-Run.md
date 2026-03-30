@@ -110,9 +110,9 @@ cd backend
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=stub
 ```
 
-Current limitation:
+Repository note:
 
-- `backend/src/main/resources/application-stub.properties` still contains unresolved merge markers, so stub mode should be treated as a known issue in the committed final release state
+- `backend/src/main/resources/application-stub.properties` still contains unresolved merge markers, so stub mode should be reviewed before using it for local runs
 
 ## Backend Test Commands
 

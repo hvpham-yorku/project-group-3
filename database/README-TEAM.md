@@ -68,7 +68,7 @@ cd backend
 .\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=stub
 ```
 
-However, the current repository state still contains unresolved merge markers in `backend/src/main/resources/application-stub.properties`. That issue has been documented and not silently corrected in this release documentation pass.
+However, `backend/src/main/resources/application-stub.properties` still contains unresolved merge markers, so stub mode should be reviewed before using it in teammate setup.
 
 ## Testing
 

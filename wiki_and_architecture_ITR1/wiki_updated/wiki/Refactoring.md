@@ -132,12 +132,11 @@ The end result of the Iteration 3 refactoring is not just cleaner packaging. It 
 - test seam clarity
 - alignment between documentation and code structure
 
-## Remaining Issues
+## Repository-State Notes
 
-The refactoring improved structure, but it did not eliminate every release issue:
+The refactoring improved structure, but a few practical repository details still matter when evaluating the final state:
 
-- the repository still contains configuration inconsistencies around SQL Docker setup
-- stub-mode configuration still contains unresolved merge markers
+- stub-mode configuration still contains unresolved merge markers that require follow-up cleanup
 - the frontend still hard-codes terms instead of using the backend term endpoint
 
-Those are release issues, not reasons to hide the refactoring outcome.
+Those points do not change the value of the refactoring outcome, but they do affect how the final repository should be interpreted.

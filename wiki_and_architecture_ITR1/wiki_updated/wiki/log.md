@@ -273,23 +273,58 @@ The earlier iteration entries below preserve the documented estimates and actual
 | 2026-03-05 | Jostin Martinez Castillo | Database folder and TA/team setup docs | 2.0 | 2.0 | Docker and local-setup docs |
 | 2026-03-05 | Jostin Martinez Castillo | Wiki updates for ITR2 | 2.0 | 2.0 | SQL vs stub documentation |
 
-## Iteration 3 Task Traceability
+The traceability tables below complement the work log by tying the delivered milestones to repository-visible commits and tags. Because they are Git-grounded rather than meeting-grounded, they should be read as release traceability rather than as a complete list of every small contribution.
 
-The table below records ITR3 work that can be confirmed from repository evidence. Since no hour-based ITR3 task sheet was found, the effort columns use qualitative sizing grounded in repository scope.
+## Iteration 1 Task Traceability
+
+The table below records ITR1 work that can be confirmed directly from repository tags and commits.
 
 | Date | Evidence | Primary contributor visible in Git history | Planned task allocation | Est. (h) | Actual (h) |
 |---|---|---|---|---:|---:|
-| 2026-03-22 | Add profile management and polished account navigation | Jostin | Best interpreted as a self-contained ITR3 feature addition focused on the authenticated user account workflow | Medium | Medium |
-| 2026-03-25 | Persist saved course selections by term | Wamiq Lakha | Best interpreted as work advancing the carried-forward save-planning theme from the earlier plan | Medium | Medium |
-| 2026-03-25 | Seed sections for all courses in Summer 2027 and improve schedule errors | Wamiq Lakha | Best interpreted as schedule-scope expansion rather than a new product area | Medium | Medium |
-| 2026-03-29 | Feature-based backend refactor merge | ReubenJ | Best interpreted as a maintainability-focused engineering refactor across multiple backend domains | High | High |
-| 2026-03-29 | ITR3 release documentation update | Jostin | Best interpreted as release hardening across README, wiki, planning, architecture, and log artifacts | Medium | Medium |
+| 2026-02-08 | `v0.0.1` / `Initial project structure and docs` | ReubenJ | Best interpreted as repository bootstrap and documentation baseline for the first working increment | Medium | Medium |
+| 2026-02-08 | `jostin-v0.0.1` / `Add course API + in-memory repo + update frontend UI` | Jostin | Best interpreted as early backend/frontend integration for course browsing and the initial user-facing workflow | Medium | Medium |
+| 2026-02-13 | `Organized files in frontend` and `Added Architecture Sketch` | ReubenJ | Best interpreted as UI structure cleanup and release-documentation support for the ITR1 package | Medium | Medium |
+| 2026-02-13 | `v0.0.2` / `ITR1: backend auth/scheduling, frontend UI updates, and wiki docs` | Jostin | Best interpreted as the consolidated ITR1 feature release covering authentication, schedule building, UI integration, and wiki delivery | High | High |
+| 2026-02-27 | `v0.0.2-hotfix1` / `HOTFIX: Fix schedule build payload and schedule CSS` | Jostin | Best interpreted as post-release stabilization for the schedule-building flow and frontend presentation | Low | Low |
+| 2026-03-01 | `Add conflict detection: show detailed time clashes when schedule build fails` | Taha Usama | Best interpreted as late ITR1 schedule-feedback hardening before the database-focused ITR2 work began | Medium | Medium |
+
+## Iteration 2 Task Traceability
+
+The table below records ITR2 work that can be confirmed directly from repository tags and commits.
+
+| Date | Evidence | Primary contributor visible in Git history | Planned task allocation | Est. (h) | Actual (h) |
+|---|---|---|---|---:|---:|
+| 2026-03-05 | `Integrate MySQL + Flyway migrations; add course details/sections UI with term filter` | Jostin | Best interpreted as the core ITR2 database integration plus term-aware course-details flow | High | High |
+| 2026-03-05 | `Add program/checklist backend endpoints + frontend integration` | Jostin | Best interpreted as delivery of the checklist and program-selection slice carried forward from the earlier planning narrative | Medium | Medium |
+| 2026-03-06 | `v0.1.3` / `ITR2: DB + stub alignment, seed v3 data, fixes` | Jostin | Best interpreted as the main SQL/stub parity milestone, including store seams, stub data, and ITR2 documentation updates | High | High |
+| 2026-03-06 | `ITR2-v0.1.4` / `fix stub mode by isolating SQL components and adding term store support` | Jostin | Best interpreted as stub-mode hardening and completion of term access across both runtime modes | Medium | Medium |
+| 2026-03-06 | `Add comprehensive unit and integration tests and support stub/real database switching` | Wamiq Lakha | Best interpreted as the primary ITR2 testing and seam-validation pass for SQL/stub switching | High | High |
+| 2026-03-06 | `added the needed documents for itr 2` | Fejuku Oyinkansola Barbara (`oyinkan` / `bubblebookmark`) | Best interpreted as the ITR2 documentation package, including planning and peer-review artifacts committed under Barbara's Git identities | Medium | Medium |
+| 2026-03-07 | `ITR2-v0.1.5` / `Add unit tests and finalize ITR2 merge` | Jostin | Best interpreted as release hardening and final merge cleanup for the ITR2 delivery branch | Medium | Medium |
+| 2026-03-13 | `ITR_2-v0.1.6` / authentication package reorganization and test alignment | ReubenJ | Best interpreted as late ITR2 engineering cleanup around authentication structure and database-backed auth integration | Medium | Medium |
+| 2026-03-13 | `ITR2-v0.1.7` / `Added Log File in docs` | ReubenJ | Best interpreted as final ITR2 release-documentation closure rather than a new product feature | Low | Low |
+
+## Iteration 3 Task Traceability
+
+The table below records ITR3 work using the nearest release tags and the repository milestones they capture.
+
+Unlike ITR1 and ITR2, the ITR3 tags were created at broader release checkpoints rather than at every individual feature commit. The evidence column therefore uses the closest release tag together with the milestone change it best represents.
+
+As with the other Git-grounded traceability tables, the effort columns remain qualitative because no hour-based ITR3 task sheet was found in the committed repository artifacts.
+
+| Date | Evidence | Primary contributor visible in Git history | Planned task allocation | Est. (h) | Actual (h) |
+|---|---|---|---|---:|---:|
+| 2026-03-22 | `ITR3-v0.1.9` / includes `2c3798e` profile-management milestone | Jostin | Best interpreted as a self-contained ITR3 feature addition focused on the authenticated user account workflow | Medium | Medium |
+| 2026-03-25 | `ITR3-v0.1.10` / includes `c0f66b1` saved-course persistence milestone | Wamiq Lakha | Best interpreted as work advancing the carried-forward save-planning theme from the earlier plan | Medium | Medium |
+| 2026-03-25 | `ITR3-v0.1.10` / includes `36d5c9b` Summer 2027 schedule-expansion milestone | Wamiq Lakha | Best interpreted as schedule-scope expansion rather than a new product area | Medium | Medium |
+| 2026-03-29 | `ITR3-v0.1.10` / includes `594b983` feature-based backend refactor state | ReubenJ | Best interpreted as a maintainability-focused engineering refactor across multiple backend domains | High | High |
+| 2026-03-29 | `ITR3-v0.1.11` / `docs: finalize ITR3 release docs and docker setup` | Jostin | Best interpreted as release hardening across README, wiki, planning, architecture, and log artifacts | Medium | Medium |
 
 ---
 
-## Concerns And Open Issues
+## Current Repository Context
 
-The following concerns are grounded in the current repository:
+The following implementation details are grounded in the current repository and remain relevant release context:
 
 - unresolved merge markers in `application-stub.properties`
 - static frontend term selector despite the presence of `/api/terms`

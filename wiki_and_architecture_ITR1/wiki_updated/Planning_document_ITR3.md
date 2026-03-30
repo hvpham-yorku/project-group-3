@@ -120,9 +120,9 @@ The following tasks can be tied to specific repository evidence. Since no hour-b
 | 2026-03-29 | `refactored backend... packaged by feature` and merge `RJ_RE-Organize` | ReubenJ | engineering refactor supporting maintainability | High - broad design-level change across backend packages | High - the final codebase shows large-scale structural movement rather than a localized edit |
 | 2026-03-29 | `docs: document backend and frontend modules for ITR3` | Jostin | release documentation hardening | Medium - release hardening task spanning multiple docs | Medium - README, wiki, planning, architecture, and log updates indicate a moderate documentation pass |
 
-## 6. Confirmed Unresolved Items At Final Release
+## 6. Final Release Scope Notes
 
-The final release still contains visible issues that should be treated as open:
+The final release still includes a few repository-state details that are useful when comparing the delivered scope with the earlier plan:
 
 1. Stub profile configuration conflict markers
    `application-stub.properties` still contains unresolved merge markers.

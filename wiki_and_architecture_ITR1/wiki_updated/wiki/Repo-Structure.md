@@ -89,4 +89,4 @@ Release documentation is concentrated in:
 
 - The repository still contains documentation and artifacts from earlier iterations.
 - The final release intentionally preserves that history instead of flattening everything into a single new narrative.
-- Some infrastructure docs now document known issues rather than claiming a perfectly clean setup.
+- Some infrastructure docs still include practical repository-state notes so setup and traceability remain accurate.

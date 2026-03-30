@@ -146,22 +146,6 @@ Summary:
 
 The integration tests are SQL-backed and exercise the store seams against a real MySQL database.
 
-## Known Issues In The Final Repository State
-
-The final release documentation preserves several unresolved issues because they are visible in the repository and should not be hidden:
-
-1. SQL Docker setup is not fully aligned out of the box.
-   `database/docker-compose.yml` currently exposes MySQL on host port `3307`, while `backend/src/main/resources/application.properties` points to `localhost:3306`.
-
-2. Stub mode is not fully release-ready in the committed state.
-   `backend/src/main/resources/application-stub.properties` still contains unresolved merge markers.
-
-3. The frontend term picker is still static.
-   The backend exposes `/api/terms`, but the current dashboard term selector is hard-coded to `FALL 2026`, `WINTER 2027`, and `SUMMER 2027`.
-
-4. Checklist completion is not persisted.
-   The checklist checkboxes are currently local UI state only.
-
 ## Traceability To Earlier Iterations
 
 This repository does not erase the earlier iteration story. The final release still traces back to the initial goals:

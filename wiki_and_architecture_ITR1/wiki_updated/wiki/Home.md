@@ -1,6 +1,6 @@
 # YU Path Builder Wiki - Final Iteration 3 Release
 
-This wiki documents the final Iteration 3 state of YU Path Builder. It preserves the progression from earlier iterations while updating the project description, architecture notes, API references, planning traceability, and known issues to match the repository as of March 29, 2026.
+This wiki documents the final Iteration 3 state of YU Path Builder. It preserves the progression from earlier iterations while updating the project description, architecture notes, API references, planning traceability, and release documentation to match the repository as of March 29, 2026.
 
 ## Product Summary
 
@@ -48,15 +48,6 @@ The repository evidence for Iteration 3 shows four especially important changes:
 - The backend is no longer best described as a flat `controller/service/repo/store` layout; it is now a feature-based structure.
 - The frontend now includes a profile page and a more complete authenticated navigation flow.
 - Selected courses are now treated as persisted user data instead of only transient UI state.
-
-## Known Unresolved Issues
-
-The final release documentation intentionally preserves important unresolved issues rather than hiding them:
-
-1. Docker SQL setup is not aligned with the committed backend datasource port.
-2. `application-stub.properties` still contains unresolved merge markers.
-3. The frontend term selector is still hard-coded instead of using `/api/terms`.
-4. Checklist checkbox state is not persisted.
 
 ## Documentation Strategy
 

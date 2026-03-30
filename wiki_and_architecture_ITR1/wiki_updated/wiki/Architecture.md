@@ -162,14 +162,13 @@ These tests live under:
 
 - `backend/src/test/java/com/yupathbuilder/backend/integration/store/`
 
-## 8. Architectural Deviations And Open Issues
+## 8. Architectural Notes
 
-The final architecture is clearer than the ITR2 version, but several issues remain visible:
+The final architecture is clearer than the ITR2 version, and a few repository-state details are still relevant when reasoning about the current system:
 
 1. Stub mode is not cleanly runnable because `application-stub.properties` still contains merge markers.
-2. The SQL Docker host port and default backend datasource port are inconsistent.
-3. The backend exposes `/api/terms`, but the frontend still hard-codes the available terms.
-4. Checklist completion state exists only in the browser and is not persisted.
+2. The backend exposes `/api/terms`, but the frontend still hard-codes the available terms.
+3. Checklist completion state exists only in the browser and is not persisted.
 
 ## 9. Related Documents
 
