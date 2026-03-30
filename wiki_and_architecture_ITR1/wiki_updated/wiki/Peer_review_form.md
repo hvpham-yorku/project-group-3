@@ -1,20 +1,20 @@
 # **Peer Evaluation Form for Group Work**
 
-Group number3
+Group number 3
 
-  Your name	Fejuku Oyinkansola Barbara
+Your name: Jostin Martinez
 
 Write the name of each of your group members in a separate column. For each person, indicate the extent to which you agree with the statement on the left, using a scale of 1-4 (1=strongly disagree; 2=disagree; 3=agree; 4=strongly agree). Total numbers in each column.
 
-| Evaluation Criteria | Member: Jostin Martinez | Member Reuben Jaicks  : | Member: Fejuku Oyinkansola Barbara | Member:Wamiq Lakha | Member: | Member: |
-| :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| Attends group meetings regularly and arrives on time. | 4 | 4 | 4 | 4 |  |  |
-| Contributes meaningfully to group discussions. | 4 | 4 | 4 | 4 |  |  |
-| Completes group assignments on time. | 4 | 4 | 4 | 4 |  |  |
-| Prepares work in a quality manner. | 4 | 3 | 3 | 3 |  |  |
-| Demonstrates a cooperative and supportive attitude. | 3 | 3 | 3 | 3 |  |  |
-| Contributes significantly to the success of the project. | 4 | 4 | 3 | 3 |  |  |
-| TOTALS | 23 | 22 | 21 | 21 |  |  |
+| Evaluation Criteria | Member: Jaicks Reuben | Member: Fejuku Oyinkansola Barbara | Member: Wamiq Lakha | Member: Taha Usama |
+| :---- | :---- | :---- | :---- | :---- |
+| Attends group meetings regularly and arrives on time. | 4 | 4 | 4 |  |
+| Contributes meaningfully to group discussions. | 4 | 4 | 4 |  |
+| Completes group assignments on time. | 4 | 4 | 4 |  |
+| Prepares work in a quality manner. | 3 | 3 | 3 |  |
+| Demonstrates a cooperative and supportive attitude. | 3 | 3 | 3 |  |
+| Contributes significantly to the success of the project. | 4 | 3 | 3 |  |
+| TOTALS | 22 | 21 | 21 |  |
 
 Feedback on team dynamics:
 
