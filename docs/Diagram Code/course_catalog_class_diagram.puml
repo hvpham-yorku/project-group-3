@@ -1,0 +1,125 @@
+@startuml Course Catalog Feature Class Diagram
+
+package "Controllers" {
+    class CourseControllerDb {
+        - courseCatalogService: CourseCatalogService
+        + listCourses(q: String, season: String, year: Integer): List<CourseDto>
+    }
+
+    class CourseDetailsController {
+        - courseDetailsService: CourseDetailsService
+        + details(courseCode: String, season: String, year: int): ResponseEntity<?>
+    }
+
+    class SearchController {
+        - courseCatalogService: CourseCatalogService
+        + search(q: String, season: String, year: Integer): List<CourseDto>
+    }
+}
+
+package "Services" {
+    class CourseCatalogService {
+        - courseStore: CourseStore
+        + listCourses(q: String): List<CourseDto>
+        + searchCourses(q: String): List<CourseDto>
+    }
+
+    class CourseDetailsService {
+        - courseDetailsStore: CourseDetailsStore
+        + getDetails(courseCode: String, season: String, year: int): CourseDetailsDto
+    }
+}
+
+package "Stores" {
+    interface CourseStore {
+        + listCourses(): List<CourseEntity>
+        + searchCourses(q: String): List<CourseEntity>
+    }
+
+    interface CourseDetailsStore {
+        + getDetails(courseCode: String, season: String, year: int): CourseDetailsDto
+    }
+
+    class SqlCourseStore {
+        - courseRepo: CourseRepo
+        + listCourses(): List<CourseEntity>
+        + searchCourses(q: String): List<CourseEntity>
+    }
+
+    class SqlCourseDetailsStore {
+        - courseRepo: CourseRepo
+        - sectionRepo: SectionRepo
+        + getDetails(courseCode: String, season: String, year: int): CourseDetailsDto
+    }
+}
+
+package "Data Access" {
+    class CourseEntity {
+        - id: Long
+        - courseCode: String
+        - title: String
+        - subject: String
+        - catalogNumber: String
+        - description: String
+        + getters and setters
+    }
+
+    interface CourseRepo {
+        + findAll(): List<CourseEntity>
+        + findByCourseCode(courseCode: String): CourseEntity
+        + searchByTerm(q: String, season: Season, year: int): List<CourseEntity>
+        + findTop20ByCourseCodeContainingIgnoreCaseOrTitleContainingIgnoreCase(code: String, title: String): List<CourseEntity>
+    }
+}
+
+package "DTOs" {
+    record CourseDto {
+        + courseCode: String
+        + title: String
+        + description: String
+    }
+
+    record CourseDetailsDto {
+        + courseCode: String
+        + title: String
+        + description: String
+        + term: String
+        + sections: List<SectionInfoDto>
+    }
+
+    record SectionInfoDto {
+        + sectionCode: String
+        + meetings: List<MeetingDto>
+    }
+
+    record MeetingDto {
+        + day: String
+        + startTime: String
+        + endTime: String
+        + location: String
+    }
+}
+
+' Relationships
+CourseControllerDb --> CourseCatalogService : uses
+CourseDetailsController --> CourseDetailsService : uses
+SearchController --> CourseCatalogService : uses
+
+CourseCatalogService --> CourseStore : uses
+CourseDetailsService --> CourseDetailsStore : uses
+
+SqlCourseStore ..|> CourseStore : implements
+SqlCourseDetailsStore ..|> CourseDetailsStore : implements
+
+SqlCourseStore --> CourseRepo : uses
+SqlCourseDetailsStore --> CourseRepo : uses
+SqlCourseDetailsStore --> "SectionRepo" : uses
+
+CourseRepo --> CourseEntity : manages
+
+CourseCatalogService --> CourseDto : returns
+CourseDetailsService --> CourseDetailsDto : returns
+CourseDetailsDto --> SectionInfoDto : contains
+SectionInfoDto --> MeetingDto : contains
+
+@enduml
