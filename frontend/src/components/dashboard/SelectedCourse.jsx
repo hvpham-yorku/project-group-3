@@ -12,6 +12,7 @@ import {
   formatDayLabel,
   formatRange,
 } from "../../utils/scheduleConflicts.js";
+import { buildSelectedCourseKeyPrefix } from "../../utils/selectedCourseKey.js";
 
 /**
  * Renders term-scoped selections and the schedule output that results from
@@ -24,13 +25,7 @@ export default function SelectedCourses({
   selectedTerm,
   msg,
 }) {
-  // The same flattened key format used in Dashboard is decoded again here for term filtering.
-  const prefix = useMemo(() => {
-    const [seasonRaw, yearRaw] = selectedTerm.trim().split(/\s+/);
-    const season = (seasonRaw || "FALL").toUpperCase();
-    const year = yearRaw || "2026";
-    return `${season}-${year}-`;
-  }, [selectedTerm]);
+  const prefix = useMemo(() => buildSelectedCourseKeyPrefix(selectedTerm), [selectedTerm]);
 
   const selectedForTerm = useMemo(
     () => selected.filter((k) => k.startsWith(prefix)),

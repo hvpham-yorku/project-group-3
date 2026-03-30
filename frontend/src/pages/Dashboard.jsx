@@ -12,6 +12,11 @@ import {
   listSelectedCourses,
   removeSelectedCourse,
 } from "../api/SelectedCoursesApi.js";
+import {
+  buildSelectedCourseKey,
+  buildSelectedCourseKeyPrefix,
+  parseSelectedCourseKey,
+} from "../utils/selectedCourseKey.js";
 
 import CourseSearch from "../components/dashboard/CourseSearch.jsx";
 import SelectedCourses from "../components/dashboard/SelectedCourse.jsx";
@@ -30,31 +35,11 @@ export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
 
   const selectedSet = useMemo(() => new Set(selected), [selected]);
 
-  // Keys combine term and course so one course can be represented distinctly per term in UI state.
-  const prefixOf = (term) => {
-    const [seasonRaw, yearRaw] = term.trim().split(/\s+/);
-    const season = (seasonRaw || "FALL").toUpperCase();
-    const year = yearRaw || "2026";
-    return `${season}-${year}-`;
-  };
-
-  const keyOf = (term, courseCode) => `${prefixOf(term)}${courseCode}`;
-
-  // Saved selections are stored as flattened keys and decoded when the term or course is needed separately.
-  const parseKey = (key) => {
-    const firstDash = key.indexOf("-");
-    const secondDash = key.indexOf("-", firstDash + 1);
-    return {
-      term: `${key.slice(0, firstDash)} ${key.slice(firstDash + 1, secondDash)}`,
-      courseCode: key.slice(secondDash + 1),
-    };
-  };
-
   // This lookup lets the search UI explain when a course is already saved under a different term.
   const savedCourseTermByCode = useMemo(() => {
     return Object.fromEntries(
       selected.map((key) => {
-        const { term, courseCode } = parseKey(key);
+        const { term, courseCode } = parseSelectedCourseKey(key);
         return [courseCode, term];
       })
     );
@@ -71,7 +56,9 @@ export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
           return;
         }
         setSelected(
-          (Array.isArray(saved) ? saved : []).map((item) => keyOf(item.term, item.courseCode))
+          (Array.isArray(saved) ? saved : []).map((item) =>
+            buildSelectedCourseKey(item.term, item.courseCode)
+          )
         );
       } catch (e) {
         if (!ignore) {
@@ -94,7 +81,7 @@ export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
     setSchedule(null);
     setScheduleMsg("");
     setSaveError("");
-    const key = keyOf(selectedTerm, courseCode);
+    const key = buildSelectedCourseKey(selectedTerm, courseCode);
     const alreadySelected = selected.includes(key);
 
     setSaving(true);
@@ -120,7 +107,7 @@ export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
     setSchedule(null);
     setScheduleMsg("");
     setSaveError("");
-    const { term, courseCode } = parseKey(key);
+    const { term, courseCode } = parseSelectedCourseKey(key);
 
     setSaving(true);
     try {
@@ -133,7 +120,7 @@ export default function Dashboard({ theme, onToggleTheme, onNavigate }) {
     }
   }
 
-  const prefix = useMemo(() => prefixOf(selectedTerm), [selectedTerm]);
+  const prefix = useMemo(() => buildSelectedCourseKeyPrefix(selectedTerm), [selectedTerm]);
 
   // Derived selection subsets keep the child components focused on the active term only.
   const selectedForTerm = useMemo(

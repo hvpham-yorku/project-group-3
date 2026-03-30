@@ -6,6 +6,10 @@
  */
 import React, { useEffect, useMemo, useState } from "react";
 import { searchCourses, getCourseDetails } from "../../api/CourseApi.js";
+import {
+  buildSelectedCourseKey,
+  parseSelectedTerm,
+} from "../../utils/selectedCourseKey.js";
 
 /**
  * Renders the search UI for browsing courses within the selected term.
@@ -28,15 +32,8 @@ export default function CourseSearch({
   const [detailsByCode, setDetailsByCode] = useState({});
   const [loadingByCode, setLoadingByCode] = useState({});
 
-  // parse season/year from selectedTerm
   // The backend details and search endpoints expect term data as separate season/year values.
-  const { season, year } = useMemo(() => {
-    const parts = selectedTerm.trim().split(/\s+/);
-    return {
-      season: (parts[0] || "FALL").toUpperCase(),
-      year: parseInt(parts[1] || "2026", 10),
-    };
-  }, [selectedTerm]);
+  const { season, year } = useMemo(() => parseSelectedTerm(selectedTerm), [selectedTerm]);
 
   // ✅ IMPORTANT FIX: when term changes, reset cached details + open states
   // so "More Info" fetches again with the new season/year.
@@ -126,7 +123,7 @@ export default function CourseSearch({
       <div className="list courseSearchList">
         {results.slice(0, 15).map((c) => {
           const code = c.courseCode;
-          const selectionKey = `${season}-${year}-${code}`;
+          const selectionKey = buildSelectedCourseKey(selectedTerm, code);
           // A course can be saved elsewhere, so the search UI explains why add is disabled.
           const savedInTerm = savedCourseTermByCode[code] || "";
           const savedElsewhere = Boolean(savedInTerm) && savedInTerm !== selectedTerm;
